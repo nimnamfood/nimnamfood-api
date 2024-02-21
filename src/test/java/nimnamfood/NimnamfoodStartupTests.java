@@ -1,10 +1,12 @@
-package com.vtertre.nimnamfood;
+package nimnamfood;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class NimnamfoodApiApplicationTests {
+@Tag("IO")
+class NimnamfoodStartupTests {
 
 	@Test
 	void contextLoads() {
