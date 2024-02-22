@@ -2,6 +2,7 @@ package vtertre.infrastructure.bus.query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vtertre.infrastructure.bus.NoHandlerFound;
 import vtertre.query.Query;
 import vtertre.query.QueryBus;
 import vtertre.query.QueryHandler;
@@ -29,7 +30,7 @@ public class QueryBusAsync implements QueryBus {
                 .findFirst()
                 .map(queryHandler -> (QueryHandler<Query<TResponse>, TResponse>) queryHandler)
                 .map(queryHandler -> this.execute(queryHandler, query))
-                .orElseGet(() -> CompletableFuture.failedFuture(new RuntimeException("Pas de handler")));
+                .orElseGet(() -> CompletableFuture.failedFuture(new NoHandlerFound(query.getClass())));
     }
 
     private <TResponse> CompletableFuture<TResponse> execute(

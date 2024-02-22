@@ -28,7 +28,7 @@ public class QueryBusAsyncTest {
                 .isThrownBy(result::get)
                 .havingCause()
                 .isInstanceOf(RuntimeException.class)
-                .withMessage("Pas de handler");
+                .withMessage("NO_HANDLER_FOUND - class vtertre.infrastructure.bus.query.QueryBusAsyncTest$FakeQuery");
     }
 
     @Test
