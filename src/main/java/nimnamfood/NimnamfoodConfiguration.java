@@ -1,6 +1,8 @@
 package nimnamfood;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import nimnamfood.infrastructure.repository.memory.MemoryRepositories;
+import nimnamfood.model.Repositories;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,5 +26,11 @@ public class NimnamfoodConfiguration {
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public QueryBus queryBus(Set<QueryHandler<?, ?>> queryHandlers, ExecutorService executorService) {
         return new QueryBusAsync(queryHandlers, executorService);
+    }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+    public Repositories repositories() {
+        return new MemoryRepositories();
     }
 }
