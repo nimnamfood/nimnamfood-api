@@ -5,7 +5,7 @@ import org.springframework.beans.factory.InitializingBean;
 public abstract class Repositories implements InitializingBean {
     private static Repositories INSTANCE;
 
-    protected abstract CriteriaRepository getCriteria();
+    protected abstract TagRepository getTags();
 
     @Override
     public void afterPropertiesSet() {
@@ -16,7 +16,7 @@ public abstract class Repositories implements InitializingBean {
         Repositories.INSTANCE = instance;
     }
 
-    public static CriteriaRepository criteria() {
-        return INSTANCE.getCriteria();
+    public static TagRepository tags() {
+        return INSTANCE.getTags();
     }
 }

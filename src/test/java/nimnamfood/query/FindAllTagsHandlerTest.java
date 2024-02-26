@@ -2,7 +2,7 @@ package nimnamfood.query;
 
 import nimnamfood.infrastructure.repository.memory.WithMemoryRepositories;
 import nimnamfood.model.Repositories;
-import nimnamfood.query.model.CriteriaSummary;
+import nimnamfood.query.model.TagSummary;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -11,24 +11,24 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith({WithMemoryRepositories.class})
-public class FindAllCriteriaHandlerTest {
+public class FindAllTagsHandlerTest {
 
     @Test
-    void returnsAnEmptyListOfCriteria() {
-        FindAllCriteriaHandler handler = new FindAllCriteriaHandler();
+    void returnsAnEmptyListOfTags() {
+        FindAllTagsHandler handler = new FindAllTagsHandler();
 
-        List<CriteriaSummary> result = handler.execute(new FindAllCriteria());
+        List<TagSummary> result = handler.execute(new FindAllTags());
 
         assertThat(result).hasSize(0);
     }
 
     @Test
-    void returnsANonEmptyListOfCriteria() {
-        FindAllCriteriaHandler handler = new FindAllCriteriaHandler();
-        Repositories.criteria().add("Rapide");
-        Repositories.criteria().add("Végé");
+    void returnsANonEmptyListOfTags() {
+        FindAllTagsHandler handler = new FindAllTagsHandler();
+        Repositories.tags().add("Rapide");
+        Repositories.tags().add("Végé");
 
-        List<CriteriaSummary> result = handler.execute(new FindAllCriteria());
+        List<TagSummary> result = handler.execute(new FindAllTags());
 
         assertThat(result).hasSize(2);
         assertThat(result.getFirst().name).isEqualTo("Rapide");
