@@ -3,6 +3,7 @@ package vtertre.infrastructure.bus.query;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.MoreExecutors;
 import org.junit.jupiter.api.Test;
+import vtertre.infrastructure.bus.NoHandlerFound;
 import vtertre.query.Query;
 import vtertre.query.QueryHandler;
 
@@ -27,7 +28,7 @@ public class QueryBusAsyncTest {
         assertThatExceptionOfType(ExecutionException.class)
                 .isThrownBy(result::get)
                 .havingCause()
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(NoHandlerFound.class)
                 .withMessage("NO_HANDLER_FOUND - class vtertre.infrastructure.bus.query.QueryBusAsyncTest$FakeQuery");
     }
 
