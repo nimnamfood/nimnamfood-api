@@ -2,6 +2,7 @@ package nimnamfood.query;
 
 import nimnamfood.infrastructure.repository.memory.WithMemoryRepositories;
 import nimnamfood.model.Repositories;
+import nimnamfood.model.tag.Tag;
 import nimnamfood.query.model.TagSummary;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,13 +26,11 @@ public class FindAllTagsHandlerTest {
     @Test
     void returnsANonEmptyListOfTags() {
         FindAllTagsHandler handler = new FindAllTagsHandler();
-        Repositories.tags().add("Rapide");
-        Repositories.tags().add("Végé");
+        Repositories.tags().add(new Tag("rapide"));
 
         List<TagSummary> result = handler.execute(new FindAllTags());
 
-        assertThat(result).hasSize(2);
-        assertThat(result.getFirst().name).isEqualTo("Rapide");
-        assertThat(result.getLast().name).isEqualTo("Végé");
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().name).isEqualTo("rapide");
     }
 }

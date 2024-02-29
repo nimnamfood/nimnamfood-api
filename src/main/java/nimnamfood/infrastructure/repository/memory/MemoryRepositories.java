@@ -1,6 +1,6 @@
 package nimnamfood.infrastructure.repository.memory;
 
-import nimnamfood.model.TagRepository;
+import nimnamfood.model.tag.TagRepository;
 import nimnamfood.model.Repositories;
 
 public class MemoryRepositories extends Repositories {

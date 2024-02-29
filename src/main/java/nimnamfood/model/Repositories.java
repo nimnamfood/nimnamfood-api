@@ -1,5 +1,6 @@
 package nimnamfood.model;
 
+import nimnamfood.model.tag.TagRepository;
 import org.springframework.beans.factory.InitializingBean;
 
 public abstract class Repositories implements InitializingBean {

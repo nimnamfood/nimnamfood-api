@@ -1,7 +1,8 @@
 package nimnamfood.infrastructure.repository.memory;
 
-import nimnamfood.model.TagRepository;
-import vtertre.infrastructure.persistence.memory.MemoryRepository;
+import nimnamfood.model.tag.Tag;
+import nimnamfood.model.tag.TagRepository;
+import vtertre.infrastructure.persistence.memory.MemoryRepositoryWithUuid;
 
-public class TagMemoryRepository extends MemoryRepository<String> implements TagRepository {
+public class TagMemoryRepository extends MemoryRepositoryWithUuid<Tag> implements TagRepository {
 }

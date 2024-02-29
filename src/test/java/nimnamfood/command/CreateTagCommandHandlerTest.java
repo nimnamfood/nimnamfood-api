@@ -2,6 +2,7 @@ package nimnamfood.command;
 
 import nimnamfood.infrastructure.repository.memory.WithMemoryRepositories;
 import nimnamfood.model.Repositories;
+import nimnamfood.model.tag.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -18,9 +19,9 @@ public class CreateTagCommandHandlerTest {
         command.name = "végé";
 
         UUID result = handler.execute(command);
-        String tag = Repositories.tags().getAll().stream().findFirst().get();
+        Tag tag = Repositories.tags().getAll().stream().findFirst().get();
 
         assertThat(result).isNotNull();
-        assertThat(tag).isEqualTo("végé");
+        assertThat(tag.getName()).isEqualTo("végé");
     }
 }

@@ -2,8 +2,8 @@ package vtertre.ddd;
 
 import java.util.Set;
 
-public interface Repository<T> {
-    void add(T entity);
+public interface Repository<TId, TAggregateRoot extends AggregateRoot<TId>> {
+    void add(TAggregateRoot aggregateRoot);
 
-    Set<T> getAll();
+    Set<TAggregateRoot> getAll();
 }
