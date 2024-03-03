@@ -46,7 +46,7 @@ public class NimnamfoodConfiguration {
             List<CommandMiddleware> middlewares,
             Set<CommandHandler<?, ?>> commandHandlers,
             @Qualifier("Computation") ExecutorService executorService) {
-        return new CommandBusAsync(Sets.newHashSet(middlewares), commandHandlers, executorService);
+        return new CommandBusAsync(middlewares, commandHandlers, executorService);
     }
 
     @Bean

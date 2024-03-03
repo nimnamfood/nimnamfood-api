@@ -13,7 +13,7 @@ public class FindAllTagsHandler implements QueryHandler<FindAllTags, List<TagSum
     public List<TagSummary> execute(FindAllTags query) {
         return Repositories.tags().getAll()
                 .stream()
-                .map(tag -> TagSummary.withName(tag.getName()))
+                .map(TagSummary::fromTag)
                 .toList();
     }
 }

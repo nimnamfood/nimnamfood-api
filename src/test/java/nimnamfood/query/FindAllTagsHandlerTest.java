@@ -26,11 +26,13 @@ public class FindAllTagsHandlerTest {
     @Test
     void returnsANonEmptyListOfTags() {
         FindAllTagsHandler handler = new FindAllTagsHandler();
-        Repositories.tags().add(new Tag("rapide"));
+        Tag tag = new Tag("rapide");
+        Repositories.tags().add(tag);
 
         List<TagSummary> result = handler.execute(new FindAllTags());
 
         assertThat(result).hasSize(1);
+        assertThat(result.getFirst().id).isEqualTo(tag.getId());
         assertThat(result.getFirst().name).isEqualTo("rapide");
     }
 }

@@ -7,6 +7,7 @@ import vtertre.command.CommandBus;
 import vtertre.command.CommandHandler;
 import vtertre.command.CommandMiddleware;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -15,7 +16,7 @@ public class CommandBusAsync implements CommandBus {
     private final MiddlewareChainLink firstMiddlewareChainLink;
     private final static Logger LOGGER = LoggerFactory.getLogger(CommandBusAsync.class);
 
-    public CommandBusAsync(Set<CommandMiddleware> middlewares, Set<CommandHandler<?, ?>> handlers, ExecutorService executorService) {
+    public CommandBusAsync(List<CommandMiddleware> middlewares, Set<CommandHandler<?, ?>> handlers, ExecutorService executorService) {
         MiddlewareChainLink currentLink = new MiddlewareChainLink(
                 new InvokeCommandHandlerMiddleware(handlers, executorService),
                 new ClosingMiddlewareChainLink()

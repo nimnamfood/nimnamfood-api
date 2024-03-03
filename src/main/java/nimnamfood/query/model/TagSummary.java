@@ -1,11 +1,17 @@
 package nimnamfood.query.model;
 
+import nimnamfood.model.tag.Tag;
+
+import java.util.UUID;
+
 public class TagSummary {
+    public UUID id;
     public String name;
 
-    public static TagSummary withName(String name) {
+    public static TagSummary fromTag(Tag tag) {
         TagSummary summary = new TagSummary();
-        summary.name = name;
+        summary.id = tag.getId();
+        summary.name = tag.getName();
         return summary;
     }
 }
