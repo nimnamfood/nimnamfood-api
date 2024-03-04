@@ -10,6 +10,6 @@ public class Tag extends BaseAggregateRootWithUuid {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 }

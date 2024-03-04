@@ -22,6 +22,7 @@ public class CreateTagCommandHandlerTest {
         Tag tag = Repositories.tags().getAll().stream().findFirst().get();
 
         assertThat(result).isNotNull();
+        assertThat(tag.getId()).isNotNull();
         assertThat(tag.getName()).isEqualTo("végé");
     }
 }
