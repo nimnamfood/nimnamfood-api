@@ -1,4 +1,4 @@
-package nimnamfood.query.model;
+package nimnamfood.query.tag.model;
 
 import nimnamfood.model.tag.Tag;
 

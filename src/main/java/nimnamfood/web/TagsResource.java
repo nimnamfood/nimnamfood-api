@@ -1,8 +1,8 @@
 package nimnamfood.web;
 
 import nimnamfood.command.CreateTagCommand;
-import nimnamfood.query.FindAllTags;
-import nimnamfood.query.model.TagSummary;
+import nimnamfood.query.tag.FindAllTags;
+import nimnamfood.query.tag.model.TagSummary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

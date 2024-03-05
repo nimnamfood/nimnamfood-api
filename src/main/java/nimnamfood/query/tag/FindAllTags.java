@@ -1,6 +1,6 @@
-package nimnamfood.query;
+package nimnamfood.query.tag;
 
-import nimnamfood.query.model.TagSummary;
+import nimnamfood.query.tag.model.TagSummary;
 import vtertre.query.Query;
 
 import java.util.List;

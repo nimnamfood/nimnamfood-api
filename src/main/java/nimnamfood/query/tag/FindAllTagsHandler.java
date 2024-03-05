@@ -1,7 +1,7 @@
-package nimnamfood.query;
+package nimnamfood.query.tag;
 
 import nimnamfood.model.Repositories;
-import nimnamfood.query.model.TagSummary;
+import nimnamfood.query.tag.model.TagSummary;
 import org.springframework.stereotype.Component;
 import vtertre.query.QueryHandler;
 

@@ -3,7 +3,9 @@ package nimnamfood.query;
 import nimnamfood.infrastructure.repository.memory.WithMemoryRepositories;
 import nimnamfood.model.Repositories;
 import nimnamfood.model.tag.Tag;
-import nimnamfood.query.model.TagSummary;
+import nimnamfood.query.tag.FindAllTags;
+import nimnamfood.query.tag.FindAllTagsHandler;
+import nimnamfood.query.tag.model.TagSummary;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
