@@ -2,6 +2,7 @@ package nimnamfood.query.ingredient;
 
 import nimnamfood.model.Repositories;
 import nimnamfood.model.ingredient.Ingredient;
+import nimnamfood.query.QueryNormalizer;
 import nimnamfood.query.ingredient.model.IngredientSummary;
 import org.springframework.stereotype.Component;
 import vtertre.query.QueryHandler;
@@ -14,9 +15,8 @@ public class FindIngredientsHandler implements QueryHandler<FindIngredients, Lis
     @Override
     public List<IngredientSummary> execute(FindIngredients query) {
         Stream<Ingredient> sourceStream = Repositories.ingredients().getAll().stream();
-        Stream<Ingredient> filteredStream = query.query == null
-                ? sourceStream
-                : sourceStream.filter(ingredient -> ingredient.getName().toLowerCase().contains(query.query.toLowerCase()));
+        Stream<Ingredient> filteredStream = query.query == null ? sourceStream : sourceStream.filter(ingredient ->
+                QueryNormalizer.normalize(ingredient.getName()).contains(QueryNormalizer.normalize(query.query)));
 
         return filteredStream
                 .map(IngredientSummary::fromIngredient)

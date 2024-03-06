@@ -1,13 +1,10 @@
 package nimnamfood.web;
 
 import nimnamfood.command.CreateTagCommand;
-import nimnamfood.query.tag.FindAllTags;
+import nimnamfood.query.tag.FindTags;
 import nimnamfood.query.tag.model.TagSummary;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import vtertre.command.CommandBus;
 import vtertre.query.QueryBus;
 
@@ -29,8 +26,8 @@ public class TagsResource {
     }
 
     @GetMapping("/tags")
-    public Future<List<TagSummary>> getAll() {
-        return this.queryBus.send(new FindAllTags());
+    public Future<List<TagSummary>> get(@RequestParam(required = false, name = "q") String query) {
+        return this.queryBus.send(new FindTags(query));
     }
 
     @PostMapping("/tags")

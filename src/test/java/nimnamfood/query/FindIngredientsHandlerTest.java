@@ -68,13 +68,13 @@ public class FindIngredientsHandlerTest {
     }
 
     @Test
-    void ignoresTheQueryCase() {
+    void ignoresTheQueryCaseAndSpecialCharacters() {
         FindIngredientsHandler handler = new FindIngredientsHandler();
-        Repositories.ingredients().add(new Ingredient("Chocolat", IngredientUnit.GRAM));
+        Repositories.ingredients().add(new Ingredient("Chöcolat", IngredientUnit.GRAM));
 
         List<IngredientSummary> result = handler.execute(new FindIngredients("choc"));
 
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().name).isEqualTo("Chocolat");
+        assertThat(result.getFirst().name).isEqualTo("Chöcolat");
     }
 }
