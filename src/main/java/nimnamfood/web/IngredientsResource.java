@@ -4,6 +4,8 @@ import nimnamfood.command.CreateIngredientCommand;
 import nimnamfood.query.ingredient.FindIngredients;
 import nimnamfood.query.ingredient.model.IngredientSummary;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vtertre.command.CommandBus;
 import vtertre.query.QueryBus;
@@ -26,10 +28,11 @@ public class IngredientsResource {
     }
 
     @PostMapping("/ingredients")
-    public Future<Map<String, UUID>> create(@RequestBody CreateIngredientCommand command) {
+    public Future<ResponseEntity<Map<String, UUID>>> create(@RequestBody CreateIngredientCommand command) {
         return this.commandBus
                 .send(command)
-                .thenApply(result -> Collections.singletonMap("id", result));
+                .thenApply(result -> Collections.singletonMap("id", result))
+                .thenApply(result -> new ResponseEntity<>(result, HttpStatus.CREATED));
     }
 
     @GetMapping("/ingredients")

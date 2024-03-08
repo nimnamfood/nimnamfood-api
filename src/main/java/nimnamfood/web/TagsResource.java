@@ -4,6 +4,8 @@ import nimnamfood.command.CreateTagCommand;
 import nimnamfood.query.tag.FindTags;
 import nimnamfood.query.tag.model.TagSummary;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vtertre.command.CommandBus;
 import vtertre.query.QueryBus;
@@ -31,9 +33,10 @@ public class TagsResource {
     }
 
     @PostMapping("/tags")
-    public Future<Map<String, UUID>> create(@RequestBody CreateTagCommand command) {
+    public Future<ResponseEntity<Map<String, UUID>>> create(@RequestBody CreateTagCommand command) {
         return this.commandBus
                 .send(command)
-                .thenApply(result -> Collections.singletonMap("id", result));
+                .thenApply(result -> Collections.singletonMap("id", result))
+                .thenApply(result -> new ResponseEntity<>(result, HttpStatus.CREATED));
     }
 }

@@ -27,7 +27,7 @@ public class CommandValidatorTest {
         ValidationException e = catchThrowableOfType(() -> validator.validate(new FakeCommand("")),
                 ValidationException.class);
 
-        assertThat(e.messages().isEmpty()).isFalse();
+        assertThat(e.messages()).isNotEmpty();
         assertThat(e.messages().getFirst()).isNotBlank();
     }
 
