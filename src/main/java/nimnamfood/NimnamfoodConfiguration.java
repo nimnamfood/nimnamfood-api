@@ -1,12 +1,14 @@
 package nimnamfood;
 
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import nimnamfood.infrastructure.repository.memory.MemoryRepositories;
 import nimnamfood.model.Repositories;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import vtertre.command.CommandBus;
@@ -23,6 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Configuration
+@ComponentScan("vtertre.command")
 public class NimnamfoodConfiguration {
     @Qualifier("Computation")
     @Bean
@@ -41,8 +44,13 @@ public class NimnamfoodConfiguration {
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+    public Validator validator() {
+        return Validation.buildDefaultValidatorFactory().getValidator();
+    }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public CommandBus commandBus(
-            // @Order does not seem to work on Sets
             List<CommandMiddleware> middlewares,
             Set<CommandHandler<?, ?>> commandHandlers,
             @Qualifier("Computation") ExecutorService executorService) {

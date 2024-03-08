@@ -1,2 +1,3 @@
 - [X] Recherche de tag
-- [ ] Validation des commandes
+- [X] Validation des commandes
+- [ ] Code réponses
