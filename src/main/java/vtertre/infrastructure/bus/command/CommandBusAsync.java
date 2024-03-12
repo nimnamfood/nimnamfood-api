@@ -28,7 +28,7 @@ public class CommandBusAsync implements CommandBus {
     }
 
     @Override
-    public <TResponse> CompletableFuture<TResponse> send(Command<TResponse> command) {
+    public <TResponse> CompletableFuture<TResponse> dispatch(Command<TResponse> command) {
         return this.firstMiddlewareChainLink.apply(command);
     }
 

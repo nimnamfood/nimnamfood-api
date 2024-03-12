@@ -23,7 +23,7 @@ public class QueryBusAsyncTest {
     void throwsAnExceptionWhenNoHandlerIsFound() {
         QueryBusAsync bus = new QueryBusAsync(Collections.emptySet(), executorService);
 
-        CompletableFuture<String> result = bus.send(new FakeQuery());
+        CompletableFuture<String> result = bus.dispatch(new FakeQuery());
 
         assertThatExceptionOfType(ExecutionException.class)
                 .isThrownBy(result::get)
@@ -38,7 +38,7 @@ public class QueryBusAsyncTest {
         QueryBusAsync bus = new QueryBusAsync(Sets.newHashSet(handler), executorService);
         FakeQuery query = new FakeQuery();
 
-        CompletableFuture<String> result = bus.send(query);
+        CompletableFuture<String> result = bus.dispatch(query);
 
         assertThat(result.get()).isEqualTo("fake query result");
         assertThat(handler.query).isEqualTo(query);

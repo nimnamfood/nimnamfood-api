@@ -16,6 +16,6 @@ public class HomeResource {
 
     @GetMapping("/")
     public Future<Map<String, String>> checkHealth() {
-        return this.queryBus.send(new GetHealthCheck());
+        return this.queryBus.dispatch(new GetHealthCheck());
     }
 }

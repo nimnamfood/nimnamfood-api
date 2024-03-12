@@ -30,13 +30,13 @@ public class IngredientsResource {
     @PostMapping("/ingredients")
     public Future<ResponseEntity<Map<String, UUID>>> create(@RequestBody CreateIngredientCommand command) {
         return this.commandBus
-                .send(command)
+                .dispatch(command)
                 .thenApply(result -> Collections.singletonMap("id", result))
                 .thenApply(result -> new ResponseEntity<>(result, HttpStatus.CREATED));
     }
 
     @GetMapping("/ingredients")
     public Future<List<IngredientSummary>> get(@RequestParam(required = false, name = "q") String query) {
-        return this.queryBus.send(new FindIngredients(query));
+        return this.queryBus.dispatch(new FindIngredients(query));
     }
 }

@@ -23,7 +23,7 @@ public class QueryBusAsync implements QueryBus {
     }
 
     @Override
-    public <TResponse> CompletableFuture<TResponse> send(Query<TResponse> query) {
+    public <TResponse> CompletableFuture<TResponse> dispatch(Query<TResponse> query) {
         return this.queryHandlers
                 .stream()
                 .filter(queryHandler -> queryHandler.messageType().equals(query.getClass()))

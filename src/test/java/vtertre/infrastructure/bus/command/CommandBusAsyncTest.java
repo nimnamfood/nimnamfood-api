@@ -27,7 +27,7 @@ public class CommandBusAsyncTest {
         CommandBusAsync bus = new CommandBusAsync(Collections.emptyList(), Collections.emptySet(), executorService);
 
         assertThatExceptionOfType(NoHandlerFound.class)
-                .isThrownBy(() -> bus.send(new FakeCommand()))
+                .isThrownBy(() -> bus.dispatch(new FakeCommand()))
                 .withMessage("NO_HANDLER_FOUND - class vtertre.infrastructure.bus.command.CommandBusAsyncTest$FakeCommand");
     }
 
@@ -37,7 +37,7 @@ public class CommandBusAsyncTest {
         CommandBusAsync bus = new CommandBusAsync(Collections.emptyList(), Sets.newHashSet(handler), executorService);
         FakeCommand command = new FakeCommand();
 
-        CompletableFuture<String> result = bus.send(command);
+        CompletableFuture<String> result = bus.dispatch(command);
 
         assertThat(result.get()).isEqualTo("fake command result");
         assertThat(handler.command).isEqualTo(command);
@@ -53,7 +53,7 @@ public class CommandBusAsyncTest {
                 Lists.newArrayList(firstMiddleware, secondMiddleware), Sets.newHashSet(handler), executorService);
         FakeCommand command = new FakeCommand();
 
-        CompletableFuture<String> result = bus.send(command);
+        CompletableFuture<String> result = bus.dispatch(command);
 
         assertThat(firstMiddleware.called).isTrue();
         assertThat(secondMiddleware.called).isTrue();

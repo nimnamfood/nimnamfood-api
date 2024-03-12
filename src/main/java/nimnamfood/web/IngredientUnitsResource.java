@@ -21,6 +21,6 @@ public class IngredientUnitsResource {
 
     @GetMapping("/units")
     public Future<Set<IngredientUnit>> getAll() {
-        return this.bus.send(new GetAllIngredientUnits());
+        return this.bus.dispatch(new GetAllIngredientUnits());
     }
 }

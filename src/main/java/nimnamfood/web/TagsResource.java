@@ -29,13 +29,13 @@ public class TagsResource {
 
     @GetMapping("/tags")
     public Future<List<TagSummary>> get(@RequestParam(required = false, name = "q") String query) {
-        return this.queryBus.send(new FindTags(query));
+        return this.queryBus.dispatch(new FindTags(query));
     }
 
     @PostMapping("/tags")
     public Future<ResponseEntity<Map<String, UUID>>> create(@RequestBody CreateTagCommand command) {
         return this.commandBus
-                .send(command)
+                .dispatch(command)
                 .thenApply(result -> Collections.singletonMap("id", result))
                 .thenApply(result -> new ResponseEntity<>(result, HttpStatus.CREATED));
     }
