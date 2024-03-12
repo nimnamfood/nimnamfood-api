@@ -32,7 +32,7 @@ public class RecipeSummary {
         public String name;
         public IngredientUnit unit;
         public float quantity;
-        public boolean fixedQuantity;
+        public boolean quantityFixed;
 
         private static RecipeIngredientSummary fromRecipeIngredient(RecipeIngredient recipeIngredient) {
             RecipeIngredientSummary summary = new RecipeIngredientSummary();
@@ -40,7 +40,7 @@ public class RecipeSummary {
             summary.name = recipeIngredient.ingredient().getName();
             summary.unit = recipeIngredient.ingredient().getUnit();
             summary.quantity = recipeIngredient.quantity();
-            summary.fixedQuantity = recipeIngredient.fixedQuantity();
+            summary.quantityFixed = recipeIngredient.quantityFixed();
             return summary;
         }
     }
