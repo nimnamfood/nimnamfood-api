@@ -1,4 +1,4 @@
-package nimnamfood.query;
+package nimnamfood.query.ingredient;
 
 import nimnamfood.model.ingredient.IngredientUnit;
 import org.springframework.stereotype.Component;

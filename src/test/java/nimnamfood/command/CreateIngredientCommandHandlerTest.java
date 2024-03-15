@@ -21,10 +21,9 @@ public class CreateIngredientCommandHandlerTest {
         command.unit = IngredientUnit.GRAM;
 
         UUID result = handler.execute(command);
-        Ingredient ingredient = Repositories.ingredients().getAll().stream().findFirst().get();
+        Ingredient ingredient = Repositories.ingredients().get(result).get();
 
-        assertThat(result).isNotNull();
-        assertThat(ingredient.getId()).isNotNull();
+        assertThat(ingredient.getId()).isEqualTo(result);
         assertThat(ingredient.getName()).isEqualTo("chocolat");
         assertThat(ingredient.getUnit()).isEqualTo(IngredientUnit.GRAM);
     }

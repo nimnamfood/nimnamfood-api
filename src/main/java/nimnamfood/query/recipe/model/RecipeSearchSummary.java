@@ -11,11 +11,11 @@ public class RecipeSearchSummary {
     public String name;
     public List<TagSummary> tags;
 
-    public static RecipeSearchSummary fromRecipe(Recipe recipe) {
+    public static RecipeSearchSummary fromRecipe(Recipe recipe, List<TagSummary> tags) {
         final RecipeSearchSummary summary = new RecipeSearchSummary();
         summary.id = recipe.getId();
         summary.name = recipe.getName();
-        summary.tags = recipe.getTags().stream().map(TagSummary::fromTag).toList();
+        summary.tags = tags;
         return summary;
     }
 }

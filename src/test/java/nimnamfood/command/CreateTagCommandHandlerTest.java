@@ -19,10 +19,9 @@ public class CreateTagCommandHandlerTest {
         command.name = "végé";
 
         UUID result = handler.execute(command);
-        Tag tag = Repositories.tags().getAll().stream().findFirst().get();
+        Tag tag = Repositories.tags().get(result).get();
 
-        assertThat(result).isNotNull();
-        assertThat(tag.getId()).isNotNull();
+        assertThat(tag.getId()).isEqualTo(result);
         assertThat(tag.getName()).isEqualTo("végé");
     }
 }

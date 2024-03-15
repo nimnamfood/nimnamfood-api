@@ -1,32 +1,33 @@
 package nimnamfood.model.recipe;
 
-import nimnamfood.model.tag.Tag;
 import vtertre.ddd.BaseAggregateRootWithUuid;
 
 import java.util.List;
+import java.util.UUID;
 
 public class Recipe extends BaseAggregateRootWithUuid {
     private final String name;
     private final int portionsCount;
     private final List<RecipeIngredient> ingredients;
     private final String instructions;
-    private final List<Tag> tags;
+    private final List<UUID> tagIds;
 
     public static Factory factory() {
         return new Factory();
     }
 
-    private Recipe(String name, int portionsCount, List<RecipeIngredient> ingredients, String instructions, List<Tag> tags) {
+    private Recipe(String name, int portionsCount, List<RecipeIngredient> ingredients, String instructions, List<UUID> tagIds) {
         this.name = name;
         this.portionsCount = portionsCount;
         this.ingredients = ingredients;
         this.instructions = instructions;
-        this.tags = tags;
+        this.tagIds = tagIds;
     }
 
     public static class Factory {
-        public Recipe create(String name, int portionsCount, List<RecipeIngredient> ingredients, String instructions, List<Tag> tags) {
-            return new Recipe(name, portionsCount, ingredients, instructions, tags);
+        public Recipe create(String name, int portionsCount, List<RecipeIngredient> ingredients,
+                             String instructions, List<UUID> tagIds) {
+            return new Recipe(name, portionsCount, ingredients, instructions, tagIds);
         }
     }
 
@@ -46,7 +47,7 @@ public class Recipe extends BaseAggregateRootWithUuid {
         return this.instructions;
     }
 
-    public List<Tag> getTags() {
-        return this.tags;
+    public List<UUID> getTagIds() {
+        return this.tagIds;
     }
 }

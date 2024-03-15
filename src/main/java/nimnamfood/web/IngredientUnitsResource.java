@@ -1,7 +1,7 @@
 package nimnamfood.web;
 
 import nimnamfood.model.ingredient.IngredientUnit;
-import nimnamfood.query.GetAllIngredientUnits;
+import nimnamfood.query.ingredient.GetAllIngredientUnits;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

@@ -9,11 +9,13 @@ import nimnamfood.query.recipe.FindRecipesHandler;
 import nimnamfood.query.recipe.model.RecipeSearchSummary;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import vtertre.ddd.MissingAggregateRootException;
 
 import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @ExtendWith({WithMemoryRepositories.class})
 public class FindRecipesHandlerTest {
@@ -27,10 +29,12 @@ public class FindRecipesHandlerTest {
     }
 
     @Test
-    void returnsAllIngredientsWhenNoQueryIsProvided() {
+    void returnsAllRecipesWhenNoQueryIsProvided() {
         FindRecipesHandler handler = new FindRecipesHandler();
         Recipe recipe1 = Recipe.factory().create("recette", 1, Collections.emptyList(), "", Collections.emptyList());
-        Recipe recipe2 = Recipe.factory().create("recette 2", 1, Collections.emptyList(), "", List.of(new Tag("tag")));
+        Tag tag = new Tag("tag");
+        Repositories.tags().add(tag);
+        Recipe recipe2 = Recipe.factory().create("recette 2", 1, Collections.emptyList(), "", List.of(tag.getId()));
         Repositories.recipes().add(recipe1);
         Repositories.recipes().add(recipe2);
 
@@ -46,7 +50,7 @@ public class FindRecipesHandlerTest {
     }
 
     @Test
-    void returnsAllIngredientsContainingTheQuery() {
+    void returnsAllRecipesContainingTheQuery() {
         FindRecipesHandler handler = new FindRecipesHandler();
 
         Recipe recipe1 = Recipe.factory().create("poulet citron", 1, Collections.emptyList(), "", Collections.emptyList());
@@ -73,5 +77,17 @@ public class FindRecipesHandlerTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().name).isEqualTo("taboulé de poulet");
+    }
+
+    @Test
+    void throwsAnExceptionWhenATagReferenceIdDoesNotMatchAnyEntity() {
+        FindRecipesHandler handler = new FindRecipesHandler();
+        Tag tag = new Tag("tag");
+        Recipe recipe = Recipe.factory().create("", 1, Collections.emptyList(), "", List.of(tag.getId()));
+        Repositories.recipes().add(recipe);
+
+        assertThatExceptionOfType(MissingAggregateRootException.class)
+                .isThrownBy(() -> handler.execute(new FindRecipes()))
+                .withMessage("AGGREGATE_ROOT_NOT_FOUND - " + tag.getId().toString());
     }
 }

@@ -1,6 +1,6 @@
 package nimnamfood.model.recipe;
 
-import nimnamfood.model.ingredient.Ingredient;
+import java.util.UUID;
 
-public record RecipeIngredient(Ingredient ingredient, float quantity, boolean quantityFixed) {
+public record RecipeIngredient(UUID ingredientId, float quantity, boolean quantityFixed) {
 }

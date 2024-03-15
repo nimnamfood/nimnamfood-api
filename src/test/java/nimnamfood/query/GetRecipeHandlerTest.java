@@ -27,7 +27,11 @@ public class GetRecipeHandlerTest {
     @Test
     void returnsTheRecipeWithMatchingId() {
         GetRecipeHandler handler = new GetRecipeHandler();
-        Recipe recipe = RecipeFactory.create("recette 1");
+        Ingredient ingredient = new Ingredient("ingredient", IngredientUnit.GRAM);
+        Tag tag = new Tag("tag");
+        Repositories.ingredients().add(ingredient);
+        Repositories.tags().add(tag);
+        Recipe recipe = RecipeFactory.create("recette 1", ingredient, tag);
         Repositories.recipes().add(recipe);
         Repositories.recipes().add(RecipeFactory.createEmpty("recette 2"));
 
@@ -51,16 +55,38 @@ public class GetRecipeHandlerTest {
                 .withMessage("AGGREGATE_ROOT_NOT_FOUND - " + stringUuid);
     }
 
+    @Test
+    void throwsAnExceptionWhenATagReferenceIdDoesNotMatchAnyEntity() {
+        GetRecipeHandler handler = new GetRecipeHandler();
+        Tag tag = new Tag("tag");
+        Recipe recipe = Recipe.factory().create("", 1, Collections.emptyList(), "", List.of(tag.getId()));
+        Repositories.recipes().add(recipe);
+
+        assertThatExceptionOfType(MissingAggregateRootException.class)
+                .isThrownBy(() -> handler.execute(new GetRecipe(recipe.getId().toString())))
+                .withMessage("AGGREGATE_ROOT_NOT_FOUND - " + tag.getId().toString());
+    }
+
+    @Test
+    void throwsAnExceptionWhenAnIngredientReferenceIdDoesNotMatchAnyEntity() {
+        GetRecipeHandler handler = new GetRecipeHandler();
+        Ingredient ingredient = new Ingredient("ingredient", IngredientUnit.GRAM);
+        Recipe recipe = Recipe.factory().create("", 1, List.of(new RecipeIngredient(ingredient.getId(), 1, false)), "", Collections.emptyList());
+        Repositories.recipes().add(recipe);
+
+        assertThatExceptionOfType(MissingAggregateRootException.class)
+                .isThrownBy(() -> handler.execute(new GetRecipe(recipe.getId().toString())))
+                .withMessage("AGGREGATE_ROOT_NOT_FOUND - " + ingredient.getId().toString());
+    }
+
     private static class RecipeFactory {
         public static Recipe createEmpty(String name) {
             return Recipe.factory().create(name, 1, Collections.emptyList(), "instructions", Collections.emptyList());
         }
 
-        public static Recipe create(String name) {
-            Ingredient ingredient = new Ingredient("ingredient", IngredientUnit.GRAM);
-            RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient, 120, false);
-            Tag tag = new Tag("tag");
-            return Recipe.factory().create(name, 1, List.of(recipeIngredient), "instructions", List.of(tag));
+        public static Recipe create(String name, Ingredient ingredient, Tag tag) {
+            RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient.getId(), 120, false);
+            return Recipe.factory().create(name, 1, List.of(recipeIngredient), "instructions", List.of(tag.getId()));
         }
     }
 }

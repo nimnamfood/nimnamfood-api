@@ -1,6 +1,8 @@
 package nimnamfood.query;
 
 import nimnamfood.model.ingredient.IngredientUnit;
+import nimnamfood.query.ingredient.GetAllIngredientUnits;
+import nimnamfood.query.ingredient.GetAllIngredientUnitsHandler;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
