@@ -5,8 +5,13 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import nimnamfood.infrastructure.repository.memory.MemoryRepositories;
 import nimnamfood.model.Repositories;
+import nimnamfood.model.ingredient.Ingredient;
+import nimnamfood.model.ingredient.IngredientUnit;
+import nimnamfood.model.tag.Tag;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -69,5 +74,42 @@ public class NimnamfoodConfiguration {
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public Repositories repositories() {
         return new MemoryRepositories();
+    }
+
+    @Bean
+    @ConditionalOnProperty("nimnamfood.data.bootstrap")
+    public CommandLineRunner commandLineRunner() {
+        return args -> {
+            final List<Tag> tags = List.of(
+                    new Tag("rapide"),
+                    new Tag("végé"),
+                    new Tag("poisson gras"),
+                    new Tag("poulet"),
+                    new Tag("boeuf"),
+                    new Tag("poisson maigre"),
+                    new Tag("crustacés"),
+                    new Tag("steph"),
+                    new Tag("vincent"),
+                    new Tag("soupe")
+            );
+
+            final List<Ingredient> ingredients = List.of(
+                    new Ingredient("pavé de saumon", IngredientUnit.PIECE),
+                    new Ingredient("cacao", IngredientUnit.GRAM),
+                    new Ingredient("jus de citron", IngredientUnit.MILLILITER),
+                    new Ingredient("sel", IngredientUnit.PINCH),
+                    new Ingredient("sauce soja salée", IngredientUnit.TEASPOON),
+                    new Ingredient("sirop d'érable", IngredientUnit.TABLESPOON),
+                    new Ingredient("farine de riz", IngredientUnit.GRAM),
+                    new Ingredient("gousse d'ail", IngredientUnit.PIECE),
+                    new Ingredient("crevettes", IngredientUnit.GRAM),
+                    new Ingredient("riz", IngredientUnit.GRAM),
+                    new Ingredient("chili flakes", IngredientUnit.PINCH),
+                    new Ingredient("patate douce", IngredientUnit.GRAM)
+            );
+
+            tags.forEach(tag -> Repositories.tags().add(tag));
+            ingredients.forEach(ingredient -> Repositories.ingredients().add(ingredient));
+        };
     }
 }

@@ -15,7 +15,8 @@ public class CreateRecipeCommandHandler implements CommandHandler<CreateRecipeCo
     public UUID execute(CreateRecipeCommand command) {
         final List<RecipeIngredient> recipeIngredients = command.ingredients
                 .stream()
-                .map(part -> new RecipeIngredient(UUID.fromString(part.ingredientId), part.quantity, part.quantityFixed))
+                .map(part -> new RecipeIngredient(
+                        UUID.fromString(part.ingredientId), part.quantity, part.unit, part.quantityFixed))
                 .toList();
 
         final Recipe recipe = Recipe.factory().create(

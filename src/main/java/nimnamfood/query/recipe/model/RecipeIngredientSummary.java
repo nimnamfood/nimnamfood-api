@@ -17,7 +17,7 @@ public class RecipeIngredientSummary {
         RecipeIngredientSummary summary = new RecipeIngredientSummary();
         summary.id = recipeIngredient.ingredientId();
         summary.name = ingredient.getName();
-        summary.unit = ingredient.getUnit();
+        summary.unit = recipeIngredient.unit();
         summary.quantity = recipeIngredient.quantity();
         summary.quantityFixed = recipeIngredient.quantityFixed();
         return summary;

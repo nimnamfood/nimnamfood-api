@@ -29,6 +29,7 @@ public class CreateRecipeCommandHandlerTest {
         RecipeIngredientCommandPart part = new RecipeIngredientCommandPart() {{
             ingredientId = ingredient.getId().toString();
             quantity = 20f;
+            unit = IngredientUnit.PIECE;
             quantityFixed = false;
         }};
 
@@ -46,6 +47,7 @@ public class CreateRecipeCommandHandlerTest {
         assertThat(recipe.getPortionsCount()).isEqualTo(1);
         assertThat(recipe.getInstructions()).isEqualTo("instructions");
         assertThat(recipe.getTagIds()).containsExactly(tag.getId());
-        assertThat(recipe.getIngredients()).containsExactly(new RecipeIngredient(ingredient.getId(), 20f, false));
+        assertThat(recipe.getIngredients()).containsExactly(
+                new RecipeIngredient(ingredient.getId(), 20f, IngredientUnit.PIECE, false));
     }
 }

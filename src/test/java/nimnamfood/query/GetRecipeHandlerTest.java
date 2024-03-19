@@ -43,6 +43,7 @@ public class GetRecipeHandlerTest {
         assertThat(summary.instructions).isEqualTo(recipe.getInstructions());
         assertThat(summary.tags.getFirst().name).isEqualTo("tag");
         assertThat(summary.ingredients.getFirst().name).isEqualTo("ingredient");
+        assertThat(summary.ingredients.getFirst().unit).isEqualTo(IngredientUnit.PIECE);
     }
 
     @Test
@@ -71,7 +72,8 @@ public class GetRecipeHandlerTest {
     void throwsAnExceptionWhenAnIngredientReferenceIdDoesNotMatchAnyEntity() {
         GetRecipeHandler handler = new GetRecipeHandler();
         Ingredient ingredient = new Ingredient("ingredient", IngredientUnit.GRAM);
-        Recipe recipe = Recipe.factory().create("", 1, List.of(new RecipeIngredient(ingredient.getId(), 1, false)), "", Collections.emptyList());
+        Recipe recipe = Recipe.factory().create("", 1,
+                List.of(new RecipeIngredient(ingredient.getId(), 1, IngredientUnit.GRAM, false)), "", Collections.emptyList());
         Repositories.recipes().add(recipe);
 
         assertThatExceptionOfType(MissingAggregateRootException.class)
@@ -85,7 +87,7 @@ public class GetRecipeHandlerTest {
         }
 
         public static Recipe create(String name, Ingredient ingredient, Tag tag) {
-            RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient.getId(), 120, false);
+            RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient.getId(), 120, IngredientUnit.PIECE, false);
             return Recipe.factory().create(name, 1, List.of(recipeIngredient), "instructions", List.of(tag.getId()));
         }
     }

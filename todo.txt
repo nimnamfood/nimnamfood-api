@@ -1,3 +1,6 @@
 - [X] Recherche de tag
 - [X] Validation des commandes
 - [X] Code réponses
+- [X] L'unité d'un ingrédient est l'unité par défaut, elle peut être adaptée par recette
+- [ ] Consultation de recette
+- [ ] Recherche de recette (par nom et ou tags)

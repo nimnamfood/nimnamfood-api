@@ -21,7 +21,7 @@ public class CreateRecipeCommand implements Command<java.util.UUID> {
     @NotBlank
     public String instructions;
 
-    @NotEmpty
+    @NotNull
     public List<@NotNull @UUID(version = 4) String> tagIds;
 
     @NotEmpty
