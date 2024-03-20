@@ -7,6 +7,8 @@ import nimnamfood.infrastructure.repository.memory.MemoryRepositories;
 import nimnamfood.model.Repositories;
 import nimnamfood.model.ingredient.Ingredient;
 import nimnamfood.model.ingredient.IngredientUnit;
+import nimnamfood.model.recipe.Recipe;
+import nimnamfood.model.recipe.RecipeIngredient;
 import nimnamfood.model.tag.Tag;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -19,6 +21,7 @@ import org.springframework.context.annotation.Scope;
 import vtertre.command.CommandBus;
 import vtertre.command.CommandHandler;
 import vtertre.command.CommandMiddleware;
+import vtertre.ddd.BaseEntity;
 import vtertre.infrastructure.bus.command.CommandBusAsync;
 import vtertre.infrastructure.bus.query.QueryBusAsync;
 import vtertre.query.QueryBus;
@@ -94,22 +97,32 @@ public class NimnamfoodConfiguration {
             );
 
             final List<Ingredient> ingredients = List.of(
-                    new Ingredient("pavé de saumon", IngredientUnit.PIECE),
+                    new Ingredient("pavé(s) de saumon", IngredientUnit.PIECE),
                     new Ingredient("cacao", IngredientUnit.GRAM),
+                    new Ingredient("feuille(s) d'agar-agar", IngredientUnit.PIECE),
                     new Ingredient("jus de citron", IngredientUnit.MILLILITER),
                     new Ingredient("sel", IngredientUnit.PINCH),
                     new Ingredient("sauce soja salée", IngredientUnit.TEASPOON),
                     new Ingredient("sirop d'érable", IngredientUnit.TABLESPOON),
                     new Ingredient("farine de riz", IngredientUnit.GRAM),
-                    new Ingredient("gousse d'ail", IngredientUnit.PIECE),
+                    new Ingredient("olive(s) verte(s)", IngredientUnit.GRAM),
+                    new Ingredient("gousse(s) d'ail", IngredientUnit.PIECE),
                     new Ingredient("crevettes", IngredientUnit.GRAM),
                     new Ingredient("riz", IngredientUnit.GRAM),
                     new Ingredient("chili flakes", IngredientUnit.PINCH),
-                    new Ingredient("patate douce", IngredientUnit.GRAM)
+                    new Ingredient("patate douce", IngredientUnit.GRAM),
+                    new Ingredient("huile d'olive", IngredientUnit.GRAM)
             );
+
+            final Recipe recipe = Recipe.factory().create("Recette test", 2,
+                    ingredients.stream().map(ingredient -> new RecipeIngredient(
+                            ingredient.getId(), 10, ingredient.getUnit(), ingredient.getName().equals("sel"))).toList(),
+                    "Une première étape assez courte.\n\nUne deuxième étape beaucoup plus longue pour pouvoir tester le fait que les lignes s'affichent correctement en sorti et ce même sur des écrans beaucoup plus larges.\n\nUne troisème étape pour le fun.",
+                    tags.subList(0, 4).stream().map(BaseEntity::getId).toList());
 
             tags.forEach(tag -> Repositories.tags().add(tag));
             ingredients.forEach(ingredient -> Repositories.ingredients().add(ingredient));
+            Repositories.recipes().add(recipe);
         };
     }
 }
