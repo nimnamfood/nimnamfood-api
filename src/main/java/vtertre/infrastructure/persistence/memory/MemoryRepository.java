@@ -7,6 +7,8 @@ import vtertre.ddd.Repository;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class MemoryRepository<TId, TAggregateRoot extends AggregateRoot<TId>> implements Repository<TId, TAggregateRoot> {
     final protected HashSet<TAggregateRoot> entities = Sets.newHashSet();
@@ -22,7 +24,7 @@ public class MemoryRepository<TId, TAggregateRoot extends AggregateRoot<TId>> im
     }
 
     @Override
-    public Set<TAggregateRoot> getAll() {
-        return this.entities;
+    public Set<TAggregateRoot> getAll(Predicate<TAggregateRoot> predicate) {
+        return this.entities.stream().filter(predicate).collect(Collectors.toSet());
     }
 }

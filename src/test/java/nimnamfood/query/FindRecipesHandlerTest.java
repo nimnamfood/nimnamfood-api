@@ -90,4 +90,53 @@ public class FindRecipesHandlerTest {
                 .isThrownBy(() -> handler.execute(new FindRecipes()))
                 .withMessage("AGGREGATE_ROOT_NOT_FOUND - " + tag.getId().toString());
     }
+
+    @Test
+    void returnsAllRecipesHavingAtLeastAllRequestedTags() {
+        FindRecipesHandler handler = new FindRecipesHandler();
+
+        Tag tag1 = new Tag("1");
+        Tag tag2 = new Tag("2");
+        Tag tag3 = new Tag("3");
+        Repositories.tags().add(tag1);
+        Repositories.tags().add(tag2);
+        Repositories.tags().add(tag3);
+
+        Recipe recipe1 = Recipe.factory().create("1", 1, null, "", List.of(tag2.getId(), tag3.getId()));
+        Recipe recipe2 = Recipe.factory().create("2", 1, null, "", List.of(tag2.getId(), tag1.getId()));
+        Recipe recipe3 = Recipe.factory().create("3", 1, null, "", List.of());
+        Recipe recipe4 = Recipe.factory().create("4", 1, null, "", List.of(tag1.getId(), tag2.getId(), tag3.getId()));
+        Repositories.recipes().add(recipe1);
+        Repositories.recipes().add(recipe2);
+        Repositories.recipes().add(recipe3);
+        Repositories.recipes().add(recipe4);
+
+        List<RecipeSearchSummary> result = handler.execute(new FindRecipes(List.of(tag3.getId().toString(), tag2.getId().toString())));
+
+        assertThat(result).hasSize(2);
+        assertThat(result).anyMatch(summary -> summary.id.equals(recipe1.getId()));
+        assertThat(result).anyMatch(summary -> summary.id.equals(recipe4.getId()));
+    }
+
+    @Test
+    void returnsAllRecipesContainingTheQueryAndHavingAtLeastAllRequestedTags() {
+        FindRecipesHandler handler = new FindRecipesHandler();
+
+        Tag tag1 = new Tag("1");
+        Tag tag2 = new Tag("2");
+        Repositories.tags().add(tag1);
+        Repositories.tags().add(tag2);
+
+        Recipe recipe1 = Recipe.factory().create("poulet au citron", 1, null, "", List.of(tag1.getId()));
+        Recipe recipe2 = Recipe.factory().create("pâtes au poulet", 1, null, "", List.of(tag2.getId()));
+        Recipe recipe3 = Recipe.factory().create("pâtes au citron", 1, null, "", List.of(tag2.getId(), tag1.getId()));
+        Repositories.recipes().add(recipe1);
+        Repositories.recipes().add(recipe2);
+        Repositories.recipes().add(recipe3);
+
+        List<RecipeSearchSummary> result = handler.execute(new FindRecipes("poulet", List.of(tag2.getId().toString())));
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().id).isEqualTo(recipe2.getId());
+    }
 }

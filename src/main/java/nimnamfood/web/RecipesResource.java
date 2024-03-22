@@ -35,7 +35,9 @@ public class RecipesResource {
     }
 
     @GetMapping("/recipes")
-    public Future<List<RecipeSearchSummary>> get(@RequestParam(required = false, name = "q") String query) {
-        return this.queryBus.dispatch(new FindRecipes(query));
+    public Future<List<RecipeSearchSummary>> get(
+            @RequestParam(required = false, name = "q") String query,
+            @RequestParam(required = false, name = "tags") List<String> tags) {
+        return this.queryBus.dispatch(new FindRecipes(query, tags));
     }
 }
