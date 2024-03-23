@@ -4,5 +4,5 @@ import vtertre.query.Query;
 
 import java.util.Map;
 
-public class GetHealthCheck implements Query<Map<String, String>> {
+public class GetHealthCheck extends Query<Map<String, String>> {
 }

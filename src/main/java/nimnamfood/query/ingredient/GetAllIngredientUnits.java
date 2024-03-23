@@ -5,5 +5,5 @@ import vtertre.query.Query;
 
 import java.util.Set;
 
-public class GetAllIngredientUnits implements Query<Set<IngredientUnit>> {
+public class GetAllIngredientUnits extends Query<Set<IngredientUnit>> {
 }

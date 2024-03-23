@@ -13,7 +13,9 @@ public class FindIngredientsHandler implements QueryHandler<FindIngredients, Lis
     @Override
     public List<IngredientSummary> execute(FindIngredients query) {
         return Repositories.ingredients()
-                .getAll(ingredient -> query.query == null || QueryNormalizer.partialMatch(ingredient.getName(), query.query))
+                .getAll(
+                        ingredient ->query.query == null || QueryNormalizer.partialMatch(ingredient.getName(), query.query),
+                        query.limit(), query.skip())
                 .stream()
                 .map(IngredientSummary::fromIngredient)
                 .toList();

@@ -5,7 +5,7 @@ import vtertre.query.Query;
 
 import java.util.List;
 
-public class FindTags implements Query<List<TagSummary>> {
+public class FindTags extends Query<List<TagSummary>> {
     public final String query;
 
     public FindTags() {

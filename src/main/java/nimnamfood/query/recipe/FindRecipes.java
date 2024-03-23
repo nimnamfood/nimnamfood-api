@@ -5,7 +5,7 @@ import vtertre.query.Query;
 
 import java.util.List;
 
-public class FindRecipes implements Query<List<RecipeSearchSummary>> {
+public class FindRecipes extends Query<List<RecipeSearchSummary>> {
     public final String query;
     public final List<String> tags;
 

@@ -9,5 +9,5 @@ public interface Repository<TId, TAggregateRoot extends AggregateRoot<TId>> {
 
     void add(TAggregateRoot aggregateRoot);
 
-    Set<TAggregateRoot> getAll(Predicate<TAggregateRoot> predicate);
+    Set<TAggregateRoot> getAll(Predicate<TAggregateRoot> predicate, int limit, int skip);
 }

@@ -19,7 +19,7 @@ public class FindRecipesHandler implements QueryHandler<FindRecipes, List<Recipe
     @Override
     public List<RecipeSearchSummary> execute(FindRecipes query) {
         return Repositories.recipes()
-                .getAll(matchesQueryAndTags(query))
+                .getAll(matchesQueryAndTags(query), query.limit(), query.skip())
                 .stream()
                 .map(recipe -> {
                     final List<TagSummary> tags = tagSummaries(recipe.getTagIds());

@@ -44,7 +44,7 @@ public class QueryBusAsyncTest {
         assertThat(handler.query).isEqualTo(query);
     }
 
-    private static class FakeQuery implements Query<String> {
+    private static class FakeQuery extends Query<String> {
     }
 
     private static class FakeQueryHandler implements QueryHandler<FakeQuery, String> {

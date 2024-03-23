@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MemoryRepository<TId, TAggregateRoot extends AggregateRoot<TId>> implements Repository<TId, TAggregateRoot> {
     final protected HashSet<TAggregateRoot> entities = Sets.newHashSet();
@@ -24,7 +25,12 @@ public class MemoryRepository<TId, TAggregateRoot extends AggregateRoot<TId>> im
     }
 
     @Override
-    public Set<TAggregateRoot> getAll(Predicate<TAggregateRoot> predicate) {
-        return this.entities.stream().filter(predicate).collect(Collectors.toSet());
+    public Set<TAggregateRoot> getAll(Predicate<TAggregateRoot> predicate, int limit, int skip) {
+        final Stream<TAggregateRoot> stream = this.entities
+                .stream()
+                .unordered()
+                .filter(predicate)
+                .skip(skip);
+        return limit > 0 ? stream.limit(limit).collect(Collectors.toSet()) : stream.collect(Collectors.toSet());
     }
 }

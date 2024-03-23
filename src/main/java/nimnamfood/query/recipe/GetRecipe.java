@@ -5,7 +5,7 @@ import vtertre.query.Query;
 
 import java.util.UUID;
 
-public class GetRecipe implements Query<RecipeSummary> {
+public class GetRecipe extends Query<RecipeSummary> {
     public final UUID id;
 
     public GetRecipe(String stringUuid) {

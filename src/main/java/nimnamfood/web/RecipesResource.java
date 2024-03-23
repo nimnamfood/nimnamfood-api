@@ -21,6 +21,8 @@ public class RecipesResource {
     private final CommandBus commandBus;
     private final QueryBus queryBus;
 
+    private final int MAX_SEARCH_RESULT = 15;
+
     @Autowired
     public RecipesResource(CommandBus commandBus, QueryBus queryBus) {
         this.commandBus = commandBus;
@@ -37,7 +39,11 @@ public class RecipesResource {
     @GetMapping("/recipes")
     public Future<List<RecipeSearchSummary>> get(
             @RequestParam(required = false, name = "q") String query,
-            @RequestParam(required = false, name = "tags") List<String> tags) {
-        return this.queryBus.dispatch(new FindRecipes(query, tags));
+            @RequestParam(required = false) List<String> tags,
+            @RequestParam(required = false) Integer skip,
+            @RequestParam(required = false) Integer limit) {
+        return this.queryBus.dispatch(new FindRecipes(query, tags)
+                .skip(skip != null ? Math.max(skip, 0) : 0)
+                .limit(limit != null ? Math.clamp(limit, 0, MAX_SEARCH_RESULT) : 0));
     }
 }
