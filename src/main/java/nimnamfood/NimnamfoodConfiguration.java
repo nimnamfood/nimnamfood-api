@@ -46,8 +46,8 @@ public class NimnamfoodConfiguration {
 
     @Qualifier("Io")
     @Bean
-    public ExecutorService cachedThreadPoolExecutorService() {
-        return Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("io-pool-%d").build());
+    public ExecutorService virtualThreadPerTaskExecutorService() {
+        return Executors.newVirtualThreadPerTaskExecutor();
     }
 
     @Bean
