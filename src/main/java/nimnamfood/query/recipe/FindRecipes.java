@@ -4,12 +4,13 @@ import nimnamfood.query.recipe.model.RecipeSearchSummary;
 import vtertre.query.Query;
 
 import java.util.List;
+import java.util.Set;
 
 public class FindRecipes extends Query<List<RecipeSearchSummary>> {
     public final String query;
-    public final List<String> tags;
+    public final Set<String> tags;
 
-    public FindRecipes(String query, List<String> tags) {
+    public FindRecipes(String query, Set<String> tags) {
         this.query = query;
         this.tags = tags;
     }
@@ -19,7 +20,7 @@ public class FindRecipes extends Query<List<RecipeSearchSummary>> {
         this.tags = null;
     }
 
-    public FindRecipes(List<String> tags) {
+    public FindRecipes(Set<String> tags) {
         this.query = null;
         this.tags = tags;
     }

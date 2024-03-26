@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Positive;
 import org.hibernate.validator.constraints.UUID;
 import vtertre.command.Command;
 
-import java.util.List;
+import java.util.Set;
 
 public class CreateRecipeCommand implements Command<java.util.UUID> {
     @NotBlank
@@ -22,8 +22,8 @@ public class CreateRecipeCommand implements Command<java.util.UUID> {
     public String instructions;
 
     @NotNull
-    public List<@NotNull @UUID(version = 4) String> tagIds;
+    public Set<@NotNull @UUID(version = 4) String> tagIds;
 
     @NotEmpty
-    public List<@Valid RecipeIngredientCommandPart> ingredients;
+    public Set<@Valid RecipeIngredientCommandPart> ingredients;
 }

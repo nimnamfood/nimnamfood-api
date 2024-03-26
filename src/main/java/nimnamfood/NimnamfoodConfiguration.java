@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @Configuration
 @ComponentScan("vtertre.command")
@@ -116,9 +117,9 @@ public class NimnamfoodConfiguration {
 
             final Recipe recipe = Recipe.factory().create("Recette test", 2,
                     ingredients.stream().map(ingredient -> new RecipeIngredient(
-                            ingredient.getId(), 10, ingredient.getUnit(), ingredient.getName().equals("sel"))).toList(),
+                            ingredient.getId(), 10, ingredient.getUnit(), ingredient.getName().equals("sel"))).collect(Collectors.toSet()),
                     "Une première étape assez courte.\n\nUne deuxième étape beaucoup plus longue pour pouvoir tester le fait que les lignes s'affichent correctement en sorti et ce même sur des écrans beaucoup plus larges.\n\nUne troisème étape pour le fun.",
-                    tags.subList(0, 4).stream().map(BaseEntity::getId).toList());
+                    tags.subList(0, 4).stream().map(BaseEntity::getId).collect(Collectors.toSet()));
 
             tags.forEach(tag -> Repositories.tags().add(tag));
             ingredients.forEach(ingredient -> Repositories.ingredients().add(ingredient));

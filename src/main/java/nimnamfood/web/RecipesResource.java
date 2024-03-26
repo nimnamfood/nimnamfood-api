@@ -10,10 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import vtertre.command.CommandBus;
 import vtertre.query.QueryBus;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Future;
 
 @RestController
@@ -39,7 +36,7 @@ public class RecipesResource {
     @GetMapping("/recipes")
     public Future<List<RecipeSearchSummary>> get(
             @RequestParam(required = false, name = "q") String query,
-            @RequestParam(required = false) List<String> tags,
+            @RequestParam(required = false) Set<String> tags,
             @RequestParam(required = false) Integer skip,
             @RequestParam(required = false) Integer limit) {
         return this.queryBus.dispatch(new FindRecipes(query, tags)

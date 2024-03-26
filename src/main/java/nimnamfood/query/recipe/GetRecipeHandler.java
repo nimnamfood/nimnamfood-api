@@ -11,7 +11,9 @@ import vtertre.ddd.MissingAggregateRootException;
 import vtertre.query.QueryHandler;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 public class GetRecipeHandler implements QueryHandler<GetRecipe, RecipeSummary> {
@@ -20,28 +22,28 @@ public class GetRecipeHandler implements QueryHandler<GetRecipe, RecipeSummary> 
         return Repositories.recipes()
                 .get(query.id)
                 .map(recipe -> {
-                    final List<TagSummary> tags = this.tagSummaries(recipe.getTagIds());
-                    final List<RecipeIngredientSummary> ingredients = this.ingredientSummaries(recipe.getIngredients());
+                    final Set<TagSummary> tags = this.tagSummaries(recipe.getTagIds());
+                    final Set<RecipeIngredientSummary> ingredients = this.ingredientSummaries(recipe.getIngredients());
                     return RecipeSummary.fromRecipe(recipe, ingredients, tags);
                 })
                 .orElseThrow(() -> new MissingAggregateRootException(query.id));
     }
 
-    private List<RecipeIngredientSummary> ingredientSummaries(List<RecipeIngredient> recipeIngredients) {
+    private Set<RecipeIngredientSummary> ingredientSummaries(Set<RecipeIngredient> recipeIngredients) {
         return recipeIngredients.stream()
                 .map(recipeIngredient -> {
                     final Ingredient ingredient = Repositories.ingredients().get(recipeIngredient.ingredientId())
                             .orElseThrow(() -> new MissingAggregateRootException(recipeIngredient.ingredientId()));
                     return RecipeIngredientSummary.fromRecipeIngredient(recipeIngredient, ingredient);
                 })
-                .toList();
+                .collect(Collectors.toSet());
     }
 
-    private List<TagSummary> tagSummaries(List<UUID> tagIds) {
+    private Set<TagSummary> tagSummaries(Set<UUID> tagIds) {
         return tagIds.stream()
                 .map(id -> Repositories.tags().get(id)
                         .orElseThrow(() -> new MissingAggregateRootException(id)))
                 .map(TagSummary::fromTag)
-                .toList();
+                .collect(Collectors.toSet());
     }
 }

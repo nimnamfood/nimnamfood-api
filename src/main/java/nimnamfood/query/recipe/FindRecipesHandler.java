@@ -11,8 +11,10 @@ import vtertre.query.QueryHandler;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Component
 public class FindRecipesHandler implements QueryHandler<FindRecipes, List<RecipeSearchSummary>> {
@@ -22,7 +24,7 @@ public class FindRecipesHandler implements QueryHandler<FindRecipes, List<Recipe
                 .getAll(matchesQueryAndTags(query), query.limit(), query.skip())
                 .stream()
                 .map(recipe -> {
-                    final List<TagSummary> tags = tagSummaries(recipe.getTagIds());
+                    final Set<TagSummary> tags = tagSummaries(recipe.getTagIds());
                     return RecipeSearchSummary.fromRecipe(recipe, tags);
                 })
                 .toList();
@@ -32,16 +34,16 @@ public class FindRecipesHandler implements QueryHandler<FindRecipes, List<Recipe
         return recipe -> {
             final boolean queryMatches = query.query == null || QueryNormalizer.partialMatch(recipe.getName(), query.query);
             final boolean tagsMatch = query.tags == null || new HashSet<>(
-                    recipe.getTagIds().stream().map(UUID::toString).toList()).containsAll(query.tags);
+                    recipe.getTagIds().stream().map(UUID::toString).collect(Collectors.toSet())).containsAll(query.tags);
             return queryMatches && tagsMatch;
         };
     }
 
-    private static List<TagSummary> tagSummaries(List<UUID> tagIds) {
+    private static Set<TagSummary> tagSummaries(Set<UUID> tagIds) {
         return tagIds.stream()
                 .map(id -> Repositories.tags().get(id)
                         .orElseThrow(() -> new MissingAggregateRootException(id)))
                 .map(TagSummary::fromTag)
-                .toList();
+                .collect(Collectors.toSet());
     }
 }

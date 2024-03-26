@@ -15,7 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import vtertre.ddd.MissingAggregateRootException;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,9 +41,9 @@ public class GetRecipeHandlerTest {
         assertThat(summary.name).isEqualTo(recipe.getName());
         assertThat(summary.portionsCount).isEqualTo(recipe.getPortionsCount());
         assertThat(summary.instructions).isEqualTo(recipe.getInstructions());
-        assertThat(summary.tags.getFirst().name).isEqualTo("tag");
-        assertThat(summary.ingredients.getFirst().name).isEqualTo("ingredient");
-        assertThat(summary.ingredients.getFirst().unit).isEqualTo(IngredientUnit.PIECE);
+        assertThat(summary.tags.stream().findFirst().get().name).isEqualTo("tag");
+        assertThat(summary.ingredients.stream().findFirst().get().name).isEqualTo("ingredient");
+        assertThat(summary.ingredients.stream().findFirst().get().unit).isEqualTo(IngredientUnit.PIECE);
     }
 
     @Test
@@ -60,7 +60,7 @@ public class GetRecipeHandlerTest {
     void throwsAnExceptionWhenATagReferenceIdDoesNotMatchAnyEntity() {
         GetRecipeHandler handler = new GetRecipeHandler();
         Tag tag = new Tag("tag");
-        Recipe recipe = Recipe.factory().create("", 1, Collections.emptyList(), "", List.of(tag.getId()));
+        Recipe recipe = Recipe.factory().create("", 1, Collections.emptySet(), "", Set.of(tag.getId()));
         Repositories.recipes().add(recipe);
 
         assertThatExceptionOfType(MissingAggregateRootException.class)
@@ -73,7 +73,7 @@ public class GetRecipeHandlerTest {
         GetRecipeHandler handler = new GetRecipeHandler();
         Ingredient ingredient = new Ingredient("ingredient", IngredientUnit.GRAM);
         Recipe recipe = Recipe.factory().create("", 1,
-                List.of(new RecipeIngredient(ingredient.getId(), 1, IngredientUnit.GRAM, false)), "", Collections.emptyList());
+                Set.of(new RecipeIngredient(ingredient.getId(), 1, IngredientUnit.GRAM, false)), "", Collections.emptySet());
         Repositories.recipes().add(recipe);
 
         assertThatExceptionOfType(MissingAggregateRootException.class)
@@ -83,12 +83,12 @@ public class GetRecipeHandlerTest {
 
     private static class RecipeFactory {
         public static Recipe createEmpty(String name) {
-            return Recipe.factory().create(name, 1, Collections.emptyList(), "instructions", Collections.emptyList());
+            return Recipe.factory().create(name, 1, Collections.emptySet(), "instructions", Collections.emptySet());
         }
 
         public static Recipe create(String name, Ingredient ingredient, Tag tag) {
             RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient.getId(), 120, IngredientUnit.PIECE, false);
-            return Recipe.factory().create(name, 1, List.of(recipeIngredient), "instructions", List.of(tag.getId()));
+            return Recipe.factory().create(name, 1, Set.of(recipeIngredient), "instructions", Set.of(tag.getId()));
         }
     }
 }

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,8 +38,8 @@ public class CreateRecipeCommandHandlerTest {
         command.name = "chocolat";
         command.portionsCount = 1;
         command.instructions = "instructions";
-        command.tagIds = List.of(tag.getId().toString());
-        command.ingredients = List.of(part);
+        command.tagIds = Set.of(tag.getId().toString());
+        command.ingredients = Set.of(part);
 
         UUID result = handler.execute(command);
         Recipe recipe = Repositories.recipes().get(result).get();
