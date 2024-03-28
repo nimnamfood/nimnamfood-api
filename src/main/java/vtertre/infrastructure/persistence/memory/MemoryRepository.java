@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class MemoryRepository<TId, TAggregateRoot extends AggregateRoot<TId>> implements Repository<TId, TAggregateRoot> {
+public abstract class MemoryRepository<TId, TAggregateRoot extends AggregateRoot<TId>> implements Repository<TId, TAggregateRoot> {
     final protected HashSet<TAggregateRoot> entities = Sets.newHashSet();
 
     @Override

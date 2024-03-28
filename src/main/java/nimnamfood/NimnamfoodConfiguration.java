@@ -3,6 +3,7 @@ package nimnamfood;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import nimnamfood.infrastructure.repository.jdbc.JdbcRepositories;
 import nimnamfood.infrastructure.repository.memory.MemoryRepositories;
 import nimnamfood.model.Repositories;
 import nimnamfood.model.ingredient.Ingredient;
@@ -15,12 +16,13 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
 import vtertre.command.CommandBus;
 import vtertre.command.CommandHandler;
 import vtertre.command.CommandMiddleware;
+import vtertre.command.CommandValidator;
 import vtertre.ddd.BaseEntity;
 import vtertre.infrastructure.bus.command.CommandBusAsync;
 import vtertre.infrastructure.bus.query.QueryBusAsync;
@@ -34,10 +36,10 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Configuration
-@ComponentScan("vtertre.command")
+@Import(CommandValidator.class)
 public class NimnamfoodConfiguration {
-    @Qualifier("Computation")
     @Bean
+    @Qualifier("Computation")
     public ExecutorService fixedThreadPoolExecutorService() {
         return Executors.newFixedThreadPool(
                 Runtime.getRuntime().availableProcessors(),
@@ -45,8 +47,8 @@ public class NimnamfoodConfiguration {
         );
     }
 
-    @Qualifier("Io")
     @Bean
+    @Qualifier("Io")
     public ExecutorService virtualThreadPerTaskExecutorService() {
         return Executors.newVirtualThreadPerTaskExecutor();
     }
@@ -76,8 +78,16 @@ public class NimnamfoodConfiguration {
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public Repositories repositories() {
+    @ConditionalOnProperty(value = "nimnamfood.data.inmemory", havingValue = "true")
+    public Repositories memoryRepositories() {
         return new MemoryRepositories();
+    }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+    @ConditionalOnProperty(value = "nimnamfood.data.inmemory", havingValue = "false", matchIfMissing = true)
+    public Repositories jdbcRepositories() {
+        return new JdbcRepositories();
     }
 
     @Bean
