@@ -42,6 +42,21 @@ public class JdbcRepositoryTest extends PostgresTestContainerBase {
         assertThat(dbo).isNotNull();
     }
 
+    @Test
+    void canCheckIfAnAggregateRootExistsByItsId() {
+        FakeAggregateRoot aggregateRoot = new FakeAggregateRoot("1", "aggregate");
+        FakeAggregateRootDbo dbo = new FakeAggregateRootDbo();
+        dbo.id = aggregateRoot.id;
+        dbo.name = aggregateRoot.name;
+        this.jdbcAggregateTemplate.insert(dbo);
+
+        boolean addedAggregateExists = this.repository.exists("1");
+        boolean randomAggregateDoesNotExist = this.repository.exists("2");
+
+        assertThat(addedAggregateExists).isTrue();
+        assertThat(randomAggregateDoesNotExist).isFalse();
+    }
+
     private static class Main {
         public static void main(String[] args) {
             SpringApplication.run(FakeApp.class, args);

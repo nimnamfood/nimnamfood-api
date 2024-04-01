@@ -6,10 +6,6 @@ import vtertre.ddd.Repository;
 
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public abstract class MemoryRepository<TId, TAggregateRoot extends AggregateRoot<TId>> implements Repository<TId, TAggregateRoot> {
     final protected HashSet<TAggregateRoot> entities = Sets.newHashSet();
@@ -25,12 +21,7 @@ public abstract class MemoryRepository<TId, TAggregateRoot extends AggregateRoot
     }
 
     @Override
-    public Set<TAggregateRoot> getAll(Predicate<TAggregateRoot> predicate, int limit, int skip) {
-        final Stream<TAggregateRoot> stream = this.entities
-                .stream()
-                .unordered()
-                .filter(predicate)
-                .skip(skip);
-        return limit > 0 ? stream.limit(limit).collect(Collectors.toSet()) : stream.collect(Collectors.toSet());
+    public boolean exists(TId tId) {
+        return this.entities.stream().anyMatch(entity -> entity.getId().equals(tId));
     }
 }

@@ -5,6 +5,7 @@ import nimnamfood.model.recipe.Recipe;
 import nimnamfood.model.recipe.RecipeIngredient;
 import org.springframework.stereotype.Component;
 import vtertre.command.CommandHandler;
+import vtertre.ddd.MissingAggregateRootException;
 
 import java.util.Set;
 import java.util.UUID;
@@ -14,21 +15,45 @@ import java.util.stream.Collectors;
 public class CreateRecipeCommandHandler implements CommandHandler<CreateRecipeCommand, UUID> {
     @Override
     public UUID execute(CreateRecipeCommand command) {
-        final Set<RecipeIngredient> recipeIngredients = command.ingredients
-                .stream()
-                .map(part -> new RecipeIngredient(
-                        UUID.fromString(part.ingredientId), part.quantity, part.unit, part.quantityFixed))
-                .collect(Collectors.toSet());
-        ;
+        final Set<RecipeIngredient> recipeIngredients = recipeIngredients(command.ingredients);
+        final Set<UUID> tagIds = getTagIds(command.tagIds);
 
         final Recipe recipe = Recipe.factory().create(
                 command.name,
                 command.portionsCount,
                 recipeIngredients,
                 command.instructions,
-                command.tagIds.stream().map(UUID::fromString).collect(Collectors.toSet())
+                tagIds
         );
         Repositories.recipes().add(recipe);
         return recipe.getId();
+    }
+
+    private static Set<RecipeIngredient> recipeIngredients(Set<RecipeIngredientCommandPart> parts) {
+        return parts
+                .stream()
+                .map(part -> {
+                    final UUID ingredientId = UUID.fromString(part.ingredientId);
+
+                    if (!Repositories.ingredients().exists(ingredientId)) {
+                        throw new MissingAggregateRootException(ingredientId);
+                    }
+
+                    return new RecipeIngredient(
+                            UUID.fromString(part.ingredientId), part.quantity, part.unit, part.quantityFixed);
+                })
+                .collect(Collectors.toSet());
+    }
+
+    private static Set<UUID> getTagIds(Set<String> tagIds) {
+        return tagIds.stream().map(stringUuid -> {
+            final UUID tagId = UUID.fromString(stringUuid);
+
+            if (!Repositories.tags().exists(tagId)) {
+                throw new MissingAggregateRootException(tagId);
+            }
+
+            return tagId;
+        }).collect(Collectors.toSet());
     }
 }
