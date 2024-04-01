@@ -21,7 +21,8 @@ public class GetAllIngredientUnitsHandlerTest {
                 IngredientUnit.PIECE,
                 IngredientUnit.TABLESPOON,
                 IngredientUnit.TEASPOON,
-                IngredientUnit.PINCH
+                IngredientUnit.PINCH,
+                IngredientUnit.HANDFUL
         );
     }
 }
