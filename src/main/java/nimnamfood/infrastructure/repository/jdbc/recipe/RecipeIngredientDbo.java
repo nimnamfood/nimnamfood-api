@@ -9,10 +9,19 @@ import java.util.UUID;
 @Table("recipe_ingredients")
 public class RecipeIngredientDbo {
     @Id
+    UUID id;
     UUID ingredientId;
     Float quantity;
     IngredientUnit unit;
     Boolean quantityFixed;
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
     public UUID getIngredientId() {
         return ingredientId;

@@ -5,12 +5,10 @@ import nimnamfood.model.Repositories;
 import nimnamfood.model.ingredient.Ingredient;
 import nimnamfood.model.ingredient.IngredientUnit;
 import nimnamfood.model.recipe.Recipe;
-import nimnamfood.model.recipe.RecipeIngredient;
 import nimnamfood.model.tag.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -48,7 +46,9 @@ public class CreateRecipeCommandHandlerTest {
         assertThat(recipe.getPortionsCount()).isEqualTo(1);
         assertThat(recipe.getInstructions()).isEqualTo("instructions");
         assertThat(recipe.getTagIds()).containsExactly(tag.getId());
-        assertThat(recipe.getIngredients()).containsExactly(
-                new RecipeIngredient(ingredient.getId(), 20f, IngredientUnit.PIECE, false));
+        assertThat(recipe.getIngredients()).hasSize(1);
+        assertThat(recipe.getIngredients().stream().findFirst().get()).matches(ri -> ri.getId() != null &&
+                ri.ingredientId().equals(ingredient.getId()) && ri.quantity() == 20f &&
+                ri.unit() == IngredientUnit.PIECE && !ri.quantityFixed());
     }
 }

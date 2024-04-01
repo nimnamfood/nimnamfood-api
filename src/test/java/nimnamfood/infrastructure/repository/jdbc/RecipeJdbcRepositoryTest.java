@@ -39,6 +39,7 @@ public class RecipeJdbcRepositoryTest extends PostgresTestContainerBase {
         recipeTagDbo.setTagId(tagDbo.getId());
 
         RecipeIngredientDbo recipeIngredientDbo = new RecipeIngredientDbo();
+        recipeIngredientDbo.setId(UUID.randomUUID());
         recipeIngredientDbo.setIngredientId(ingredientDbo.getId());
         recipeIngredientDbo.setQuantity(10f);
         recipeIngredientDbo.setUnit(IngredientUnit.PIECE);
@@ -66,6 +67,7 @@ public class RecipeJdbcRepositoryTest extends PostgresTestContainerBase {
         assertThat(foundRecipe.get().getTagIds()).containsExactly(tagDbo.getId());
 
         final RecipeIngredient recipeIngredient = foundRecipe.get().getIngredients().stream().findFirst().get();
+        assertThat(recipeIngredient.getId()).isEqualTo(recipeIngredientDbo.getId());
         assertThat(recipeIngredient.ingredientId()).isEqualTo(ingredientDbo.getId());
         assertThat(recipeIngredient.quantity()).isEqualTo(10f);
         assertThat(recipeIngredient.unit()).isEqualTo(IngredientUnit.PIECE);
@@ -77,9 +79,8 @@ public class RecipeJdbcRepositoryTest extends PostgresTestContainerBase {
         RecipeJdbcRepository repository = new RecipeJdbcRepository(crudRepository, jdbcAggregateTemplate);
         UUID tagId = UUID.randomUUID();
         UUID ingredientId = UUID.randomUUID();
-        Recipe recipe = Recipe.factory().create("autre recette", 1,
-                Set.of(new RecipeIngredient(ingredientId, 3, IngredientUnit.PINCH, false)),
-                "autres", Set.of(tagId));
+        RecipeIngredient recipeIngredient = new RecipeIngredient(ingredientId, 3, IngredientUnit.PINCH, false);
+        Recipe recipe = Recipe.factory().create("autre recette", 1, Set.of(recipeIngredient), "autres", Set.of(tagId));
 
         repository.add(recipe);
         RecipeDbo dbo = this.jdbcAggregateTemplate.findById(recipe.getId(), RecipeDbo.class);
@@ -91,6 +92,7 @@ public class RecipeJdbcRepositoryTest extends PostgresTestContainerBase {
         assertThat(dbo.getTags().stream().findFirst().get().getTagId()).isEqualTo(tagId);
 
         final RecipeIngredientDbo recipeIngredientDbo = dbo.getIngredients().stream().findFirst().get();
+        assertThat(recipeIngredientDbo.getId()).isEqualTo(recipeIngredient.getId());
         assertThat(recipeIngredientDbo.getIngredientId()).isEqualTo(ingredientId);
         assertThat(recipeIngredientDbo.getQuantity()).isEqualTo(3);
         assertThat(recipeIngredientDbo.getUnit()).isEqualTo(IngredientUnit.PINCH);

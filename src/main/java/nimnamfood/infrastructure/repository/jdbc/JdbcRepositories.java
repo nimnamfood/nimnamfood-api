@@ -14,13 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 
 public class JdbcRepositories extends Repositories {
-    @Autowired
     private JdbcAggregateTemplate jdbcAggregateTemplate;
-    @Autowired
     private TagJdbcCrudRepository tagJdbcCrudRepository;
-    @Autowired
     private IngredientJdbcCrudRepository ingredientJdbcCrudRepository;
-    @Autowired
     private RecipeJdbcCrudRepository recipeJdbcCrudRepository;
 
     @Override
@@ -36,5 +32,25 @@ public class JdbcRepositories extends Repositories {
     @Override
     protected RecipeRepository getRecipes() {
         return new RecipeJdbcRepository(this.recipeJdbcCrudRepository, this.jdbcAggregateTemplate);
+    }
+
+    @Autowired
+    public void setJdbcAggregateTemplate(JdbcAggregateTemplate jdbcAggregateTemplate) {
+        this.jdbcAggregateTemplate = jdbcAggregateTemplate;
+    }
+
+    @Autowired
+    public void setTagJdbcCrudRepository(TagJdbcCrudRepository tagJdbcCrudRepository) {
+        this.tagJdbcCrudRepository = tagJdbcCrudRepository;
+    }
+
+    @Autowired
+    public void setIngredientJdbcCrudRepository(IngredientJdbcCrudRepository ingredientJdbcCrudRepository) {
+        this.ingredientJdbcCrudRepository = ingredientJdbcCrudRepository;
+    }
+
+    @Autowired
+    public void setRecipeJdbcCrudRepository(RecipeJdbcCrudRepository recipeJdbcCrudRepository) {
+        this.recipeJdbcCrudRepository = recipeJdbcCrudRepository;
     }
 }

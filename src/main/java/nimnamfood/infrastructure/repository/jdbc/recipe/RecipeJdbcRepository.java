@@ -33,6 +33,7 @@ public class RecipeJdbcRepository extends JdbcRepositoryWithUuid<Recipe, RecipeD
 
     private static RecipeIngredientDbo recipeIngredientDbo(RecipeIngredient recipeIngredient) {
         final RecipeIngredientDbo recipeIngredientDbo = new RecipeIngredientDbo();
+        recipeIngredientDbo.id = recipeIngredient.getId();
         recipeIngredientDbo.ingredientId = recipeIngredient.ingredientId();
         recipeIngredientDbo.quantity = recipeIngredient.quantity();
         recipeIngredientDbo.unit = recipeIngredient.unit();

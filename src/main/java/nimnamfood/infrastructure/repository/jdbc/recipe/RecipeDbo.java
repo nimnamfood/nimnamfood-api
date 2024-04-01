@@ -23,9 +23,12 @@ public class RecipeDbo extends BaseJdbcDboWithUuid<Recipe> {
 
     @Override
     public Recipe asAggregateRoot() {
-        Set<RecipeIngredient> recipeIngredients = this.ingredients.stream().map(recipeIngredientDbo ->
-                new RecipeIngredient(recipeIngredientDbo.ingredientId, recipeIngredientDbo.quantity,
-                        recipeIngredientDbo.unit, recipeIngredientDbo.quantityFixed)).collect(Collectors.toSet());
+        Set<RecipeIngredient> recipeIngredients = this.ingredients.stream().map(recipeIngredientDbo -> {
+            final RecipeIngredient recipeIngredient = new RecipeIngredient(recipeIngredientDbo.ingredientId,
+                    recipeIngredientDbo.quantity, recipeIngredientDbo.unit, recipeIngredientDbo.quantityFixed);
+            recipeIngredient.setId(recipeIngredientDbo.getId());
+            return recipeIngredient;
+        }).collect(Collectors.toSet());
         final Recipe recipe = Recipe.factory().create(
                 this.name, this.portionsCount, recipeIngredients, this.instructions,
                 this.tags.stream().map(tag -> tag.tagId).collect(Collectors.toSet()));

@@ -15,6 +15,7 @@ create table recipe_tags (
 );
 
 create table recipe_ingredients (
+    id uuid primary key,
     recipe_id uuid not null,
     ingredient_id uuid not null,
     quantity numeric not null,
