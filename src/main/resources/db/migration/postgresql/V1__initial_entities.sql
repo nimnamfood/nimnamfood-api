@@ -1,12 +1,14 @@
 create table tags (
     id uuid primary key,
-    name text not null
+    name text not null,
+    unique(name)
 );
 
 create table ingredients (
     id uuid primary key,
     name text not null,
-    unit text not null
+    unit text not null,
+    unique(name)
 );
 
 create table recipe_tags (

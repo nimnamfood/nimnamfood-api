@@ -7,14 +7,16 @@ create table far (
 drop table if exists tags;
 create table tags (
     id uuid primary key,
-    name text not null
+    name text not null,
+    unique(name)
 );
 
 drop table if exists ingredients;
 create table ingredients (
     id uuid primary key,
     name text not null,
-    unit text not null
+    unit text not null,
+    unique(name)
 );
 
 drop table if exists recipe_tags;

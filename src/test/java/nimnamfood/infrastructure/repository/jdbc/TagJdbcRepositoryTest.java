@@ -6,6 +6,7 @@ import nimnamfood.infrastructure.repository.jdbc.tag.TagJdbcRepository;
 import nimnamfood.model.tag.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import vtertre.infrastructure.persistence.jdbc.PostgresTestContainerBase;
 
@@ -13,6 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatRuntimeException;
 
 public class TagJdbcRepositoryTest extends PostgresTestContainerBase {
     @Autowired
@@ -45,5 +47,15 @@ public class TagJdbcRepositoryTest extends PostgresTestContainerBase {
 
         assertThat(dbo).isNotNull();
         assertThat(dbo.getName()).isEqualTo("végé");
+    }
+
+    @Test
+    void throwsAnErrorWhenAddingATagWithAnExistingName() {
+        TagJdbcRepository repository = new TagJdbcRepository(crudRepository, jdbcAggregateTemplate);
+
+        repository.add(new Tag("rapide"));
+
+        assertThatRuntimeException().isThrownBy(
+                () -> repository.add(new Tag("rapide"))).withCauseInstanceOf(DuplicateKeyException.class);
     }
 }
