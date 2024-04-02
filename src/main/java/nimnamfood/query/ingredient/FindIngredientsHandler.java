@@ -1,6 +1,8 @@
 package nimnamfood.query.ingredient;
 
+import nimnamfood.model.ingredient.IngredientUnit;
 import nimnamfood.query.ingredient.model.IngredientSummary;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -8,6 +10,7 @@ import vtertre.query.QueryHandlerJdbc;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class FindIngredientsHandler extends QueryHandlerJdbc<FindIngredients, List<IngredientSummary>> {
@@ -18,11 +21,21 @@ public class FindIngredientsHandler extends QueryHandlerJdbc<FindIngredients, Li
 
         if (query.query == null || query.query.isEmpty()) {
             final String sqlQuery = appendLimitAndOffset(baseSqlQuery);
-            return template.query(sqlQuery, new MapSqlParameterSource(params), IngredientSummary.mapper());
+            return template.query(sqlQuery, new MapSqlParameterSource(params), ingredientSummaryMapper());
         }
 
         final String sqlQuery = appendLimitAndOffset(baseSqlQuery + " WHERE name ILIKE :query");
         params.put("query", "%" + query.query + "%");
-        return template.query(sqlQuery, new MapSqlParameterSource(params), IngredientSummary.mapper());
+        return template.query(sqlQuery, new MapSqlParameterSource(params), ingredientSummaryMapper());
+    }
+
+    private static RowMapper<IngredientSummary> ingredientSummaryMapper() {
+        return (resultSet, rowNum) -> {
+            final IngredientSummary summary = new IngredientSummary();
+            summary.id = resultSet.getObject("id", UUID.class);
+            summary.name = resultSet.getString("name");
+            summary.unit = IngredientUnit.valueOf(resultSet.getString("unit"));
+            return summary;
+        };
     }
 }
