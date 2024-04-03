@@ -26,7 +26,7 @@ public class CommandBusAsyncTest {
 
     @Test
     void throwsAnExceptionWhenNoHandlerIsFound() {
-        CommandBusAsync bus = new CommandBusAsync(Collections.emptyList(), Collections.emptySet(), executorService);
+        CommandBusAsync bus = new CommandBusAsync(Collections.emptySet(), Collections.emptySet(), executorService);
 
         assertThatExceptionOfType(NoHandlerFound.class)
                 .isThrownBy(() -> bus.dispatch(new FakeCommand()))
@@ -36,7 +36,7 @@ public class CommandBusAsyncTest {
     @Test
     void executesTheCommandWithTheHandler() throws Exception {
         FakeCommandHandler handler = new FakeCommandHandler();
-        CommandBusAsync bus = new CommandBusAsync(Collections.emptyList(), Sets.newHashSet(handler), executorService);
+        CommandBusAsync bus = new CommandBusAsync(Collections.emptySet(), Sets.newHashSet(handler), executorService);
         FakeCommand command = new FakeCommand();
 
         CompletableFuture<String> result = bus.dispatch(command);
@@ -52,7 +52,7 @@ public class CommandBusAsyncTest {
         FakeMiddleware firstMiddleware = new FakeMiddleware(callChain);
         FakeMiddleware secondMiddleware = new FakeMiddleware(callChain);
         CommandBusAsync bus = new CommandBusAsync(
-                Lists.newArrayList(firstMiddleware, secondMiddleware), Sets.newHashSet(handler), executorService);
+                Sets.newLinkedHashSet(List.of(firstMiddleware, secondMiddleware)), Sets.newHashSet(handler), executorService);
         FakeCommand command = new FakeCommand();
 
         CompletableFuture<String> result = bus.dispatch(command);

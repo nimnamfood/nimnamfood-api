@@ -18,7 +18,7 @@ public class CommandBusAsync implements CommandBus {
     private final MiddlewareChainLink firstMiddlewareChainLink;
     private final static Logger LOGGER = LoggerFactory.getLogger(CommandBusAsync.class);
 
-    public CommandBusAsync(List<CommandMiddleware> middlewares, Set<CommandHandler<?, ?>> handlers, ExecutorService executorService) {
+    public CommandBusAsync(Set<CommandMiddleware> middlewares, Set<CommandHandler<?, ?>> handlers, ExecutorService executorService) {
         MiddlewareChainLink currentLink = new MiddlewareChainLink(
                 new InvokeCommandHandlerMiddleware(handlers, executorService),
                 new ClosingMiddlewareChainLink()

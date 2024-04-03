@@ -1,5 +1,6 @@
 package nimnamfood;
 
+import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -34,7 +35,6 @@ import vtertre.infrastructure.bus.query.QueryBusAsync;
 import vtertre.query.QueryBus;
 import vtertre.query.QueryHandler;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -68,10 +68,10 @@ public class NimnamfoodConfiguration {
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public EventBus eventBus(
-            LinkedHashSet<EventBusMiddleware> middlewares,
+            List<EventBusMiddleware> middlewares,
             Set<EventCaptor<?>> eventCaptors,
             @Qualifier("Io") ExecutorService executorService) {
-        return new EventBusAsync(middlewares, eventCaptors, executorService);
+        return new EventBusAsync(Sets.newLinkedHashSet(middlewares), eventCaptors, executorService);
     }
 
     @Bean
@@ -80,7 +80,7 @@ public class NimnamfoodConfiguration {
             List<CommandMiddleware> middlewares,
             Set<CommandHandler<?, ?>> commandHandlers,
             @Qualifier("Computation") ExecutorService executorService) {
-        return new CommandBusAsync(middlewares, commandHandlers, executorService);
+        return new CommandBusAsync(Sets.newLinkedHashSet(middlewares), commandHandlers, executorService);
     }
 
     @Bean
