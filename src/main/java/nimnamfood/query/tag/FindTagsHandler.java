@@ -28,11 +28,7 @@ public class FindTagsHandler extends QueryHandlerJdbc<FindTags, List<TagSummary>
     }
 
     private static RowMapper<TagSummary> tagSummaryMapper() {
-        return (resultSet, rowNum) -> {
-            final TagSummary summary = new TagSummary();
-            summary.id = resultSet.getObject("id", UUID.class);
-            summary.name = resultSet.getString("name");
-            return summary;
-        };
+        return (resultSet, rowNum) ->new TagSummary(
+                resultSet.getObject("id", UUID.class), resultSet.getString("name"));
     }
 }

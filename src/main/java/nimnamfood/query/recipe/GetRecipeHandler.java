@@ -50,36 +50,36 @@ public class GetRecipeHandler extends QueryHandlerJdbc<GetRecipe, RecipeSummary>
 
                 final UUID tagId = resultSet.getObject("tag_id", UUID.class);
                 if (!tagSummariesById.containsKey(tagId)) {
-                    final TagSummary tagSummary = new TagSummary();
-                    tagSummary.id = tagId;
-                    tagSummary.name = resultSet.getString("tag_name");
+                    final TagSummary tagSummary = new TagSummary(tagId, resultSet.getString("tag_name"));
                     tagSummariesById.put(tagId, tagSummary);
                 }
             } while (resultSet.next());
 
-            summary.ingredients = Sets.newHashSet(ingredientSummariesById.values());
-            summary.tags = Sets.newHashSet(tagSummariesById.values());
+            summary.ingredients().addAll(ingredientSummariesById.values());
+            summary.tags().addAll(tagSummariesById.values());
 
             return summary;
         });
     }
 
     private static RecipeSummary extractRecipeSummary(ResultSet resultSet) throws SQLException {
-        final RecipeSummary summary = new RecipeSummary();
-        summary.id = resultSet.getObject("id", UUID.class);
-        summary.name = resultSet.getString("name");
-        summary.portionsCount = resultSet.getInt("portions_count");
-        summary.instructions = resultSet.getString("instructions");
-        return summary;
+        return new RecipeSummary(
+                resultSet.getObject("id", UUID.class),
+                resultSet.getString("name"),
+                resultSet.getInt("portions_count"),
+                resultSet.getString("instructions"),
+                Sets.newHashSet(),
+                Sets.newHashSet()
+        );
     }
 
     private static RecipeIngredientSummary extractRecipeIngredientSummary(ResultSet resultSet) throws SQLException {
-        final RecipeIngredientSummary ingredientSummary = new RecipeIngredientSummary();
-        ingredientSummary.id = resultSet.getObject("ingredient_id", UUID.class);
-        ingredientSummary.name = resultSet.getString("ingredient_name");
-        ingredientSummary.quantity = resultSet.getFloat("ingredient_quantity");
-        ingredientSummary.unit = IngredientUnit.valueOf(resultSet.getString("ingredient_unit"));
-        ingredientSummary.quantityFixed = resultSet.getBoolean("ingredient_quantity_fixed");
-        return ingredientSummary;
+        return new RecipeIngredientSummary(
+                resultSet.getObject("ingredient_id", UUID.class),
+                resultSet.getString("ingredient_name"),
+                resultSet.getFloat("ingredient_quantity"),
+                IngredientUnit.valueOf(resultSet.getString("ingredient_unit")),
+                resultSet.getBoolean("ingredient_quantity_fixed")
+        );
     }
 }

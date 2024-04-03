@@ -41,12 +41,12 @@ public class FindIngredientsHandlerTest extends PostgresTestContainerBase {
         List<IngredientSummary> result = handler.execute(new FindIngredients(), jdbcTemplate);
 
         assertThat(result).hasSize(2);
-        assertThat(result).anyMatch(summary -> summary.id.equals(ingredient1.getId()) &&
-                summary.name.equals(ingredient1.getName()) &&
-                summary.unit == ingredient1.getUnit());
-        assertThat(result).anyMatch(summary -> summary.id.equals(ingredient2.getId()) &&
-                summary.name.equals(ingredient2.getName()) &&
-                summary.unit == ingredient2.getUnit());
+        assertThat(result).anyMatch(summary -> summary.id().equals(ingredient1.getId()) &&
+                summary.name().equals(ingredient1.getName()) &&
+                summary.unit() == ingredient1.getUnit());
+        assertThat(result).anyMatch(summary -> summary.id().equals(ingredient2.getId()) &&
+                summary.name().equals(ingredient2.getName()) &&
+                summary.unit() == ingredient2.getUnit());
     }
 
     @Test
@@ -63,12 +63,12 @@ public class FindIngredientsHandlerTest extends PostgresTestContainerBase {
         List<IngredientSummary> result = handler.execute(new FindIngredients("citron"), jdbcTemplate);
 
         assertThat(result).hasSize(2);
-        assertThat(result).anyMatch(summary -> summary.id.equals(ingredient3.getId()) &&
-                summary.name.equals(ingredient3.getName()) &&
-                summary.unit == ingredient3.getUnit());
-        assertThat(result).anyMatch(summary -> summary.id.equals(ingredient2.getId()) &&
-                summary.name.equals(ingredient2.getName()) &&
-                summary.unit == ingredient2.getUnit());
+        assertThat(result).anyMatch(summary -> summary.id().equals(ingredient3.getId()) &&
+                summary.name().equals(ingredient3.getName()) &&
+                summary.unit() == ingredient3.getUnit());
+        assertThat(result).anyMatch(summary -> summary.id().equals(ingredient2.getId()) &&
+                summary.name().equals(ingredient2.getName()) &&
+                summary.unit() == ingredient2.getUnit());
     }
 
     @Disabled("Désactivé le temps de trouver comment ignorer les caractères spéciaux côté DB ou via les projections")
@@ -80,7 +80,7 @@ public class FindIngredientsHandlerTest extends PostgresTestContainerBase {
         List<IngredientSummary> result = handler.execute(new FindIngredients("choc"));
 
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().name).isEqualTo("Chöcolat");
+        assertThat(result.getFirst().name()).isEqualTo("Chöcolat");
     }
 
     @Test
@@ -95,12 +95,12 @@ public class FindIngredientsHandlerTest extends PostgresTestContainerBase {
         List<IngredientSummary> result2 = handler.execute((FindIngredients) new FindIngredients().limit(1).skip(1), jdbcTemplate);
 
         assertThat(result1).hasSize(1);
-        assertThat(result1.getFirst().id).isEqualTo(ingredient1.getId());
-        assertThat(result1.getFirst().name).isEqualTo("chocolat");
-        assertThat(result1.getFirst().unit).isEqualTo(IngredientUnit.GRAM);
+        assertThat(result1.getFirst().id()).isEqualTo(ingredient1.getId());
+        assertThat(result1.getFirst().name()).isEqualTo("chocolat");
+        assertThat(result1.getFirst().unit()).isEqualTo(IngredientUnit.GRAM);
         assertThat(result2).hasSize(1);
-        assertThat(result2.getFirst().id).isEqualTo(ingredient2.getId());
-        assertThat(result2.getFirst().name).isEqualTo("citron");
-        assertThat(result2.getFirst().unit).isEqualTo(IngredientUnit.PIECE);
+        assertThat(result2.getFirst().id()).isEqualTo(ingredient2.getId());
+        assertThat(result2.getFirst().name()).isEqualTo("citron");
+        assertThat(result2.getFirst().unit()).isEqualTo(IngredientUnit.PIECE);
     }
 }

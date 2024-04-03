@@ -45,12 +45,12 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
         List<RecipeSearchSummary> result = handler.execute(new FindRecipes(), template);
 
         assertThat(result).hasSize(2);
-        assertThat(result).anyMatch(summary -> summary.id.equals(recipe1.getId()) &&
-                summary.name.equals(recipe1.getName()) &&
-                summary.tags.isEmpty());
-        assertThat(result).anyMatch(summary -> summary.id.equals(recipe2.getId()) &&
-                summary.name.equals(recipe2.getName()) &&
-                summary.tags.stream().findFirst().get().name.equals("tag"));
+        assertThat(result).anyMatch(summary -> summary.id().equals(recipe1.getId()) &&
+                summary.name().equals(recipe1.getName()) &&
+                summary.tags().isEmpty());
+        assertThat(result).anyMatch(summary -> summary.id().equals(recipe2.getId()) &&
+                summary.name().equals(recipe2.getName()) &&
+                summary.tags().stream().findFirst().get().name().equals("tag"));
     }
 
     @Test
@@ -67,12 +67,12 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
         List<RecipeSearchSummary> result = handler.execute(new FindRecipes("poulet"), template);
 
         assertThat(result).hasSize(2);
-        assertThat(result).anyMatch(summary -> summary.id.equals(recipe1.getId()) &&
-                summary.name.equals(recipe1.getName()) &&
-                summary.tags.isEmpty());
-        assertThat(result).anyMatch(summary -> summary.id.equals(recipe3.getId()) &&
-                summary.name.equals(recipe3.getName()) &&
-                summary.tags.isEmpty());
+        assertThat(result).anyMatch(summary -> summary.id().equals(recipe1.getId()) &&
+                summary.name().equals(recipe1.getName()) &&
+                summary.tags().isEmpty());
+        assertThat(result).anyMatch(summary -> summary.id().equals(recipe3.getId()) &&
+                summary.name().equals(recipe3.getName()) &&
+                summary.tags().isEmpty());
     }
 
     @Disabled("Désactivé le temps de trouver comment ignorer les caractères spéciaux côté DB ou via les projections")
@@ -85,7 +85,7 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
         List<RecipeSearchSummary> result = handler.execute(new FindRecipes("taboule"), template);
 
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().name).isEqualTo("taboulé de poulet");
+        assertThat(result.getFirst().name()).isEqualTo("taboulé de poulet");
     }
 
     @Test
@@ -111,14 +111,14 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
         List<RecipeSearchSummary> result = handler.execute(new FindRecipes(Set.of(tag3.getId().toString(), tag2.getId().toString())), template);
 
         assertThat(result).hasSize(2);
-        assertThat(result).anyMatch(summary -> summary.id.equals(recipe1.getId()));
+        assertThat(result).anyMatch(summary -> summary.id().equals(recipe1.getId()));
 
-        final RecipeSearchSummary summaryOfRecipe4 = result.stream().filter(s -> s.id.equals(recipe4.getId())).findFirst().get();
-        assertThat(summaryOfRecipe4.name).isEqualTo("4");
-        assertThat(summaryOfRecipe4.tags).hasSize(3);
-        assertThat(summaryOfRecipe4.tags).anyMatch(s -> s.id.equals(tag3.getId()) && s.name.equals("3"));
-        assertThat(summaryOfRecipe4.tags).anyMatch(s -> s.id.equals(tag2.getId()) && s.name.equals("2"));
-        assertThat(summaryOfRecipe4.tags).anyMatch(s -> s.id.equals(tag1.getId()) && s.name.equals("1"));
+        final RecipeSearchSummary summaryOfRecipe4 = result.stream().filter(s -> s.id().equals(recipe4.getId())).findFirst().get();
+        assertThat(summaryOfRecipe4.name()).isEqualTo("4");
+        assertThat(summaryOfRecipe4.tags()).hasSize(3);
+        assertThat(summaryOfRecipe4.tags()).anyMatch(s -> s.id().equals(tag3.getId()) && s.name().equals("3"));
+        assertThat(summaryOfRecipe4.tags()).anyMatch(s -> s.id().equals(tag2.getId()) && s.name().equals("2"));
+        assertThat(summaryOfRecipe4.tags()).anyMatch(s -> s.id().equals(tag1.getId()) && s.name().equals("1"));
 
     }
 
@@ -141,6 +141,6 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
         List<RecipeSearchSummary> result = handler.execute(new FindRecipes("poulet", Set.of(tag2.getId().toString(), tag1.getId().toString())), template);
 
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().id).isEqualTo(recipe2.getId());
+        assertThat(result.getFirst().id()).isEqualTo(recipe2.getId());
     }
 }

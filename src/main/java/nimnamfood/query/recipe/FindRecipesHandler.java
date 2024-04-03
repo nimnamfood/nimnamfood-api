@@ -34,20 +34,13 @@ public class FindRecipesHandler extends QueryHandlerJdbc<FindRecipes, List<Recip
             while (resultSet.next()) {
                 final UUID id = resultSet.getObject("id", UUID.class);
                 final String name = resultSet.getString("name");
-                final RecipeSearchSummary summary = summariesById.computeIfAbsent(id, idToAdd -> {
-                    final RecipeSearchSummary summaryToAdd = new RecipeSearchSummary();
-                    summaryToAdd.id = idToAdd;
-                    summaryToAdd.name = name;
-                    summaryToAdd.tags = Sets.newHashSet();
-                    return summaryToAdd;
-                });
+                final RecipeSearchSummary summary = summariesById.computeIfAbsent(
+                        id, idToAdd -> new RecipeSearchSummary(idToAdd, name, Sets.newHashSet()));
 
                 final UUID tagId = resultSet.getObject("tag_id", UUID.class);
                 if (tagId != null) {
-                    final TagSummary tagSummary = new TagSummary();
-                    tagSummary.id = tagId;
-                    tagSummary.name = resultSet.getString("tag_name");
-                    summary.tags.add(tagSummary);
+                    final TagSummary tagSummary = new TagSummary(tagId, resultSet.getString("tag_name"));
+                    summary.tags().add(tagSummary);
                 }
             }
             return Lists.newArrayList(summariesById.values());

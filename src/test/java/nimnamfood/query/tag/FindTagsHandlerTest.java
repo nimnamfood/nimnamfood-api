@@ -38,8 +38,8 @@ public class FindTagsHandlerTest extends PostgresTestContainerBase {
         List<TagSummary> result = handler.execute(new FindTags(), template);
 
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().id).isEqualTo(tag.getId());
-        assertThat(result.getFirst().name).isEqualTo("rapide");
+        assertThat(result.getFirst().id()).isEqualTo(tag.getId());
+        assertThat(result.getFirst().name()).isEqualTo("rapide");
     }
 
     @Test
@@ -53,8 +53,8 @@ public class FindTagsHandlerTest extends PostgresTestContainerBase {
         List<TagSummary> result = handler.execute(new FindTags("vég"), template);
 
         assertThat(result).hasSize(1);
-        assertThat(result).anyMatch(summary -> summary.id.equals(tag2.getId()) &&
-                summary.name.equals(tag2.getName()));
+        assertThat(result).anyMatch(summary -> summary.id().equals(tag2.getId()) &&
+                summary.name().equals(tag2.getName()));
     }
 
     @Disabled("Désactivé le temps de trouver comment ignorer les caractères spéciaux côté DB ou via les projections")
@@ -69,7 +69,7 @@ public class FindTagsHandlerTest extends PostgresTestContainerBase {
         List<TagSummary> result = handler.execute(new FindTags("veg"), template);
 
         assertThat(result).hasSize(1);
-        assertThat(result).anyMatch(summary -> summary.id.equals(tag2.getId()) &&
-                summary.name.equals(tag2.getName()));
+        assertThat(result).anyMatch(summary -> summary.id().equals(tag2.getId()) &&
+                summary.name().equals(tag2.getName()));
     }
 }

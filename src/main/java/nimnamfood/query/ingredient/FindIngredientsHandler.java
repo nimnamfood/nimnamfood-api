@@ -30,12 +30,10 @@ public class FindIngredientsHandler extends QueryHandlerJdbc<FindIngredients, Li
     }
 
     private static RowMapper<IngredientSummary> ingredientSummaryMapper() {
-        return (resultSet, rowNum) -> {
-            final IngredientSummary summary = new IngredientSummary();
-            summary.id = resultSet.getObject("id", UUID.class);
-            summary.name = resultSet.getString("name");
-            summary.unit = IngredientUnit.valueOf(resultSet.getString("unit"));
-            return summary;
-        };
+        return (resultSet, rowNum) -> new IngredientSummary(
+                resultSet.getObject("id", UUID.class),
+                resultSet.getString("name"),
+                IngredientUnit.valueOf(resultSet.getString("unit"))
+        );
     }
 }
