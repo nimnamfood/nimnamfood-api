@@ -9,7 +9,10 @@ import nimnamfood.model.tag.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import vtertre.ddd.MissingAggregateRootException;
+import vtertre.ddd.Tuple;
+import vtertre.ddd.event.DomainEvent;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -41,8 +44,8 @@ public class CreateRecipeCommandHandlerTest {
         command.tagIds = Set.of(tag.getId().toString());
         command.ingredients = Set.of(part);
 
-        UUID result = handler.execute(command);
-        Recipe recipe = Repositories.recipes().get(result).get();
+        Tuple<UUID, List<DomainEvent>> result = handler.execute(command);
+        Recipe recipe = Repositories.recipes().get(result._1).get();
 
         assertThat(recipe.getName()).isEqualTo("chocolat");
         assertThat(recipe.getPortionsCount()).isEqualTo(1);
@@ -52,6 +55,7 @@ public class CreateRecipeCommandHandlerTest {
         assertThat(recipe.getIngredients().stream().findFirst().get()).matches(ri -> ri.getId() != null &&
                 ri.ingredientId().equals(ingredient.getId()) && ri.quantity() == 20f &&
                 ri.unit() == IngredientUnit.PIECE && !ri.quantityFixed());
+        assertThat(result._2).isEmpty();
     }
 
     @Test

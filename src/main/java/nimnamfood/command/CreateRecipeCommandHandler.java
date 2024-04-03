@@ -6,7 +6,11 @@ import nimnamfood.model.recipe.RecipeIngredient;
 import org.springframework.stereotype.Component;
 import vtertre.command.CommandHandler;
 import vtertre.ddd.MissingAggregateRootException;
+import vtertre.ddd.Tuple;
+import vtertre.ddd.event.DomainEvent;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -14,7 +18,7 @@ import java.util.stream.Collectors;
 @Component
 public class CreateRecipeCommandHandler implements CommandHandler<CreateRecipeCommand, UUID> {
     @Override
-    public UUID execute(CreateRecipeCommand command) {
+    public Tuple<UUID, List<DomainEvent>> execute(CreateRecipeCommand command) {
         final Set<RecipeIngredient> recipeIngredients = recipeIngredients(command.ingredients);
         final Set<UUID> tagIds = getTagIds(command.tagIds);
 
@@ -26,7 +30,7 @@ public class CreateRecipeCommandHandler implements CommandHandler<CreateRecipeCo
                 tagIds
         );
         Repositories.recipes().add(recipe);
-        return recipe.getId();
+        return Tuple.of(recipe.getId(), Collections.emptyList());
     }
 
     private static Set<RecipeIngredient> recipeIngredients(Set<RecipeIngredientCommandPart> parts) {

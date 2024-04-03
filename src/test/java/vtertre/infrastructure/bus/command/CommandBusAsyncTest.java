@@ -8,6 +8,8 @@ import vtertre.command.Command;
 import vtertre.command.CommandBus;
 import vtertre.command.CommandHandler;
 import vtertre.command.CommandMiddleware;
+import vtertre.ddd.Tuple;
+import vtertre.ddd.event.DomainEvent;
 import vtertre.infrastructure.bus.NoHandlerFound;
 
 import java.util.Collections;
@@ -68,9 +70,9 @@ public class CommandBusAsyncTest {
         FakeCommand command;
 
         @Override
-        public String execute(FakeCommand command) {
+        public Tuple<String, List<DomainEvent>> execute(FakeCommand command) {
             this.command = command;
-            return "fake command result";
+            return Tuple.of("fake command result", Collections.emptyList());
         }
     }
 
@@ -83,7 +85,7 @@ public class CommandBusAsyncTest {
         }
 
         @Override
-        public <T> CompletableFuture<T> intercept(CommandBus commandBus, Command<T> command, Supplier<CompletableFuture<T>> nextMiddleware) {
+        public <T> CompletableFuture<Tuple<T, List<DomainEvent>>> intercept(CommandBus commandBus, Command<T> command, Supplier<CompletableFuture<Tuple<T, List<DomainEvent>>>> nextMiddleware) {
             this.called = true;
             this.callChain.add(this);
             return nextMiddleware.get();

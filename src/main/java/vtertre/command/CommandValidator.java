@@ -5,6 +5,8 @@ import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import vtertre.ddd.Tuple;
+import vtertre.ddd.event.DomainEvent;
 
 import java.util.List;
 import java.util.Set;
@@ -23,7 +25,8 @@ public class CommandValidator implements CommandMiddleware {
     }
 
     @Override
-    public <T> CompletableFuture<T> intercept(CommandBus commandBus, Command<T> command, Supplier<CompletableFuture<T>> nextMiddleware) {
+    public <T> CompletableFuture<Tuple<T, List<DomainEvent>>> intercept(
+            CommandBus commandBus, Command<T> command, Supplier<CompletableFuture<Tuple<T, List<DomainEvent>>>> nextMiddleware) {
         this.validate(command);
         return nextMiddleware.get();
     }

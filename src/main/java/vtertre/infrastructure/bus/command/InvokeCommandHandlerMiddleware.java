@@ -6,9 +6,12 @@ import vtertre.command.Command;
 import vtertre.command.CommandBus;
 import vtertre.command.CommandHandler;
 import vtertre.command.CommandMiddleware;
+import vtertre.ddd.Tuple;
+import vtertre.ddd.event.DomainEvent;
 import vtertre.infrastructure.bus.MessageHandler;
 import vtertre.infrastructure.bus.NoHandlerFound;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -29,7 +32,7 @@ public class InvokeCommandHandlerMiddleware implements CommandMiddleware {
     }
 
     @Override
-    public <T> CompletableFuture<T> intercept(CommandBus commandBus, Command<T> command, Supplier<CompletableFuture<T>> nextMiddleware) {
+    public <T> CompletableFuture<Tuple<T, List<DomainEvent>>> intercept(CommandBus commandBus, Command<T> command, Supplier<CompletableFuture<Tuple<T, List<DomainEvent>>>> nextMiddleware) {
         return Optional.ofNullable(this.handlers.get(command.getClass()))
                 .map(handler -> (CommandHandler<Command<T>, T>) handler)
                 .map(handler -> CompletableFuture.supplyAsync(() -> {

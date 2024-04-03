@@ -4,7 +4,11 @@ import jakarta.validation.Validation;
 import jakarta.validation.ValidatorFactory;
 import jakarta.validation.constraints.NotEmpty;
 import org.junit.jupiter.api.Test;
+import vtertre.ddd.Tuple;
+import vtertre.ddd.event.DomainEvent;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.*;
@@ -49,10 +53,11 @@ public class CommandValidatorTest {
         FakeMiddleware m = new FakeMiddleware();
         FakeCommand command = new FakeCommand("name");
 
-        CompletableFuture<String> result = validator.intercept(null, command, () -> m.apply(command));
+        CompletableFuture<Tuple<String, List<DomainEvent>>> result = validator.intercept(null, command, () -> m.apply(command));
 
         assertThat(m.command).isEqualTo(command);
-        assertThat(result.get()).isEqualTo("fake middleware");
+        assertThat(result.get()._1).isEqualTo("fake middleware");
+        assertThat(result.get()._2).isEmpty();
     }
 
     private record FakeCommand(@NotEmpty String name) implements Command<String> {
@@ -64,9 +69,9 @@ public class CommandValidatorTest {
     private static class FakeMiddleware {
         Command<?> command;
 
-        CompletableFuture<String> apply(Command<?> command) {
+        CompletableFuture<Tuple<String, List<DomainEvent>>> apply(Command<?> command) {
             this.command = command;
-            return CompletableFuture.completedFuture("fake middleware");
+            return CompletableFuture.completedFuture(Tuple.of("fake middleware", Collections.emptyList()));
         }
     }
 }

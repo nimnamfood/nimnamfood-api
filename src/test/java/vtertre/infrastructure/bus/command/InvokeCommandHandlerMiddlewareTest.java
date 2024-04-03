@@ -5,9 +5,12 @@ import com.google.common.util.concurrent.MoreExecutors;
 import org.junit.jupiter.api.Test;
 import vtertre.command.Command;
 import vtertre.command.CommandHandler;
+import vtertre.ddd.Tuple;
+import vtertre.ddd.event.DomainEvent;
 import vtertre.infrastructure.bus.NoHandlerFound;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
@@ -33,10 +36,11 @@ public class InvokeCommandHandlerMiddlewareTest {
                 Sets.newHashSet(handler), executorService);
         FakeCommand command = new FakeCommand();
 
-        CompletableFuture<String> result = middleware.intercept(null, command, null);
+        CompletableFuture<Tuple<String, List<DomainEvent>>> result = middleware.intercept(null, command, null);
 
-        assertThat(result.get()).isEqualTo("fake command result");
+        assertThat(result.get()._1).isEqualTo("fake command result");
         assertThat(handler.command).isEqualTo(command);
+        assertThat(((FakeEvent) result.get()._2.getFirst()).name).isEqualTo("test");
     }
 
     @Test
@@ -47,31 +51,34 @@ public class InvokeCommandHandlerMiddlewareTest {
         FakeCommand command = new FakeCommand();
         FakeMiddleware fakeMiddleware = new FakeMiddleware();
 
-        CompletableFuture<String> result = middleware.intercept(null, command, () -> fakeMiddleware.apply(command));
+        CompletableFuture<Tuple<String, List<DomainEvent>>> result = middleware.intercept(null, command, () -> fakeMiddleware.apply(command));
 
-        assertThat(result.get()).isEqualTo("fake command result");
+        assertThat(result.get()._1).isEqualTo("fake command result");
         assertThat(fakeMiddleware.called).isFalse();
     }
 
     private static class FakeCommand implements Command<String> {
     }
 
+    private record FakeEvent(String name) implements DomainEvent {
+    }
+
     private static class FakeCommandHandler implements CommandHandler<FakeCommand, String> {
         FakeCommand command;
 
         @Override
-        public String execute(FakeCommand command) {
+        public Tuple<String, List<DomainEvent>> execute(FakeCommand command) {
             this.command = command;
-            return "fake command result";
+            return Tuple.of("fake command result", List.of(new FakeEvent("test")));
         }
     }
 
     private static class FakeMiddleware {
         boolean called = false;
 
-        <T> CompletableFuture<T> apply(Command<T> command) {
+        <T> CompletableFuture<Tuple<T, List<DomainEvent>>> apply(Command<T> command) {
             this.called = true;
-            return CompletableFuture.completedFuture(null);
+            return CompletableFuture.completedFuture(Tuple.of(null, null));
         }
     }
 }

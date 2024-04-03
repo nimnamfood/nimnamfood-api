@@ -6,6 +6,8 @@ import vtertre.command.Command;
 import vtertre.command.CommandBus;
 import vtertre.command.CommandHandler;
 import vtertre.command.CommandMiddleware;
+import vtertre.ddd.Tuple;
+import vtertre.ddd.event.DomainEvent;
 
 import java.util.List;
 import java.util.Set;
@@ -29,7 +31,8 @@ public class CommandBusAsync implements CommandBus {
 
     @Override
     public <TResponse> CompletableFuture<TResponse> dispatch(Command<TResponse> command) {
-        return this.firstMiddlewareChainLink.apply(command);
+        return this.firstMiddlewareChainLink.apply(command).thenApply(
+                tuple -> tuple.apply((result, events) -> result));
     }
 
     private class MiddlewareChainLink {
@@ -41,7 +44,7 @@ public class CommandBusAsync implements CommandBus {
             this.nextLink = nextLink;
         }
 
-        public <T> CompletableFuture<T> apply(Command<T> command) {
+        public <T> CompletableFuture<Tuple<T, List<DomainEvent>>> apply(Command<T> command) {
             LOGGER.debug("Running middleware {}", this.currentMiddleware.getClass());
             return this.currentMiddleware.intercept(CommandBusAsync.this, command, () -> this.nextLink.apply(command));
         }
@@ -54,7 +57,7 @@ public class CommandBusAsync implements CommandBus {
         }
 
         @Override
-        public <T> CompletableFuture<T> apply(Command<T> command) {
+        public <T> CompletableFuture<Tuple<T, List<DomainEvent>>> apply(Command<T> command) {
             throw new RuntimeException("Reached middleware black hole");
         }
     }

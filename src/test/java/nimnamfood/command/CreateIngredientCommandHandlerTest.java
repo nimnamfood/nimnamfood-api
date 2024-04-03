@@ -6,7 +6,10 @@ import nimnamfood.model.ingredient.Ingredient;
 import nimnamfood.model.ingredient.IngredientUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import vtertre.ddd.Tuple;
+import vtertre.ddd.event.DomainEvent;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,11 +23,12 @@ public class CreateIngredientCommandHandlerTest {
         command.name = "chocolat";
         command.unit = IngredientUnit.GRAM;
 
-        UUID result = handler.execute(command);
-        Ingredient ingredient = Repositories.ingredients().get(result).get();
+        Tuple<UUID, List<DomainEvent>> result = handler.execute(command);
+        Ingredient ingredient = Repositories.ingredients().get(result._1).get();
 
-        assertThat(ingredient.getId()).isEqualTo(result);
+        assertThat(ingredient.getId()).isEqualTo(result._1);
         assertThat(ingredient.getName()).isEqualTo("chocolat");
         assertThat(ingredient.getUnit()).isEqualTo(IngredientUnit.GRAM);
+        assertThat(result._2).isEmpty();
     }
 }
