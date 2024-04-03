@@ -14,8 +14,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-@Order(1)
 @Component
+@Order(1)
 public class CommandValidator implements CommandMiddleware {
     private final Validator validator;
 

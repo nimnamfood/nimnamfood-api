@@ -24,11 +24,17 @@ import vtertre.command.CommandHandler;
 import vtertre.command.CommandMiddleware;
 import vtertre.command.CommandValidator;
 import vtertre.ddd.BaseEntity;
+import vtertre.ddd.event.EventBus;
+import vtertre.ddd.event.EventBusMiddleware;
+import vtertre.ddd.event.EventCaptor;
 import vtertre.infrastructure.bus.command.CommandBusAsync;
+import vtertre.infrastructure.bus.event.EventBusAsync;
+import vtertre.infrastructure.bus.event.EventPublisherMiddleware;
 import vtertre.infrastructure.bus.query.QueryBusAsync;
 import vtertre.query.QueryBus;
 import vtertre.query.QueryHandler;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -36,7 +42,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Configuration
-@Import(CommandValidator.class)
+@Import({CommandValidator.class, EventPublisherMiddleware.class})
 public class NimnamfoodConfiguration {
     @Bean
     @Qualifier("Computation")
@@ -57,6 +63,15 @@ public class NimnamfoodConfiguration {
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public Validator validator() {
         return Validation.buildDefaultValidatorFactory().getValidator();
+    }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+    public EventBus eventBus(
+            LinkedHashSet<EventBusMiddleware> middlewares,
+            Set<EventCaptor<?>> eventCaptors,
+            @Qualifier("Io") ExecutorService executorService) {
+        return new EventBusAsync(middlewares, eventCaptors, executorService);
     }
 
     @Bean
