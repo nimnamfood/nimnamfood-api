@@ -7,5 +7,7 @@ public enum IngredientUnit {
     TEASPOON,
     PIECE,
     PINCH,
-    HANDFUL
+    HANDFUL,
+    SLICE,
+    LEAF
 }

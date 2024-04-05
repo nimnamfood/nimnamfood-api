@@ -22,7 +22,9 @@ public class GetAllIngredientUnitsHandlerTest {
                 IngredientUnit.TABLESPOON,
                 IngredientUnit.TEASPOON,
                 IngredientUnit.PINCH,
-                IngredientUnit.HANDFUL
+                IngredientUnit.HANDFUL,
+                IngredientUnit.LEAF,
+                IngredientUnit.SLICE
         );
     }
 }
