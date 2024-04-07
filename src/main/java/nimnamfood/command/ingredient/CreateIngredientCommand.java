@@ -1,4 +1,4 @@
-package nimnamfood.command;
+package nimnamfood.command.ingredient;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

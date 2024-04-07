@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public abstract class JdbcRepository<TId, TAggregateRoot extends AggregateRoot<TId>, TDbo extends JdbcDbo<TId, TAggregateRoot>> implements Repository<TId, TAggregateRoot>, DboProvider<TId, TAggregateRoot, TDbo> {
     protected final CrudRepository<TDbo, TId> jdbcCrudRepository;
-    protected JdbcAggregateTemplate jdbcAggregateTemplate;
+    protected final JdbcAggregateTemplate jdbcAggregateTemplate;
 
     protected JdbcRepository(CrudRepository<TDbo, TId> jdbcCrudRepository, JdbcAggregateTemplate jdbcAggregateTemplate) {
         this.jdbcCrudRepository = jdbcCrudRepository;
@@ -26,6 +26,12 @@ public abstract class JdbcRepository<TId, TAggregateRoot extends AggregateRoot<T
     public void add(TAggregateRoot aggregateRoot) {
         final TDbo dbo = this.toDbo(aggregateRoot);
         this.jdbcAggregateTemplate.insert(dbo);
+    }
+
+    @Override
+    public void update(TAggregateRoot aggregateRoot) {
+        final TDbo dbo = this.toDbo(aggregateRoot);
+        this.jdbcCrudRepository.save(dbo);
     }
 
     @Override

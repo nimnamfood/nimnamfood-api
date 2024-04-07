@@ -7,5 +7,7 @@ public interface Repository<TId, TAggregateRoot extends AggregateRoot<TId>> {
 
     void add(TAggregateRoot aggregateRoot);
 
+    void update(TAggregateRoot aggregateRoot);
+
     boolean exists(TId id);
 }

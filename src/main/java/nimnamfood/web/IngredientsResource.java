@@ -1,6 +1,6 @@
 package nimnamfood.web;
 
-import nimnamfood.command.CreateIngredientCommand;
+import nimnamfood.command.ingredient.CreateIngredientCommand;
 import nimnamfood.query.ingredient.FindIngredients;
 import nimnamfood.query.ingredient.model.IngredientSummary;
 import org.springframework.beans.factory.annotation.Autowired;

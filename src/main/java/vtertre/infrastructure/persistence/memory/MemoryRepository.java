@@ -21,6 +21,12 @@ public abstract class MemoryRepository<TId, TAggregateRoot extends AggregateRoot
     }
 
     @Override
+    public void update(TAggregateRoot aggregateRoot) {
+        this.entities.remove(aggregateRoot);
+        this.entities.add(aggregateRoot);
+    }
+
+    @Override
     public boolean exists(TId tId) {
         return this.entities.stream().anyMatch(entity -> entity.getId().equals(tId));
     }

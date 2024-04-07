@@ -1,4 +1,4 @@
-package nimnamfood.command;
+package nimnamfood.command.ingredient;
 
 import nimnamfood.model.Repositories;
 import nimnamfood.model.ingredient.Ingredient;
