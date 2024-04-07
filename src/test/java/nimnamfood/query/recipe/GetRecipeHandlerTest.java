@@ -83,6 +83,18 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
                 .withMessage("AGGREGATE_ROOT_NOT_FOUND - " + stringUuid);
     }
 
+    @Test
+    void canReturnARecipeThatHasNoIngredientsOrTags() {
+        GetRecipeHandler handler = new GetRecipeHandler();
+        Recipe recipe = Recipe.factory().create("recette 1", 1, Collections.emptySet(), "instructions", Collections.emptySet());
+        Repositories.recipes().add(recipe);
+
+        RecipeSummary summary = handler.execute(new GetRecipe(recipe.getId().toString()), template);
+
+        assertThat(summary.ingredients()).hasSize(0);
+        assertThat(summary.tags()).hasSize(0);
+    }
+
     private static class RecipeFactory {
         public static Recipe createEmpty(String name) {
             return Recipe.factory().create(name, 1, Collections.emptySet(), "instructions", Collections.emptySet());

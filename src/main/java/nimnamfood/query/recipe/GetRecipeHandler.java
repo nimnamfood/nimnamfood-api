@@ -43,13 +43,13 @@ public class GetRecipeHandler extends QueryHandlerJdbc<GetRecipe, RecipeSummary>
 
             do {
                 final UUID recipeIngredientId = resultSet.getObject("recipe_ingredient_id", UUID.class);
-                if (!ingredientSummariesById.containsKey(recipeIngredientId)) {
+                if (recipeIngredientId != null && !ingredientSummariesById.containsKey(recipeIngredientId)) {
                     final RecipeIngredientSummary ingredientSummary = extractRecipeIngredientSummary(resultSet);
                     ingredientSummariesById.put(recipeIngredientId, ingredientSummary);
                 }
 
                 final UUID tagId = resultSet.getObject("tag_id", UUID.class);
-                if (!tagSummariesById.containsKey(tagId)) {
+                if (tagId != null && !tagSummariesById.containsKey(tagId)) {
                     final TagSummary tagSummary = new TagSummary(tagId, resultSet.getString("tag_name"));
                     tagSummariesById.put(tagId, tagSummary);
                 }
