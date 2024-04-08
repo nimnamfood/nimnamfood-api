@@ -23,7 +23,7 @@ public class IngredientResource {
     }
 
     @PutMapping("/ingredients/{stringUuid}")
-    public Future<ResponseEntity<Void>> get(@PathVariable String stringUuid,
+    public Future<ResponseEntity<Void>> put(@PathVariable String stringUuid,
                                             @RequestBody UpdateIngredientCommand command) {
         return this.commandBus
                 .dispatch(command.withId(UUID.fromString(stringUuid)))

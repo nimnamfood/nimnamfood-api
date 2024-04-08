@@ -43,6 +43,17 @@ public class JdbcRepositoryTest extends PostgresTestContainerBase {
     }
 
     @Test
+    void canUpdateAnAggregate() {
+        FakeAggregateRoot aggregateRoot = new FakeAggregateRoot("1", "aggregate");
+        this.repository.add(aggregateRoot);
+
+        this.repository.update(new FakeAggregateRoot("1", "aggregate updated"));
+        FakeAggregateRootDbo dbo = this.jdbcAggregateTemplate.findById("1", FakeAggregateRootDbo.class);
+
+        assertThat(dbo.name).isEqualTo("aggregate updated");
+    }
+
+    @Test
     void canCheckIfAnAggregateRootExistsByItsId() {
         FakeAggregateRoot aggregateRoot = new FakeAggregateRoot("1", "aggregate");
         FakeAggregateRootDbo dbo = new FakeAggregateRootDbo();

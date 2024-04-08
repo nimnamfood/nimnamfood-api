@@ -10,15 +10,12 @@ import vtertre.ddd.event.DomainEvent;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class UpdateIngredientCommandHandler implements CommandHandler<UpdateIngredientCommand, Void> {
     @Override
     public Tuple<Void, List<DomainEvent>> execute(UpdateIngredientCommand command) {
-        final Optional<Ingredient> ingredient = Repositories.ingredients().get(command.id);
-
-        if (ingredient.isEmpty()) {
+        if (!Repositories.ingredients().exists(command.id)) {
             throw new MissingAggregateRootException(command.id);
         }
 
