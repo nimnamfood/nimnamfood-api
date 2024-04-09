@@ -1,4 +1,4 @@
-package nimnamfood.command;
+package nimnamfood.command.tag;
 
 import nimnamfood.infrastructure.repository.memory.WithMemoryRepositories;
 import nimnamfood.model.Repositories;

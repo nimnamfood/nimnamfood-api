@@ -1,4 +1,4 @@
-package nimnamfood.command;
+package nimnamfood.command.tag;
 
 import jakarta.validation.constraints.NotBlank;
 import vtertre.command.Command;

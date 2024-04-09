@@ -1,6 +1,6 @@
 package nimnamfood.web;
 
-import nimnamfood.command.CreateTagCommand;
+import nimnamfood.command.tag.CreateTagCommand;
 import nimnamfood.query.tag.FindTags;
 import nimnamfood.query.tag.model.TagSummary;
 import org.springframework.beans.factory.annotation.Autowired;
