@@ -36,6 +36,10 @@ public class StorageAdapter {
         this.storage.createFrom(blobInfo, content, Storage.BlobWriteOption.doesNotExist());
     }
 
+    public BlobPublicUrl publicUrl(String blobName) {
+        return new BlobPublicUrl(this.bucketName, blobName);
+    }
+
     public boolean exists(String blobName) {
         final BlobId blobId = this.blobId(blobName);
         return this.storage.get(blobId).exists();

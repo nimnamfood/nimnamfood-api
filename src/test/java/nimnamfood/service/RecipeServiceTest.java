@@ -3,6 +3,7 @@ package nimnamfood.service;
 import nimnamfood.adapter.storage.FailedToUploadIllustrationException;
 import nimnamfood.adapter.storage.MissingBlobException;
 import nimnamfood.adapter.storage.StorageAdapter;
+import nimnamfood.adapter.storage.BlobPublicUrl;
 import nimnamfood.command.recipe.RecipeIngredientCommandPart;
 import nimnamfood.infrastructure.repository.memory.WithMemoryRepositories;
 import nimnamfood.model.Repositories;
@@ -111,6 +112,18 @@ class RecipeServiceTest {
 
         Mockito.verify(storageAdapter, Mockito.times(1))
                 .delete("live/recipes/" + illustrationId + ".webp");
+    }
+
+    @Test
+    void generatesAnIllustrationPublicUrl() {
+        RecipeService service = new RecipeService(storageAdapter);
+        UUID illustrationId = UUID.randomUUID();
+        BlobPublicUrl url = new BlobPublicUrl("bucket", "folderA/folderB/blob");
+        Mockito.when(storageAdapter.publicUrl("live/recipes/" + illustrationId + ".webp")).thenReturn(url);
+
+        String result = service.illustrationUrl(illustrationId);
+
+        assertThat(result).isEqualTo("https://firebasestorage.googleapis.com/v0/b/bucket/o/folderA%2FfolderB%2Fblob?alt=media&token=" + illustrationId);
     }
 
     @Test

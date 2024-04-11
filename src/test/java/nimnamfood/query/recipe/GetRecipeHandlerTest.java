@@ -8,8 +8,10 @@ import nimnamfood.model.recipe.Recipe;
 import nimnamfood.model.recipe.RecipeIngredient;
 import nimnamfood.model.tag.Tag;
 import nimnamfood.query.recipe.model.RecipeSummary;
+import nimnamfood.service.RecipeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import vtertre.ddd.MissingAggregateRootException;
@@ -27,9 +29,11 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
     @Autowired
     NamedParameterJdbcTemplate template;
 
+    RecipeService recipeService = Mockito.mock();
+
     @Test
     void returnsTheRecipeWithMatchingId() {
-        GetRecipeHandler handler = new GetRecipeHandler();
+        GetRecipeHandler handler = new GetRecipeHandler(recipeService);
         Ingredient ingredient1 = new Ingredient("ingredient 1", IngredientUnit.GRAM);
         Ingredient ingredient2 = new Ingredient("ingredient 2", IngredientUnit.PIECE);
         Tag tag1 = new Tag("tag 1");
@@ -38,14 +42,16 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
         Repositories.ingredients().add(ingredient2);
         Repositories.tags().add(tag1);
         Repositories.tags().add(tag2);
-        Recipe recipe = Recipe.factory().create("recette 1", null, 1, Set.of(new RecipeIngredient(ingredient1.getId(), 10f, IngredientUnit.PINCH, false), new RecipeIngredient(ingredient2.getId(), 5f, IngredientUnit.GRAM, true)), "instructions", Set.of(tag1.getId(), tag2.getId()));
+        Recipe recipe = Recipe.factory().create("recette 1", UUID.randomUUID(), 1, Set.of(new RecipeIngredient(ingredient1.getId(), 10f, IngredientUnit.PINCH, false), new RecipeIngredient(ingredient2.getId(), 5f, IngredientUnit.GRAM, true)), "instructions", Set.of(tag1.getId(), tag2.getId()));
         Repositories.recipes().add(recipe);
         Repositories.recipes().add(RecipeFactory.createEmpty("recette 2"));
+        Mockito.when(recipeService.illustrationUrl(recipe.getIllustrationId())).thenReturn("url");
 
         RecipeSummary summary = handler.execute(new GetRecipe(recipe.getId().toString()), template);
 
         assertThat(summary.id()).isEqualTo(recipe.getId());
         assertThat(summary.name()).isEqualTo(recipe.getName());
+        assertThat(summary.illustrationUrl()).isEqualTo("url");
         assertThat(summary.portionsCount()).isEqualTo(recipe.getPortionsCount());
         assertThat(summary.instructions()).isEqualTo(recipe.getInstructions());
 
@@ -60,7 +66,7 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void handlesMultipleTimesTheSameIngredient() {
-        GetRecipeHandler handler = new GetRecipeHandler();
+        GetRecipeHandler handler = new GetRecipeHandler(recipeService);
         Ingredient ingredient = new Ingredient("ingredient", IngredientUnit.GRAM);
         Repositories.ingredients().add(ingredient);
         Recipe recipe = Recipe.factory().create("recette", null, 1, Set.of(new RecipeIngredient(ingredient.getId(), 10f, IngredientUnit.GRAM, false), new RecipeIngredient(ingredient.getId(), 5f, IngredientUnit.GRAM, true)), "instructions", Collections.emptySet());
@@ -75,7 +81,7 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void throwsAnExceptionWhenTheProvidedIdDoesNotMatchAnyEntity() {
-        GetRecipeHandler handler = new GetRecipeHandler();
+        GetRecipeHandler handler = new GetRecipeHandler(recipeService);
         String stringUuid = UUID.randomUUID().toString();
 
         assertThatExceptionOfType(MissingAggregateRootException.class)
@@ -85,7 +91,7 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void canReturnARecipeThatHasNoIngredientsOrTags() {
-        GetRecipeHandler handler = new GetRecipeHandler();
+        GetRecipeHandler handler = new GetRecipeHandler(recipeService);
         Recipe recipe = Recipe.factory().create("recette 1", null, 1, Collections.emptySet(), "instructions", Collections.emptySet());
         Repositories.recipes().add(recipe);
 

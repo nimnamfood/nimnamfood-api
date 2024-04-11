@@ -5,6 +5,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import nimnamfood.query.recipe.model.RecipeSearchSummary;
 import nimnamfood.query.tag.model.TagSummary;
+import nimnamfood.service.RecipeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -18,6 +20,13 @@ import java.util.stream.Collectors;
 
 @Component
 public class FindRecipesHandler extends QueryHandlerJdbc<FindRecipes, List<RecipeSearchSummary>> {
+    private final RecipeService recipeService;
+
+    @Autowired
+    public FindRecipesHandler(RecipeService recipeService) {
+        this.recipeService = recipeService;
+    }
+
     @Override
     public List<RecipeSearchSummary> execute(FindRecipes query, NamedParameterJdbcTemplate template) {
         final String sqlQuery = sqlQuery(query);
@@ -34,8 +43,14 @@ public class FindRecipesHandler extends QueryHandlerJdbc<FindRecipes, List<Recip
             while (resultSet.next()) {
                 final UUID id = resultSet.getObject("id", UUID.class);
                 final String name = resultSet.getString("name");
-                final RecipeSearchSummary summary = summariesById.computeIfAbsent(
-                        id, idToAdd -> new RecipeSearchSummary(idToAdd, name, Sets.newHashSet()));
+                final UUID illustrationId = resultSet.getObject("illustration_id", UUID.class);
+                final RecipeSearchSummary summary = summariesById.computeIfAbsent(id, idToAdd ->
+                        new RecipeSearchSummary(
+                                idToAdd,
+                                name,
+                                illustrationId != null ? this.recipeService.illustrationUrl(illustrationId) : null,
+                                Sets.newHashSet()
+                        ));
 
                 final UUID tagId = resultSet.getObject("tag_id", UUID.class);
                 if (tagId != null) {
@@ -49,19 +64,19 @@ public class FindRecipesHandler extends QueryHandlerJdbc<FindRecipes, List<Recip
 
     private static String sqlQuery(FindRecipes query) {
         final String innerTableQuery = appendLimitAndOffset(innerTableQuery(query));
-        return "WITH matched_recipes AS (" + innerTableQuery + ") SELECT mr.id, mr.name, t.id as \"tag_id\", t.name as \"tag_name\" FROM matched_recipes mr LEFT JOIN recipe_tags rt ON mr.id = rt.recipe_id LEFT JOIN tags t ON rt.tag_id = t.id";
+        return "WITH matched_recipes AS (" + innerTableQuery + ") SELECT mr.id, mr.name, mr.illustration_id, t.id as \"tag_id\", t.name as \"tag_name\" FROM matched_recipes mr LEFT JOIN recipe_tags rt ON mr.id = rt.recipe_id LEFT JOIN tags t ON rt.tag_id = t.id";
     }
 
     private static String innerTableQuery(FindRecipes query) {
         if ((query.query == null || query.query.isEmpty()) && (query.tags == null || query.tags.isEmpty())) {
-            return "SELECT DISTINCT(id), name FROM recipes";
+            return "SELECT DISTINCT(id), name, illustration_id FROM recipes";
         }
         if (query.tags == null || query.tags.isEmpty()) {
-            return "SELECT DISTINCT(id), name FROM recipes WHERE name ILIKE :query";
+            return "SELECT DISTINCT(id), name, illustration_id FROM recipes WHERE name ILIKE :query";
         }
         if (query.query == null || query.query.isEmpty()) {
-            return "SELECT DISTINCT(r.id), r.name FROM recipes r LEFT JOIN recipe_tags rt ON r.id = rt.recipe_id WHERE rt.tag_id IN (:tagIds) GROUP BY r.id HAVING COUNT(*) = :tagCount";
+            return "SELECT DISTINCT(r.id), r.name, r.illustration_id FROM recipes r LEFT JOIN recipe_tags rt ON r.id = rt.recipe_id WHERE rt.tag_id IN (:tagIds) GROUP BY r.id HAVING COUNT(*) = :tagCount";
         }
-        return "SELECT DISTINCT(r.id), r.name FROM recipes r LEFT JOIN recipe_tags rt ON r.id = rt.recipe_id WHERE name ILIKE :query AND rt.tag_id IN (:tagIds) GROUP BY r.id HAVING COUNT(*) = :tagCount";
+        return "SELECT DISTINCT(r.id), r.name, r.illustration_id FROM recipes r LEFT JOIN recipe_tags rt ON r.id = rt.recipe_id WHERE name ILIKE :query AND rt.tag_id IN (:tagIds) GROUP BY r.id HAVING COUNT(*) = :tagCount";
     }
 }

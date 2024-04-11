@@ -6,6 +6,8 @@ import nimnamfood.model.ingredient.IngredientUnit;
 import nimnamfood.query.recipe.model.RecipeIngredientSummary;
 import nimnamfood.query.recipe.model.RecipeSummary;
 import nimnamfood.query.tag.model.TagSummary;
+import nimnamfood.service.RecipeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -19,10 +21,17 @@ import java.util.UUID;
 
 @Component
 public class GetRecipeHandler extends QueryHandlerJdbc<GetRecipe, RecipeSummary> {
+    private final RecipeService recipeService;
+
+    @Autowired
+    public GetRecipeHandler(RecipeService recipeService) {
+        this.recipeService = recipeService;
+    }
+
     @Override
     public RecipeSummary execute(GetRecipe query, NamedParameterJdbcTemplate template) {
         final String sqlQuery = """
-                SELECT r.id, r.name, r.portions_count, r.instructions, t.id as "tag_id", t.name as "tag_name", i.id as "ingredient_id", i.name as "ingredient_name", ri.id as "recipe_ingredient_id", ri.quantity as "ingredient_quantity", ri.unit as "ingredient_unit", ri.quantity_fixed as "ingredient_quantity_fixed"
+                SELECT r.id, r.name, r.illustration_id, r.portions_count, r.instructions, t.id as "tag_id", t.name as "tag_name", i.id as "ingredient_id", i.name as "ingredient_name", ri.id as "recipe_ingredient_id", ri.quantity as "ingredient_quantity", ri.unit as "ingredient_unit", ri.quantity_fixed as "ingredient_quantity_fixed"
                 FROM recipes r
                     LEFT JOIN recipe_ingredients ri ON r.id = ri.recipe_id
                     LEFT JOIN ingredients i ON ri.ingredient_id = i.id
@@ -62,10 +71,12 @@ public class GetRecipeHandler extends QueryHandlerJdbc<GetRecipe, RecipeSummary>
         });
     }
 
-    private static RecipeSummary extractRecipeSummary(ResultSet resultSet) throws SQLException {
+    private RecipeSummary extractRecipeSummary(ResultSet resultSet) throws SQLException {
+        final UUID illustrationId = resultSet.getObject("illustration_id", UUID.class);
         return new RecipeSummary(
                 resultSet.getObject("id", UUID.class),
                 resultSet.getString("name"),
+                illustrationId != null ? this.recipeService.illustrationUrl(illustrationId) : null,
                 resultSet.getInt("portions_count"),
                 resultSet.getString("instructions"),
                 Sets.newHashSet(),

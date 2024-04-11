@@ -35,6 +35,16 @@ class StorageAdapterTest {
     }
 
     @Test
+    void generatesUrlObjectByName() {
+        StorageAdapter adapter = new StorageAdapter(storage, bucketName);
+
+        BlobPublicUrl url = adapter.publicUrl("blob");
+
+        assertThat(url.blobName()).isEqualTo("blob");
+        assertThat(url.bucketName()).isEqualTo("bucket");
+    }
+
+    @Test
     void checksIfABlobExistsByName() {
         StorageAdapter adapter = new StorageAdapter(storage, bucketName);
         Blob fakeBlob = Mockito.mock();

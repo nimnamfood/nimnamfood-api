@@ -3,6 +3,7 @@ package nimnamfood.service;
 import nimnamfood.adapter.storage.FailedToUploadIllustrationException;
 import nimnamfood.adapter.storage.MissingBlobException;
 import nimnamfood.adapter.storage.StorageAdapter;
+import nimnamfood.adapter.storage.BlobPublicUrl;
 import nimnamfood.command.recipe.RecipeIngredientCommandPart;
 import nimnamfood.model.Repositories;
 import nimnamfood.model.recipe.RecipeIngredient;
@@ -61,6 +62,13 @@ public class RecipeService {
 
     public void deleteIllustration(UUID illustrationId) {
         this.storageAdapter.delete("live/recipes/" + illustrationId + ".webp");
+    }
+
+    public String illustrationUrl(UUID illustrationId) {
+        final String stringIllustrationId = illustrationId.toString();
+        final BlobPublicUrl url = this.storageAdapter.publicUrl("live/recipes/" + stringIllustrationId + ".webp")
+                .withToken(stringIllustrationId);
+        return url.toUrl();
     }
 
     public static Set<RecipeIngredient> recipeIngredientsFromCommand(Set<RecipeIngredientCommandPart> parts) {

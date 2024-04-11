@@ -5,9 +5,11 @@ import nimnamfood.model.Repositories;
 import nimnamfood.model.recipe.Recipe;
 import nimnamfood.model.tag.Tag;
 import nimnamfood.query.recipe.model.RecipeSearchSummary;
+import nimnamfood.service.RecipeService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import vtertre.infrastructure.persistence.jdbc.PostgresTestContainerBase;
@@ -15,6 +17,7 @@ import vtertre.infrastructure.persistence.jdbc.PostgresTestContainerBase;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,9 +26,11 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
     @Autowired
     NamedParameterJdbcTemplate template;
 
+    RecipeService recipeService = Mockito.mock();
+
     @Test
     void returnsAnEmptyListOfRecipes() {
-        FindRecipesHandler handler = new FindRecipesHandler();
+        FindRecipesHandler handler = new FindRecipesHandler(recipeService);
 
         List<RecipeSearchSummary> result = handler.execute(new FindRecipes(), template);
 
@@ -34,8 +39,9 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void returnsAllRecipesWhenNoQueryIsProvided() {
-        FindRecipesHandler handler = new FindRecipesHandler();
-        Recipe recipe1 = Recipe.factory().create("recette", null, 1, Collections.emptySet(), "", Collections.emptySet());
+        FindRecipesHandler handler = new FindRecipesHandler(recipeService);
+        Recipe recipe1 = Recipe.factory().create("recette", UUID.randomUUID(), 1, Collections.emptySet(), "", Collections.emptySet());
+        Mockito.when(recipeService.illustrationUrl(recipe1.getIllustrationId())).thenReturn("recipe1 illu url");
         Tag tag = new Tag("tag");
         Repositories.tags().add(tag);
         Recipe recipe2 = Recipe.factory().create("recette 2", null, 1, Collections.emptySet(), "", Set.of(tag.getId()));
@@ -46,7 +52,7 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
 
         assertThat(result).hasSize(2);
         assertThat(result).anyMatch(summary -> summary.id().equals(recipe1.getId()) &&
-                summary.name().equals(recipe1.getName()) &&
+                summary.name().equals(recipe1.getName()) && summary.illustrationUrl().equals("recipe1 illu url") &&
                 summary.tags().isEmpty());
         assertThat(result).anyMatch(summary -> summary.id().equals(recipe2.getId()) &&
                 summary.name().equals(recipe2.getName()) &&
@@ -55,7 +61,7 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void returnsAllRecipesContainingTheQuery() {
-        FindRecipesHandler handler = new FindRecipesHandler();
+        FindRecipesHandler handler = new FindRecipesHandler(recipeService);
 
         Recipe recipe1 = Recipe.factory().create("poulet citron", null, 1, Collections.emptySet(), "", Collections.emptySet());
         Recipe recipe2 = Recipe.factory().create("crevettes", null, 1, Collections.emptySet(), "", Collections.emptySet());
@@ -78,7 +84,7 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
     @Disabled("Désactivé le temps de trouver comment ignorer les caractères spéciaux côté DB ou via les projections")
     @Test
     void ignoresTheQueryCaseAndSpecialCharacters() {
-        FindRecipesHandler handler = new FindRecipesHandler();
+        FindRecipesHandler handler = new FindRecipesHandler(recipeService);
         Repositories.recipes().add(Recipe.factory().create(
                 "taboulé de poulet", null, 1, Collections.emptySet(), "", Collections.emptySet()));
 
@@ -90,7 +96,7 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void returnsAllRecipesHavingAtLeastAllRequestedTags() {
-        FindRecipesHandler handler = new FindRecipesHandler();
+        FindRecipesHandler handler = new FindRecipesHandler(recipeService);
 
         Tag tag1 = new Tag("1");
         Tag tag2 = new Tag("2");
@@ -124,7 +130,7 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void returnsAllRecipesContainingTheQueryAndHavingAtLeastAllRequestedTags() {
-        FindRecipesHandler handler = new FindRecipesHandler();
+        FindRecipesHandler handler = new FindRecipesHandler(recipeService);
 
         Tag tag1 = new Tag("1");
         Tag tag2 = new Tag("2");
