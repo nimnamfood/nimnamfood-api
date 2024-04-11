@@ -48,6 +48,7 @@ public class RecipeJdbcRepositoryTest extends PostgresTestContainerBase {
         RecipeDbo recipeDbo = new RecipeDbo();
         recipeDbo.setId(UUID.randomUUID());
         recipeDbo.setName("recette");
+        recipeDbo.setIllustrationId(UUID.randomUUID());
         recipeDbo.setPortionsCount(2);
         recipeDbo.setInstructions("instructions");
         recipeDbo.setTags(Set.of(recipeTagDbo));
@@ -62,6 +63,7 @@ public class RecipeJdbcRepositoryTest extends PostgresTestContainerBase {
         assertThat(foundRecipe).isPresent();
         assertThat(foundRecipe.get().getId()).isEqualTo(recipeDbo.getId());
         assertThat(foundRecipe.get().getName()).isEqualTo("recette");
+        assertThat(foundRecipe.get().getIllustrationId()).isEqualTo(recipeDbo.getIllustrationId());
         assertThat(foundRecipe.get().getPortionsCount()).isEqualTo(2);
         assertThat(foundRecipe.get().getInstructions()).isEqualTo("instructions");
         assertThat(foundRecipe.get().getTagIds()).containsExactly(tagDbo.getId());
@@ -80,13 +82,14 @@ public class RecipeJdbcRepositoryTest extends PostgresTestContainerBase {
         UUID tagId = UUID.randomUUID();
         UUID ingredientId = UUID.randomUUID();
         RecipeIngredient recipeIngredient = new RecipeIngredient(ingredientId, 3, IngredientUnit.PINCH, false);
-        Recipe recipe = Recipe.factory().create("autre recette", 1, Set.of(recipeIngredient), "autres", Set.of(tagId));
+        Recipe recipe = Recipe.factory().create("autre recette", UUID.randomUUID(), 1, Set.of(recipeIngredient), "autres", Set.of(tagId));
 
         repository.add(recipe);
         RecipeDbo dbo = this.jdbcAggregateTemplate.findById(recipe.getId(), RecipeDbo.class);
 
         assertThat(dbo).isNotNull();
         assertThat(dbo.getName()).isEqualTo("autre recette");
+        assertThat(dbo.getIllustrationId()).isEqualTo(recipe.getIllustrationId());
         assertThat(dbo.getPortionsCount()).isEqualTo(1);
         assertThat(dbo.getInstructions()).isEqualTo("autres");
         assertThat(dbo.getTags().stream().findFirst().get().getTagId()).isEqualTo(tagId);

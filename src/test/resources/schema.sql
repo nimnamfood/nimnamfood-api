@@ -39,6 +39,7 @@ drop table if exists recipes;
 create table recipes (
     id uuid primary key,
     name text not null,
+    illustration_id uuid null,
     portions_count smallint not null,
     instructions text not null
 );

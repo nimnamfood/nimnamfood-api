@@ -19,6 +19,7 @@ public class RecipeJdbcRepository extends JdbcRepositoryWithUuid<Recipe, RecipeD
         final RecipeDbo dbo = new RecipeDbo();
         dbo.setId(recipe.getId());
         dbo.name = recipe.getName();
+        dbo.illustrationId = recipe.getIllustrationId();
         dbo.portionsCount = recipe.getPortionsCount();
         dbo.instructions = recipe.getInstructions();
         dbo.ingredients = recipe.getIngredients().stream()

@@ -16,13 +16,25 @@ import java.util.UUID;
 
 @Component
 public class CreateRecipeCommandHandler implements CommandHandler<CreateRecipeCommand, UUID> {
+    private final RecipeService recipeService;
+
+    public CreateRecipeCommandHandler(RecipeService recipeService) {
+        this.recipeService = recipeService;
+    }
+
     @Override
     public Tuple<UUID, List<DomainEvent>> execute(CreateRecipeCommand command) {
         final Set<RecipeIngredient> recipeIngredients = RecipeService.recipeIngredientsFromCommand(command.ingredients);
         final Set<UUID> tagIds = RecipeService.tagIdsFromCommand(command.tagIds);
+        final UUID illustrationId = command.illustrationId != null ? UUID.fromString(command.illustrationId) : null;
+
+        if (illustrationId != null) {
+            this.recipeService.activateIllustration(illustrationId);
+        }
 
         final Recipe recipe = Recipe.factory().create(
                 command.name,
+                illustrationId,
                 command.portionsCount,
                 recipeIngredients,
                 command.instructions,

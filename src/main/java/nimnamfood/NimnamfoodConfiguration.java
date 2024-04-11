@@ -37,6 +37,7 @@ import vtertre.query.QueryHandler;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -140,9 +141,10 @@ public class NimnamfoodConfiguration {
                     new Ingredient("huile d'olive", IngredientUnit.GRAM)
             );
 
-            final Recipe recipe = Recipe.factory().create("Recette test", 2,
-                    ingredients.stream().map(ingredient -> new RecipeIngredient(
-                            ingredient.getId(), 10, ingredient.getUnit(), ingredient.getName().equals("sel"))).collect(Collectors.toSet()),
+            final Recipe recipe = Recipe.factory().create("Recette test",
+                    UUID.fromString("58fdefab-85da-4843-95b6-e9b9efb37e4a"), 2, ingredients.stream()
+                            .map(ingredient -> new RecipeIngredient(ingredient.getId(), 10, ingredient.getUnit(),
+                                    ingredient.getName().equals("sel"))).collect(Collectors.toSet()),
                     "Une première étape assez courte.\n\nUne deuxième étape beaucoup plus longue pour pouvoir tester le fait que les lignes s'affichent correctement en sorti et ce même sur des écrans beaucoup plus larges.\n\nUne troisème étape pour le fun.",
                     tags.subList(0, 4).stream().map(BaseEntity::getId).collect(Collectors.toSet()));
 

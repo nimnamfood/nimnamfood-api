@@ -16,7 +16,7 @@ public @interface ValidFile {
 
     Class<? extends Payload>[] payload() default {};
 
-    String[] contentTypes() default {"image/webp"};
+    String[] contentTypes() default {};
 
     long maxBytesSize() default 1_000_000L;
 }

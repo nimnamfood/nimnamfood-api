@@ -14,6 +14,9 @@ public class CreateRecipeCommand implements Command<java.util.UUID> {
     @NotBlank
     public String name;
 
+    @UUID
+    public String illustrationId;
+
     @NotNull
     @Positive
     public Integer portionsCount;

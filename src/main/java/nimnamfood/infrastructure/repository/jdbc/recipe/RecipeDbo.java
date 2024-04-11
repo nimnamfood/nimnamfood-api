@@ -8,11 +8,13 @@ import org.springframework.data.relational.core.mapping.Table;
 import vtertre.infrastructure.persistence.jdbc.BaseJdbcDboWithUuid;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Table("recipes")
 public class RecipeDbo extends BaseJdbcDboWithUuid<Recipe> {
     String name;
+    UUID illustrationId;
     Integer portionsCount;
     String instructions;
 
@@ -30,7 +32,7 @@ public class RecipeDbo extends BaseJdbcDboWithUuid<Recipe> {
             return recipeIngredient;
         }).collect(Collectors.toSet());
         final Recipe recipe = Recipe.factory().create(
-                this.name, this.portionsCount, recipeIngredients, this.instructions,
+                this.name, this.illustrationId, this.portionsCount, recipeIngredients, this.instructions,
                 this.tags.stream().map(tag -> tag.tagId).collect(Collectors.toSet()));
         recipe.setId(this.getId());
         return recipe;
@@ -42,6 +44,14 @@ public class RecipeDbo extends BaseJdbcDboWithUuid<Recipe> {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public UUID getIllustrationId() {
+        return illustrationId;
+    }
+
+    public void setIllustrationId(UUID illustrationId) {
+        this.illustrationId = illustrationId;
     }
 
     public Integer getPortionsCount() {

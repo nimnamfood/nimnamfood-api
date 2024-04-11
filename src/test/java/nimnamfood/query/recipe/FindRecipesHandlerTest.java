@@ -35,10 +35,10 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
     @Test
     void returnsAllRecipesWhenNoQueryIsProvided() {
         FindRecipesHandler handler = new FindRecipesHandler();
-        Recipe recipe1 = Recipe.factory().create("recette", 1, Collections.emptySet(), "", Collections.emptySet());
+        Recipe recipe1 = Recipe.factory().create("recette", null, 1, Collections.emptySet(), "", Collections.emptySet());
         Tag tag = new Tag("tag");
         Repositories.tags().add(tag);
-        Recipe recipe2 = Recipe.factory().create("recette 2", 1, Collections.emptySet(), "", Set.of(tag.getId()));
+        Recipe recipe2 = Recipe.factory().create("recette 2", null, 1, Collections.emptySet(), "", Set.of(tag.getId()));
         Repositories.recipes().add(recipe1);
         Repositories.recipes().add(recipe2);
 
@@ -57,9 +57,9 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
     void returnsAllRecipesContainingTheQuery() {
         FindRecipesHandler handler = new FindRecipesHandler();
 
-        Recipe recipe1 = Recipe.factory().create("poulet citron", 1, Collections.emptySet(), "", Collections.emptySet());
-        Recipe recipe2 = Recipe.factory().create("crevettes", 1, Collections.emptySet(), "", Collections.emptySet());
-        Recipe recipe3 = Recipe.factory().create("riz au poulet", 1, Collections.emptySet(), "", Collections.emptySet());
+        Recipe recipe1 = Recipe.factory().create("poulet citron", null, 1, Collections.emptySet(), "", Collections.emptySet());
+        Recipe recipe2 = Recipe.factory().create("crevettes", null, 1, Collections.emptySet(), "", Collections.emptySet());
+        Recipe recipe3 = Recipe.factory().create("riz au poulet", null, 1, Collections.emptySet(), "", Collections.emptySet());
         Repositories.recipes().add(recipe1);
         Repositories.recipes().add(recipe2);
         Repositories.recipes().add(recipe3);
@@ -80,7 +80,7 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
     void ignoresTheQueryCaseAndSpecialCharacters() {
         FindRecipesHandler handler = new FindRecipesHandler();
         Repositories.recipes().add(Recipe.factory().create(
-                "taboulé de poulet", 1, Collections.emptySet(), "", Collections.emptySet()));
+                "taboulé de poulet", null, 1, Collections.emptySet(), "", Collections.emptySet()));
 
         List<RecipeSearchSummary> result = handler.execute(new FindRecipes("taboule"), template);
 
@@ -99,10 +99,10 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
         Repositories.tags().add(tag2);
         Repositories.tags().add(tag3);
 
-        Recipe recipe1 = Recipe.factory().create("1", 1, Collections.emptySet(), "", Set.of(tag2.getId(), tag3.getId()));
-        Recipe recipe2 = Recipe.factory().create("2", 1, Collections.emptySet(), "", Set.of(tag2.getId(), tag1.getId()));
-        Recipe recipe3 = Recipe.factory().create("3", 1, Collections.emptySet(), "", Set.of());
-        Recipe recipe4 = Recipe.factory().create("4", 1, Collections.emptySet(), "", Set.of(tag1.getId(), tag2.getId(), tag3.getId()));
+        Recipe recipe1 = Recipe.factory().create("1", null, 1, Collections.emptySet(), "", Set.of(tag2.getId(), tag3.getId()));
+        Recipe recipe2 = Recipe.factory().create("2", null, 1, Collections.emptySet(), "", Set.of(tag2.getId(), tag1.getId()));
+        Recipe recipe3 = Recipe.factory().create("3", null, 1, Collections.emptySet(), "", Set.of());
+        Recipe recipe4 = Recipe.factory().create("4", null, 1, Collections.emptySet(), "", Set.of(tag1.getId(), tag2.getId(), tag3.getId()));
         Repositories.recipes().add(recipe1);
         Repositories.recipes().add(recipe2);
         Repositories.recipes().add(recipe3);
@@ -131,9 +131,9 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
         Repositories.tags().add(tag1);
         Repositories.tags().add(tag2);
 
-        Recipe recipe1 = Recipe.factory().create("poulet au citron", 1, Collections.emptySet(), "", Set.of(tag1.getId()));
-        Recipe recipe2 = Recipe.factory().create("pâtes au poulet", 1, Collections.emptySet(), "", Set.of(tag2.getId(), tag1.getId()));
-        Recipe recipe3 = Recipe.factory().create("pâtes au poulet et citron", 1, Collections.emptySet(), "", Set.of(tag2.getId()));
+        Recipe recipe1 = Recipe.factory().create("poulet au citron", null, 1, Collections.emptySet(), "", Set.of(tag1.getId()));
+        Recipe recipe2 = Recipe.factory().create("pâtes au poulet", null, 1, Collections.emptySet(), "", Set.of(tag2.getId(), tag1.getId()));
+        Recipe recipe3 = Recipe.factory().create("pâtes au poulet et citron", null, 1, Collections.emptySet(), "", Set.of(tag2.getId()));
         Repositories.recipes().add(recipe1);
         Repositories.recipes().add(recipe2);
         Repositories.recipes().add(recipe3);
