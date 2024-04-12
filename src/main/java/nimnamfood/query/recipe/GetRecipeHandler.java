@@ -3,6 +3,7 @@ package nimnamfood.query.recipe;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import nimnamfood.model.ingredient.IngredientUnit;
+import nimnamfood.query.recipe.model.IllustrationSummary;
 import nimnamfood.query.recipe.model.RecipeIngredientSummary;
 import nimnamfood.query.recipe.model.RecipeSummary;
 import nimnamfood.query.tag.model.TagSummary;
@@ -76,7 +77,7 @@ public class GetRecipeHandler extends QueryHandlerJdbc<GetRecipe, RecipeSummary>
         return new RecipeSummary(
                 resultSet.getObject("id", UUID.class),
                 resultSet.getString("name"),
-                illustrationId != null ? this.recipeService.illustrationUrl(illustrationId) : null,
+                illustrationId != null ? new IllustrationSummary(illustrationId, this.recipeService.illustrationUrl(illustrationId)) : null,
                 resultSet.getInt("portions_count"),
                 resultSet.getString("instructions"),
                 Sets.newHashSet(),

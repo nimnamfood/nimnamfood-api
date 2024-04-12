@@ -5,6 +5,12 @@ import nimnamfood.query.tag.model.TagSummary;
 import java.util.Set;
 import java.util.UUID;
 
-public record RecipeSummary(UUID id, String name, String illustrationUrl, int portionsCount, String instructions,
-                            Set<RecipeIngredientSummary> ingredients, Set<TagSummary> tags) {
+public record RecipeSummary(
+        UUID id, String name,
+        IllustrationSummary illustration,
+        int portionsCount,
+        String instructions,
+        Set<RecipeIngredientSummary> ingredients,
+        Set<TagSummary> tags
+) {
 }

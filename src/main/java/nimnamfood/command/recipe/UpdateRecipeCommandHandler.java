@@ -34,7 +34,7 @@ public class UpdateRecipeCommandHandler implements CommandHandler<UpdateRecipeCo
         final UUID newIllustrationId = command.illustrationId != null ? UUID.fromString(command.illustrationId) : null;
         final UUID currentIllustrationId = currentRecipe.get().getIllustrationId();
 
-        if (newIllustrationId != null) {
+        if (newIllustrationId != null && !newIllustrationId.equals(currentIllustrationId)) {
             this.activateNewIllustration(currentIllustrationId, newIllustrationId);
         } else if (currentIllustrationId != null) {
             this.recipeService.deleteIllustration(currentIllustrationId);

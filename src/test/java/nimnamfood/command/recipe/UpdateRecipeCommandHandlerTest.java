@@ -112,7 +112,22 @@ class UpdateRecipeCommandHandlerTest {
     }
 
     @Test
-    void overridesTheCurrentIllustration() {
+    void canKeepTheCurrentIllustration() {
+        UpdateRecipeCommandHandler handler = new UpdateRecipeCommandHandler(recipeService);
+        Recipe recipe = createRecipeWithIllustration();
+        UpdateRecipeCommand command = createDefaultCommand(recipe);
+        command.illustrationId = recipe.getIllustrationId().toString();
+
+        handler.execute(command);
+
+        Mockito.verify(recipeService, Mockito.never())
+                .replaceIllustration(Mockito.any(), Mockito.any());
+        Mockito.verify(recipeService, Mockito.never())
+                .activateIllustration(Mockito.any());
+    }
+
+    @Test
+    void canDeleteTheCurrentIllustration() {
         UpdateRecipeCommandHandler handler = new UpdateRecipeCommandHandler(recipeService);
         Recipe recipe = createRecipeWithIllustration();
         UpdateRecipeCommand command = createDefaultCommand(recipe);

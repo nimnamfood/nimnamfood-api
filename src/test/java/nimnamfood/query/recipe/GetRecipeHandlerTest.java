@@ -51,7 +51,8 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
 
         assertThat(summary.id()).isEqualTo(recipe.getId());
         assertThat(summary.name()).isEqualTo(recipe.getName());
-        assertThat(summary.illustrationUrl()).isEqualTo("url");
+        assertThat(summary.illustration().id()).isEqualTo(recipe.getIllustrationId());
+        assertThat(summary.illustration().url()).isEqualTo("url");
         assertThat(summary.portionsCount()).isEqualTo(recipe.getPortionsCount());
         assertThat(summary.instructions()).isEqualTo(recipe.getInstructions());
 
