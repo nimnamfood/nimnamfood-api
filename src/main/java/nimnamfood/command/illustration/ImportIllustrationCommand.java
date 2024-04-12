@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class ImportIllustrationCommand implements Command<UUID> {
     @NotNull
-    @ValidFile(maxBytesSize = 150_000L, contentTypes = {"image/webp"})
+    @ValidFile(maxBytesSize = 100_000_000L, contentTypes = {"image/webp"})
     public MultipartFile file;
 
     private ImportIllustrationCommand() {
