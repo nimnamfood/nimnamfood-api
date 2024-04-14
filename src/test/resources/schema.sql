@@ -41,5 +41,6 @@ create table recipes (
     name text not null,
     illustration_id uuid null,
     portions_count smallint not null,
-    instructions text not null
+    instructions text not null,
+    creation_date_time timestamp not null
 );

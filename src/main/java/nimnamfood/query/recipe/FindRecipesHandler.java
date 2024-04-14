@@ -39,7 +39,7 @@ public class FindRecipesHandler extends QueryHandlerJdbc<FindRecipes, List<Recip
         }
 
         return template.query(sqlQuery, new MapSqlParameterSource(params), resultSet -> {
-            final Map<UUID, RecipeSearchSummary> summariesById = Maps.newHashMap();
+            final Map<UUID, RecipeSearchSummary> summariesById = Maps.newLinkedHashMap();
             while (resultSet.next()) {
                 final UUID id = resultSet.getObject("id", UUID.class);
                 final String name = resultSet.getString("name");
@@ -64,19 +64,19 @@ public class FindRecipesHandler extends QueryHandlerJdbc<FindRecipes, List<Recip
 
     private static String sqlQuery(FindRecipes query) {
         final String innerTableQuery = appendLimitAndOffset(innerTableQuery(query));
-        return "WITH matched_recipes AS (" + innerTableQuery + ") SELECT mr.id, mr.name, mr.illustration_id, t.id as \"tag_id\", t.name as \"tag_name\" FROM matched_recipes mr LEFT JOIN recipe_tags rt ON mr.id = rt.recipe_id LEFT JOIN tags t ON rt.tag_id = t.id";
+        return "WITH matched_recipes AS (" + innerTableQuery + ") SELECT mr.id, mr.name, mr.illustration_id, mr.creation_date_time, t.id as \"tag_id\", t.name as \"tag_name\" FROM matched_recipes mr LEFT JOIN recipe_tags rt ON mr.id = rt.recipe_id LEFT JOIN tags t ON rt.tag_id = t.id ORDER BY mr.creation_date_time DESC";
     }
 
     private static String innerTableQuery(FindRecipes query) {
         if ((query.query == null || query.query.isEmpty()) && (query.tags == null || query.tags.isEmpty())) {
-            return "SELECT DISTINCT(id), name, illustration_id FROM recipes";
+            return "SELECT DISTINCT(id), name, illustration_id, creation_date_time FROM recipes ORDER BY creation_date_time DESC";
         }
         if (query.tags == null || query.tags.isEmpty()) {
-            return "SELECT DISTINCT(id), name, illustration_id FROM recipes WHERE name ILIKE :query";
+            return "SELECT DISTINCT(id), name, illustration_id, creation_date_time FROM recipes WHERE name ILIKE :query ORDER BY creation_date_time DESC";
         }
         if (query.query == null || query.query.isEmpty()) {
-            return "SELECT DISTINCT(r.id), r.name, r.illustration_id FROM recipes r LEFT JOIN recipe_tags rt ON r.id = rt.recipe_id WHERE rt.tag_id IN (:tagIds) GROUP BY r.id HAVING COUNT(*) = :tagCount";
+            return "SELECT DISTINCT(r.id), r.name, r.illustration_id, r.creation_date_time FROM recipes r LEFT JOIN recipe_tags rt ON r.id = rt.recipe_id WHERE rt.tag_id IN (:tagIds) GROUP BY r.id HAVING COUNT(*) = :tagCount ORDER BY r.creation_date_time DESC";
         }
-        return "SELECT DISTINCT(r.id), r.name, r.illustration_id FROM recipes r LEFT JOIN recipe_tags rt ON r.id = rt.recipe_id WHERE name ILIKE :query AND rt.tag_id IN (:tagIds) GROUP BY r.id HAVING COUNT(*) = :tagCount";
+        return "SELECT DISTINCT(r.id), r.name, r.illustration_id, r.creation_date_time FROM recipes r LEFT JOIN recipe_tags rt ON r.id = rt.recipe_id WHERE name ILIKE :query AND rt.tag_id IN (:tagIds) GROUP BY r.id HAVING COUNT(*) = :tagCount ORDER BY r.creation_date_time DESC";
     }
 }

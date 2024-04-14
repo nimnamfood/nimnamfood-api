@@ -149,4 +149,31 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().id()).isEqualTo(recipe2.getId());
     }
+
+    @Test
+    void paginatesTheRecipesInReversedCreationOrder() {
+        FindRecipesHandler handler = new FindRecipesHandler(recipeService);
+
+        Tag tag1 = new Tag("1");
+        Repositories.tags().add(tag1);
+
+        Recipe recipe1 = Recipe.factory().create("recette 1", 1, Collections.emptySet(), "", Set.of(tag1.getId()));
+        Recipe recipe2 = Recipe.factory().create("recette 2", 1, Collections.emptySet(), "", Set.of(tag1.getId()));
+        Recipe recipe3 = Recipe.factory().create("recette 3", 1, Collections.emptySet(), "", Set.of(tag1.getId()));
+        Repositories.recipes().add(recipe2);
+        Repositories.recipes().add(recipe3);
+        Repositories.recipes().add(recipe1);
+
+        List<RecipeSearchSummary> result1 = handler.execute((FindRecipes) new FindRecipes().limit(1).skip(0), template);
+        List<RecipeSearchSummary> result2 = handler.execute((FindRecipes) new FindRecipes("recette").limit(1).skip(1), template);
+        List<RecipeSearchSummary> result3 = handler.execute((FindRecipes) new FindRecipes(Set.of(tag1.getId().toString())).limit(1).skip(2), template);
+        List<RecipeSearchSummary> result4 = handler.execute((FindRecipes) new FindRecipes("recette", Set.of(tag1.getId().toString())).limit(2).skip(0), template);
+        List<RecipeSearchSummary> result5 = handler.execute(new FindRecipes(), template);
+
+        assertThat(result1).first().extracting(RecipeSearchSummary::id).isEqualTo(recipe3.getId());
+        assertThat(result2).first().extracting(RecipeSearchSummary::id).isEqualTo(recipe2.getId());
+        assertThat(result3).first().extracting(RecipeSearchSummary::id).isEqualTo(recipe1.getId());
+        assertThat(result4).matches(r -> r.get(0).id().equals(recipe3.getId()) && r.get(1).id().equals(recipe2.getId()));
+        assertThat(result5).matches(r -> r.get(0).id().equals(recipe3.getId()) && r.get(1).id().equals(recipe2.getId()) && r.get(2).id().equals(recipe1.getId()));
+    }
 }

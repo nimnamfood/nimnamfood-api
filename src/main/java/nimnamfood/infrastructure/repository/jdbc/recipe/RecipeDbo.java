@@ -2,14 +2,13 @@ package nimnamfood.infrastructure.repository.jdbc.recipe;
 
 import com.google.common.collect.Sets;
 import nimnamfood.model.recipe.Recipe;
-import nimnamfood.model.recipe.RecipeIngredient;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 import vtertre.infrastructure.persistence.jdbc.BaseJdbcDboWithUuid;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Table("recipes")
 public class RecipeDbo extends BaseJdbcDboWithUuid<Recipe> {
@@ -17,6 +16,7 @@ public class RecipeDbo extends BaseJdbcDboWithUuid<Recipe> {
     UUID illustrationId;
     Integer portionsCount;
     String instructions;
+    LocalDateTime creationDateTime;
 
     @MappedCollection(idColumn = "recipe_id")
     Set<RecipeIngredientDbo> ingredients = Sets.newHashSet();
@@ -25,17 +25,7 @@ public class RecipeDbo extends BaseJdbcDboWithUuid<Recipe> {
 
     @Override
     public Recipe asAggregateRoot() {
-        Set<RecipeIngredient> recipeIngredients = this.ingredients.stream().map(recipeIngredientDbo -> {
-            final RecipeIngredient recipeIngredient = new RecipeIngredient(recipeIngredientDbo.ingredientId,
-                    recipeIngredientDbo.quantity, recipeIngredientDbo.unit, recipeIngredientDbo.quantityFixed);
-            recipeIngredient.setId(recipeIngredientDbo.getId());
-            return recipeIngredient;
-        }).collect(Collectors.toSet());
-        final Recipe recipe = Recipe.factory().create(
-                this.name, this.illustrationId, this.portionsCount, recipeIngredients, this.instructions,
-                this.tags.stream().map(tag -> tag.tagId).collect(Collectors.toSet()));
-        recipe.setId(this.getId());
-        return recipe;
+        return Recipe.factory().recreateFromDbo(this);
     }
 
     public String getName() {
@@ -84,5 +74,13 @@ public class RecipeDbo extends BaseJdbcDboWithUuid<Recipe> {
 
     public void setIngredients(Set<RecipeIngredientDbo> ingredients) {
         this.ingredients = ingredients;
+    }
+
+    public LocalDateTime getCreationDateTime() {
+        return creationDateTime;
+    }
+
+    public void setCreationDateTime(LocalDateTime creationDateTime) {
+        this.creationDateTime = creationDateTime;
     }
 }

@@ -22,6 +22,7 @@ public class RecipeJdbcRepository extends JdbcRepositoryWithUuid<Recipe, RecipeD
         dbo.illustrationId = recipe.getIllustrationId();
         dbo.portionsCount = recipe.getPortionsCount();
         dbo.instructions = recipe.getInstructions();
+        dbo.creationDateTime = recipe.getCreationDateTime();
         dbo.ingredients = recipe.getIngredients().stream()
                 .map(RecipeJdbcRepository::recipeIngredientDbo).collect(Collectors.toSet());
         dbo.tags = recipe.getTagIds().stream().map(tagId -> {

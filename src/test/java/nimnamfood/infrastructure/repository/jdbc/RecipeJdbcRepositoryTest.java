@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import vtertre.infrastructure.persistence.jdbc.PostgresTestContainerBase;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -51,6 +52,7 @@ public class RecipeJdbcRepositoryTest extends PostgresTestContainerBase {
         recipeDbo.setIllustrationId(UUID.randomUUID());
         recipeDbo.setPortionsCount(2);
         recipeDbo.setInstructions("instructions");
+        recipeDbo.setCreationDateTime(LocalDateTime.now());
         recipeDbo.setTags(Set.of(recipeTagDbo));
         recipeDbo.setIngredients(Set.of(recipeIngredientDbo));
 
@@ -66,6 +68,7 @@ public class RecipeJdbcRepositoryTest extends PostgresTestContainerBase {
         assertThat(foundRecipe.get().getIllustrationId()).isEqualTo(recipeDbo.getIllustrationId());
         assertThat(foundRecipe.get().getPortionsCount()).isEqualTo(2);
         assertThat(foundRecipe.get().getInstructions()).isEqualTo("instructions");
+        assertThat(foundRecipe.get().getCreationDateTime()).isEqualTo(recipeDbo.getCreationDateTime());
         assertThat(foundRecipe.get().getTagIds()).containsExactly(tagDbo.getId());
 
         final RecipeIngredient recipeIngredient = foundRecipe.get().getIngredients().stream().findFirst().get();
@@ -92,6 +95,7 @@ public class RecipeJdbcRepositoryTest extends PostgresTestContainerBase {
         assertThat(dbo.getIllustrationId()).isEqualTo(recipe.getIllustrationId());
         assertThat(dbo.getPortionsCount()).isEqualTo(1);
         assertThat(dbo.getInstructions()).isEqualTo("autres");
+        assertThat(dbo.getCreationDateTime()).isEqualTo(recipe.getCreationDateTime());
         assertThat(dbo.getTags().stream().findFirst().get().getTagId()).isEqualTo(tagId);
 
         final RecipeIngredientDbo recipeIngredientDbo = dbo.getIngredients().stream().findFirst().get();
