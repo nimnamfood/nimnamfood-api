@@ -21,14 +21,14 @@ public class FindTagsHandler extends QueryHandlerJdbc<FindTags, List<TagSummary>
         }
 
         return template.query(
-                baseSqlQuery + " WHERE name ILIKE :query",
+                baseSqlQuery + " WHERE UNACCENT(name) ILIKE UNACCENT(:query)",
                 new MapSqlParameterSource("query", "%" + query.query + "%"),
                 tagSummaryMapper()
         );
     }
 
     private static RowMapper<TagSummary> tagSummaryMapper() {
-        return (resultSet, rowNum) ->new TagSummary(
+        return (resultSet, rowNum) -> new TagSummary(
                 resultSet.getObject("id", UUID.class), resultSet.getString("name"));
     }
 }

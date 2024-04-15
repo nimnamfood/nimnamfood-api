@@ -72,11 +72,11 @@ public class FindRecipesHandler extends QueryHandlerJdbc<FindRecipes, List<Recip
             return "SELECT DISTINCT(id), name, illustration_id, creation_date_time FROM recipes ORDER BY creation_date_time DESC";
         }
         if (query.tags == null || query.tags.isEmpty()) {
-            return "SELECT DISTINCT(id), name, illustration_id, creation_date_time FROM recipes WHERE name ILIKE :query ORDER BY creation_date_time DESC";
+            return "SELECT DISTINCT(id), name, illustration_id, creation_date_time FROM recipes WHERE UNACCENT(name) ILIKE UNACCENT(:query) ORDER BY creation_date_time DESC";
         }
         if (query.query == null || query.query.isEmpty()) {
             return "SELECT DISTINCT(r.id), r.name, r.illustration_id, r.creation_date_time FROM recipes r LEFT JOIN recipe_tags rt ON r.id = rt.recipe_id WHERE rt.tag_id IN (:tagIds) GROUP BY r.id HAVING COUNT(*) = :tagCount ORDER BY r.creation_date_time DESC";
         }
-        return "SELECT DISTINCT(r.id), r.name, r.illustration_id, r.creation_date_time FROM recipes r LEFT JOIN recipe_tags rt ON r.id = rt.recipe_id WHERE name ILIKE :query AND rt.tag_id IN (:tagIds) GROUP BY r.id HAVING COUNT(*) = :tagCount ORDER BY r.creation_date_time DESC";
+        return "SELECT DISTINCT(r.id), r.name, r.illustration_id, r.creation_date_time FROM recipes r LEFT JOIN recipe_tags rt ON r.id = rt.recipe_id WHERE UNACCENT(r.name) ILIKE UNACCENT(:query) AND rt.tag_id IN (:tagIds) GROUP BY r.id HAVING COUNT(*) = :tagCount ORDER BY r.creation_date_time DESC";
     }
 }

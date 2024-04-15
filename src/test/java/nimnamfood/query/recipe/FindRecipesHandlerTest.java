@@ -6,7 +6,6 @@ import nimnamfood.model.recipe.Recipe;
 import nimnamfood.model.tag.Tag;
 import nimnamfood.query.recipe.model.RecipeSearchSummary;
 import nimnamfood.service.RecipeService;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -81,7 +80,6 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
                 summary.tags().isEmpty());
     }
 
-    @Disabled("Désactivé le temps de trouver comment ignorer les caractères spéciaux côté DB ou via les projections")
     @Test
     void ignoresTheQueryCaseAndSpecialCharacters() {
         FindRecipesHandler handler = new FindRecipesHandler(recipeService);

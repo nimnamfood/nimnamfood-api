@@ -5,7 +5,6 @@ import nimnamfood.model.Repositories;
 import nimnamfood.model.ingredient.Ingredient;
 import nimnamfood.model.ingredient.IngredientUnit;
 import nimnamfood.query.ingredient.model.IngredientSummary;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,13 +70,12 @@ public class FindIngredientsHandlerTest extends PostgresTestContainerBase {
                 summary.unit() == ingredient2.getUnit());
     }
 
-    @Disabled("Désactivé le temps de trouver comment ignorer les caractères spéciaux côté DB ou via les projections")
     @Test
     void ignoresTheQueryCaseAndSpecialCharacters() {
         FindIngredientsHandler handler = new FindIngredientsHandler();
         Repositories.ingredients().add(new Ingredient("Chöcolat", IngredientUnit.GRAM));
 
-        List<IngredientSummary> result = handler.execute(new FindIngredients("choc"));
+        List<IngredientSummary> result = handler.execute(new FindIngredients("choc"), jdbcTemplate);
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().name()).isEqualTo("Chöcolat");

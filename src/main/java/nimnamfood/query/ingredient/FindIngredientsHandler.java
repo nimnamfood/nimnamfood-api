@@ -24,7 +24,7 @@ public class FindIngredientsHandler extends QueryHandlerJdbc<FindIngredients, Li
             return template.query(sqlQuery, new MapSqlParameterSource(params), ingredientSummaryMapper());
         }
 
-        final String sqlQuery = appendLimitAndOffset(baseSqlQuery + " WHERE name ILIKE :query");
+        final String sqlQuery = appendLimitAndOffset(baseSqlQuery + " WHERE UNACCENT(name) ILIKE UNACCENT(:query)");
         params.put("query", "%" + query.query + "%");
         return template.query(sqlQuery, new MapSqlParameterSource(params), ingredientSummaryMapper());
     }

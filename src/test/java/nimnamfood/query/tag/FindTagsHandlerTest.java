@@ -4,7 +4,6 @@ import nimnamfood.infrastructure.repository.jdbc.WithJdbcRepositories;
 import nimnamfood.model.Repositories;
 import nimnamfood.model.tag.Tag;
 import nimnamfood.query.tag.model.TagSummary;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +56,6 @@ public class FindTagsHandlerTest extends PostgresTestContainerBase {
                 summary.name().equals(tag2.getName()));
     }
 
-    @Disabled("Désactivé le temps de trouver comment ignorer les caractères spéciaux côté DB ou via les projections")
     @Test
     void ignoresTheQueryCaseAndSpecialCharacters() {
         FindTagsHandler handler = new FindTagsHandler();
