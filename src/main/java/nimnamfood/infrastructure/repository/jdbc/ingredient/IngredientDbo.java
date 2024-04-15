@@ -12,9 +12,7 @@ public class IngredientDbo extends BaseJdbcDboWithUuid<Ingredient> {
 
     @Override
     public Ingredient asAggregateRoot() {
-        final Ingredient ingredient = new Ingredient(this.name, this.unit);
-        ingredient.setId(this.getId());
-        return ingredient;
+        return new Ingredient(this.getId(), this.name, this.unit);
     }
 
     public String getName() {

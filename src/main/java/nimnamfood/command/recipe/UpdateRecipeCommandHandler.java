@@ -40,7 +40,7 @@ public class UpdateRecipeCommandHandler implements CommandHandler<UpdateRecipeCo
             this.recipeService.deleteIllustration(currentIllustrationId);
         }
 
-        final Recipe recipe = Recipe.factory().create(
+        final Recipe updatedRecipe = currentRecipe.get().updated(
                 command.name,
                 newIllustrationId,
                 command.portionsCount,
@@ -48,8 +48,7 @@ public class UpdateRecipeCommandHandler implements CommandHandler<UpdateRecipeCo
                 command.instructions,
                 tagIds
         );
-        recipe.setId(command.id);
-        Repositories.recipes().update(recipe);
+        Repositories.recipes().update(updatedRecipe);
 
         return Tuple.of(null, Collections.emptyList());
     }

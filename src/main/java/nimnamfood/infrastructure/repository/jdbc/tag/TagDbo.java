@@ -10,9 +10,7 @@ public class TagDbo extends BaseJdbcDboWithUuid<Tag> {
 
     @Override
     public Tag asAggregateRoot() {
-        final Tag tag = new Tag(this.name);
-        tag.setId(this.getId());
-        return tag;
+        return new Tag(this.getId(), this.name);
     }
 
     public String getName() {

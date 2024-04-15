@@ -5,7 +5,7 @@ import com.google.common.base.MoreObjects;
 import java.util.Objects;
 
 public abstract class BaseEntity<TId> implements Entity<TId> {
-    private TId id;
+    private final TId id;
 
     protected BaseEntity(TId id) {
         this.id = id;
@@ -14,10 +14,6 @@ public abstract class BaseEntity<TId> implements Entity<TId> {
     @Override
     public TId getId() {
         return this.id;
-    }
-
-    public void setId(TId id) {
-        this.id = id;
     }
 
     @Override

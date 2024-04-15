@@ -6,4 +6,8 @@ public abstract class BaseEntityWithUuid extends BaseEntity<UUID> implements Ent
     protected BaseEntityWithUuid() {
         super(UUID.randomUUID());
     }
+
+    protected BaseEntityWithUuid(UUID uuid) {
+        super(uuid);
+    }
 }

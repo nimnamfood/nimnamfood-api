@@ -18,6 +18,14 @@ public class RecipeIngredient extends BaseEntityWithUuid {
         this.quantityFixed = quantityFixed;
     }
 
+    public RecipeIngredient(UUID id, UUID ingredientId, float quantity, IngredientUnit unit, boolean quantityFixed) {
+        super(id);
+        this.ingredientId = ingredientId;
+        this.quantity = quantity;
+        this.unit = unit;
+        this.quantityFixed = quantityFixed;
+    }
+
     public UUID ingredientId() {
         return ingredientId;
     }

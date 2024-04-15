@@ -24,7 +24,20 @@ public class Recipe extends BaseAggregateRootWithUuid {
         return new Factory();
     }
 
-    private Recipe(String name, UUID illustrationId, int portionsCount, Set<RecipeIngredient> ingredients, String instructions, Set<UUID> tagIds, LocalDateTime creationDateTime) {
+    private Recipe(String name, UUID illustrationId, int portionsCount, Set<RecipeIngredient> ingredients,
+                   String instructions, Set<UUID> tagIds) {
+        this.name = name;
+        this.illustrationId = illustrationId;
+        this.portionsCount = portionsCount;
+        this.ingredients = ingredients;
+        this.instructions = instructions;
+        this.tagIds = tagIds;
+        this.creationDateTime = LocalDateTime.now(ZoneOffset.UTC);
+    }
+
+    private Recipe(UUID id, String name, UUID illustrationId, int portionsCount, Set<RecipeIngredient> ingredients,
+                   String instructions, Set<UUID> tagIds, LocalDateTime creationDateTime) {
+        super(id);
         this.name = name;
         this.illustrationId = illustrationId;
         this.portionsCount = portionsCount;
@@ -37,7 +50,7 @@ public class Recipe extends BaseAggregateRootWithUuid {
     public static class Factory {
         public Recipe create(String name, UUID illustrationId, int portionsCount,
                              Set<RecipeIngredient> ingredients, String instructions, Set<UUID> tagIds) {
-            return new Recipe(name, illustrationId, portionsCount, ingredients, instructions, tagIds, LocalDateTime.now(ZoneOffset.UTC));
+            return new Recipe(name, illustrationId, portionsCount, ingredients, instructions, tagIds);
         }
 
         public Recipe create(String name, int portionsCount, Set<RecipeIngredient> ingredients, String instructions,
@@ -50,20 +63,22 @@ public class Recipe extends BaseAggregateRootWithUuid {
         }
 
         public Recipe recreateFromDbo(RecipeDbo dbo) {
-            final Set<RecipeIngredient> recipeIngredients = dbo.getIngredients().stream().map(recipeIngredientDbo -> {
-                final RecipeIngredient recipeIngredient = new RecipeIngredient(recipeIngredientDbo.getIngredientId(),
-                        recipeIngredientDbo.getQuantity(), recipeIngredientDbo.getUnit(), recipeIngredientDbo.getQuantityFixed());
-                recipeIngredient.setId(recipeIngredientDbo.getId());
-                return recipeIngredient;
-            }).collect(Collectors.toSet());
+            final Set<RecipeIngredient> recipeIngredients = dbo.getIngredients().stream().map(recipeIngredientDbo ->
+                    new RecipeIngredient(recipeIngredientDbo.getId(), recipeIngredientDbo.getIngredientId(),
+                            recipeIngredientDbo.getQuantity(), recipeIngredientDbo.getUnit(),
+                            recipeIngredientDbo.getQuantityFixed())).collect(Collectors.toSet());
 
             final Set<UUID> tagIds = dbo.getTags().stream().map(RecipeTagDbo::getTagId).collect(Collectors.toSet());
 
-            final Recipe recipe = new Recipe(dbo.getName(), dbo.getIllustrationId(), dbo.getPortionsCount(), recipeIngredients,
-                    dbo.getInstructions(), tagIds, dbo.getCreationDateTime());
-            recipe.setId(dbo.getId());
-            return recipe;
+            return new Recipe(dbo.getId(), dbo.getName(), dbo.getIllustrationId(), dbo.getPortionsCount(),
+                    recipeIngredients, dbo.getInstructions(), tagIds, dbo.getCreationDateTime());
         }
+    }
+
+    public Recipe updated(String name, UUID illustrationId, int portionsCount,
+                          Set<RecipeIngredient> ingredients, String instructions, Set<UUID> tagIds) {
+        return new Recipe(this.getId(), name, illustrationId, portionsCount, ingredients, instructions, tagIds,
+                this.creationDateTime);
     }
 
     public String getName() {

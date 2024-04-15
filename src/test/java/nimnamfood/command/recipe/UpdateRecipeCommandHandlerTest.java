@@ -80,6 +80,16 @@ class UpdateRecipeCommandHandlerTest {
     }
 
     @Test
+    void preservesTheCreationDate() {
+        Recipe recipe = createRecipeWithoutIllustration();
+
+        new UpdateRecipeCommandHandler(recipeService).execute(createDefaultCommand(recipe));
+        Recipe updatedRecipe = Repositories.recipes().get(recipe.getId()).get();
+
+        assertThat(updatedRecipe.getCreationDateTime()).isEqualTo(recipe.getCreationDateTime());
+    }
+
+    @Test
     void addsTheIllustrationIfNoneExists() {
         UpdateRecipeCommandHandler handler = new UpdateRecipeCommandHandler(recipeService);
         Recipe recipe = createRecipeWithoutIllustration();
@@ -167,7 +177,7 @@ class UpdateRecipeCommandHandlerTest {
         Repositories.ingredients().add(ingredient);
 
         RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient.getId(), 1f, IngredientUnit.GRAM, false);
-        Recipe recipe = Recipe.factory().create("recette", null, 1, Set.of(recipeIngredient), "instructions", Collections.emptySet());
+        Recipe recipe = Recipe.factory().create("recette", 1, Set.of(recipeIngredient), "instructions");
         Repositories.recipes().add(recipe);
         return recipe;
     }
