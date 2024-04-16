@@ -30,7 +30,7 @@ public class CreateRecipeCommandHandlerTest {
     void addsTheRecipeToTheRepositoryAndReturnsItsUUID() {
         CreateRecipeCommandHandler handler = new CreateRecipeCommandHandler(recipeService);
 
-        Tag tag = new Tag("rapide");
+        Tag tag = Tag.factory().create("rapide")._1;
         Repositories.tags().add(tag);
 
         Ingredient ingredient = Ingredient.factory().create("cacao", IngredientUnit.GRAM)._1;
@@ -116,7 +116,7 @@ public class CreateRecipeCommandHandlerTest {
     @Test
     void throwsAndExceptionIfATagDoesNotExist() {
         CreateRecipeCommandHandler handler = new CreateRecipeCommandHandler(recipeService);
-        Tag tag = new Tag("rapide");
+        Tag tag = Tag.factory().create("rapide")._1;
         RecipeIngredientCommandPart part = createDefaultRecipeIngredientCommandPart();
         CreateRecipeCommand command = new CreateRecipeCommand();
         command.ingredients = Set.of(part);

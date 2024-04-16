@@ -40,7 +40,7 @@ public class TagJdbcRepositoryTest extends PostgresTestContainerBase {
     @Test
     void addsATag() {
         TagJdbcRepository repository = new TagJdbcRepository(crudRepository, jdbcAggregateTemplate);
-        Tag tag = new Tag("végé");
+        Tag tag = Tag.factory().create("végé")._1;
 
         repository.add(tag);
         TagDbo dbo = this.jdbcAggregateTemplate.findById(tag.getId(), TagDbo.class);
@@ -53,9 +53,10 @@ public class TagJdbcRepositoryTest extends PostgresTestContainerBase {
     void throwsAnErrorWhenAddingATagWithAnExistingName() {
         TagJdbcRepository repository = new TagJdbcRepository(crudRepository, jdbcAggregateTemplate);
 
-        repository.add(new Tag("rapide"));
+        repository.add(Tag.factory().create("rapide")._1);
 
-        assertThatRuntimeException().isThrownBy(
-                () -> repository.add(new Tag("rapide"))).withCauseInstanceOf(DuplicateKeyException.class);
+        assertThatRuntimeException()
+                .isThrownBy(() -> repository.add(Tag.factory().create("rapide")._1))
+                .withCauseInstanceOf(DuplicateKeyException.class);
     }
 }

@@ -41,7 +41,7 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
         FindRecipesHandler handler = new FindRecipesHandler(recipeService);
         Recipe recipe1 = Recipe.factory().create("recette", UUID.randomUUID(), 1, Collections.emptySet(), "", Collections.emptySet());
         Mockito.when(recipeService.illustrationUrl(recipe1.getIllustrationId())).thenReturn("recipe1 illu url");
-        Tag tag = new Tag("tag");
+        Tag tag = Tag.factory().create("tag")._1;
         Repositories.tags().add(tag);
         Recipe recipe2 = Recipe.factory().create("recette 2", null, 1, Collections.emptySet(), "", Set.of(tag.getId()));
         Repositories.recipes().add(recipe1);
@@ -96,9 +96,9 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
     void returnsAllRecipesHavingAtLeastAllRequestedTags() {
         FindRecipesHandler handler = new FindRecipesHandler(recipeService);
 
-        Tag tag1 = new Tag("1");
-        Tag tag2 = new Tag("2");
-        Tag tag3 = new Tag("3");
+        Tag tag1 = Tag.factory().create("1")._1;
+        Tag tag2 = Tag.factory().create("2")._1;
+        Tag tag3 = Tag.factory().create("3")._1;
         Repositories.tags().add(tag1);
         Repositories.tags().add(tag2);
         Repositories.tags().add(tag3);
@@ -130,8 +130,8 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
     void returnsAllRecipesContainingTheQueryAndHavingAtLeastAllRequestedTags() {
         FindRecipesHandler handler = new FindRecipesHandler(recipeService);
 
-        Tag tag1 = new Tag("1");
-        Tag tag2 = new Tag("2");
+        Tag tag1 = Tag.factory().create("1")._1;
+        Tag tag2 = Tag.factory().create("2")._1;
         Repositories.tags().add(tag1);
         Repositories.tags().add(tag2);
 
@@ -152,7 +152,7 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
     void paginatesTheRecipesInReversedCreationOrder() {
         FindRecipesHandler handler = new FindRecipesHandler(recipeService);
 
-        Tag tag1 = new Tag("1");
+        Tag tag1 = Tag.factory().create("1")._1;
         Repositories.tags().add(tag1);
 
         Recipe recipe1 = Recipe.factory().create("recette 1", 1, Collections.emptySet(), "", Set.of(tag1.getId()));

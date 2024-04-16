@@ -160,8 +160,8 @@ class RecipeServiceTest {
 
     @Test
     void extractsTheSetOfTagAsUuids() {
-        Tag tag1 = addTag(new Tag("1"));
-        Tag tag2 = addTag(new Tag("2"));
+        Tag tag1 = addTag(Tag.factory().create("1")._1);
+        Tag tag2 = addTag(Tag.factory().create("2")._1);
 
         Set<UUID> result = RecipeService.tagIdsFromCommand(Set.of(tag1.getId().toString(), tag2.getId().toString()));
 

@@ -1,11 +1,9 @@
 package nimnamfood.query.ingredient;
 
-import nimnamfood.infrastructure.repository.jdbc.WithJdbcRepositories;
 import nimnamfood.model.ingredient.Ingredient;
 import nimnamfood.model.ingredient.IngredientUnit;
 import nimnamfood.query.ingredient.model.IngredientSummary;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -15,7 +13,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(WithJdbcRepositories.class)
 @Import(IngredientsViewTestHelper.class)
 public class FindIngredientsHandlerTest extends PostgresTestContainerBase {
     @Autowired

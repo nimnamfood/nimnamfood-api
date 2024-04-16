@@ -31,7 +31,7 @@ class UpdateRecipeCommandHandlerTest {
     void updatesTheRecipe() {
         UpdateRecipeCommandHandler handler = new UpdateRecipeCommandHandler(recipeService);
 
-        Tag tag = new Tag("rapide");
+        Tag tag = Tag.factory().create("rapide")._1;
         Repositories.tags().add(tag);
 
         Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.GRAM)._1;

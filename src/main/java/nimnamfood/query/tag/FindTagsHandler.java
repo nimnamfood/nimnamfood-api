@@ -14,7 +14,7 @@ import java.util.UUID;
 public class FindTagsHandler extends QueryHandlerJdbc<FindTags, List<TagSummary>> {
     @Override
     protected List<TagSummary> execute(FindTags query, NamedParameterJdbcTemplate template) {
-        final String baseSqlQuery = "SELECT * FROM tags";
+        final String baseSqlQuery = "SELECT * FROM view_tags";
 
         if (query.query == null || query.query.isEmpty()) {
             return template.query(baseSqlQuery, tagSummaryMapper());

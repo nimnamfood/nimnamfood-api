@@ -36,8 +36,8 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
         GetRecipeHandler handler = new GetRecipeHandler(recipeService);
         Ingredient ingredient1 = Ingredient.factory().create("ingredient 1", IngredientUnit.GRAM)._1;
         Ingredient ingredient2 = Ingredient.factory().create("ingredient 2", IngredientUnit.PIECE)._1;
-        Tag tag1 = new Tag("tag 1");
-        Tag tag2 = new Tag("tag 2");
+        Tag tag1 = Tag.factory().create("tag 1")._1;
+        Tag tag2 = Tag.factory().create("tag 2")._1;
         Repositories.ingredients().add(ingredient1);
         Repositories.ingredients().add(ingredient2);
         Repositories.tags().add(tag1);

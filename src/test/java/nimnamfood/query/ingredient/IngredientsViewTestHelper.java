@@ -39,6 +39,7 @@ public class IngredientsViewTestHelper {
                         resultSet.getObject("id", UUID.class),
                         resultSet.getString("name"),
                         IngredientUnit.valueOf(resultSet.getString("unit"))
-                )).optional();
+                ))
+                .optional();
     }
 }
