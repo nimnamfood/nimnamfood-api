@@ -3,7 +3,9 @@ package nimnamfood.command.ingredient;
 import nimnamfood.infrastructure.repository.memory.WithMemoryRepositories;
 import nimnamfood.model.Repositories;
 import nimnamfood.model.ingredient.Ingredient;
+import nimnamfood.model.ingredient.IngredientCreated;
 import nimnamfood.model.ingredient.IngredientUnit;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import vtertre.ddd.Tuple;
@@ -29,6 +31,12 @@ public class CreateIngredientCommandHandlerTest {
         assertThat(ingredient.getId()).isEqualTo(result._1);
         assertThat(ingredient.getName()).isEqualTo("chocolat");
         assertThat(ingredient.getUnit()).isEqualTo(IngredientUnit.GRAM);
-        assertThat(result._2).isEmpty();
+        assertThat(result._2).hasSize(1).first()
+                .asInstanceOf(InstanceOfAssertFactories.type(IngredientCreated.class))
+                .satisfies(event -> {
+                    assertThat(event.id()).isEqualTo(result._1);
+                    assertThat(event.name()).isEqualTo("chocolat");
+                    assertThat(event.unit()).isEqualTo(IngredientUnit.GRAM);
+                });
     }
 }

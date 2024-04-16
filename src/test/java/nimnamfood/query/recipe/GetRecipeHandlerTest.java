@@ -34,8 +34,8 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
     @Test
     void returnsTheRecipeWithMatchingId() {
         GetRecipeHandler handler = new GetRecipeHandler(recipeService);
-        Ingredient ingredient1 = new Ingredient("ingredient 1", IngredientUnit.GRAM);
-        Ingredient ingredient2 = new Ingredient("ingredient 2", IngredientUnit.PIECE);
+        Ingredient ingredient1 = Ingredient.factory().create("ingredient 1", IngredientUnit.GRAM)._1;
+        Ingredient ingredient2 = Ingredient.factory().create("ingredient 2", IngredientUnit.PIECE)._1;
         Tag tag1 = new Tag("tag 1");
         Tag tag2 = new Tag("tag 2");
         Repositories.ingredients().add(ingredient1);
@@ -68,7 +68,7 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
     @Test
     void handlesMultipleTimesTheSameIngredient() {
         GetRecipeHandler handler = new GetRecipeHandler(recipeService);
-        Ingredient ingredient = new Ingredient("ingredient", IngredientUnit.GRAM);
+        Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.GRAM)._1;
         Repositories.ingredients().add(ingredient);
         Recipe recipe = Recipe.factory().create("recette", null, 1, Set.of(new RecipeIngredient(ingredient.getId(), 10f, IngredientUnit.GRAM, false), new RecipeIngredient(ingredient.getId(), 5f, IngredientUnit.GRAM, true)), "instructions", Collections.emptySet());
         Repositories.recipes().add(recipe);

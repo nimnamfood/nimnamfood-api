@@ -1,13 +1,13 @@
 package nimnamfood.query.ingredient;
 
 import nimnamfood.infrastructure.repository.jdbc.WithJdbcRepositories;
-import nimnamfood.model.Repositories;
 import nimnamfood.model.ingredient.Ingredient;
 import nimnamfood.model.ingredient.IngredientUnit;
 import nimnamfood.query.ingredient.model.IngredientSummary;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import vtertre.infrastructure.persistence.jdbc.PostgresTestContainerBase;
 
@@ -15,8 +15,12 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith({WithJdbcRepositories.class})
+@ExtendWith(WithJdbcRepositories.class)
+@Import(IngredientsViewTestHelper.class)
 public class FindIngredientsHandlerTest extends PostgresTestContainerBase {
+    @Autowired
+    IngredientsViewTestHelper view;
+
     @Autowired
     NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -32,10 +36,9 @@ public class FindIngredientsHandlerTest extends PostgresTestContainerBase {
     @Test
     void returnsAllIngredientsWhenNoQueryIsProvided() {
         FindIngredientsHandler handler = new FindIngredientsHandler();
-        Ingredient ingredient1 = new Ingredient("chocolat", IngredientUnit.GRAM);
-        Ingredient ingredient2 = new Ingredient("citron", IngredientUnit.PIECE);
-        Repositories.ingredients().add(ingredient1);
-        Repositories.ingredients().add(ingredient2);
+        Ingredient ingredient1 = Ingredient.factory().create("chocolat", IngredientUnit.GRAM)._1;
+        Ingredient ingredient2 = Ingredient.factory().create("citron", IngredientUnit.PIECE)._1;
+        view.insertIngredients(ingredient1, ingredient2);
 
         List<IngredientSummary> result = handler.execute(new FindIngredients(), jdbcTemplate);
 
@@ -51,13 +54,10 @@ public class FindIngredientsHandlerTest extends PostgresTestContainerBase {
     @Test
     void returnsAllIngredientsContainingTheQuery() {
         FindIngredientsHandler handler = new FindIngredientsHandler();
-
-        Ingredient ingredient1 = new Ingredient("chocolat", IngredientUnit.GRAM);
-        Ingredient ingredient2 = new Ingredient("citron", IngredientUnit.PIECE);
-        Ingredient ingredient3 = new Ingredient("jus de citron", IngredientUnit.MILLILITER);
-        Repositories.ingredients().add(ingredient1);
-        Repositories.ingredients().add(ingredient2);
-        Repositories.ingredients().add(ingredient3);
+        Ingredient ingredient1 = Ingredient.factory().create("chocolat", IngredientUnit.GRAM)._1;
+        Ingredient ingredient2 = Ingredient.factory().create("citron", IngredientUnit.PIECE)._1;
+        Ingredient ingredient3 = Ingredient.factory().create("jus de citron", IngredientUnit.MILLILITER)._1;
+        view.insertIngredients(ingredient1, ingredient2, ingredient3);
 
         List<IngredientSummary> result = handler.execute(new FindIngredients("citron"), jdbcTemplate);
 
@@ -73,7 +73,7 @@ public class FindIngredientsHandlerTest extends PostgresTestContainerBase {
     @Test
     void ignoresTheQueryCaseAndSpecialCharacters() {
         FindIngredientsHandler handler = new FindIngredientsHandler();
-        Repositories.ingredients().add(new Ingredient("Chöcolat", IngredientUnit.GRAM));
+        view.insertIngredients(Ingredient.factory().create("Chöcolat", IngredientUnit.GRAM)._1);
 
         List<IngredientSummary> result = handler.execute(new FindIngredients("choc"), jdbcTemplate);
 
@@ -84,10 +84,9 @@ public class FindIngredientsHandlerTest extends PostgresTestContainerBase {
     @Test
     void paginatesTheIngredients() {
         FindIngredientsHandler handler = new FindIngredientsHandler();
-        Ingredient ingredient1 = new Ingredient("chocolat", IngredientUnit.GRAM);
-        Ingredient ingredient2 = new Ingredient("citron", IngredientUnit.PIECE);
-        Repositories.ingredients().add(ingredient1);
-        Repositories.ingredients().add(ingredient2);
+        Ingredient ingredient1 = Ingredient.factory().create("chocolat", IngredientUnit.GRAM)._1;
+        Ingredient ingredient2 = Ingredient.factory().create("citron", IngredientUnit.PIECE)._1;
+        view.insertIngredients(ingredient1, ingredient2);
 
         List<IngredientSummary> result1 = handler.execute((FindIngredients) new FindIngredients().limit(1).skip(0), jdbcTemplate);
         List<IngredientSummary> result2 = handler.execute((FindIngredients) new FindIngredients().limit(1).skip(1), jdbcTemplate);

@@ -128,7 +128,7 @@ class RecipeServiceTest {
 
     @Test
     void extractsTheSetOfRecipeIngredientsFromACommandPart() {
-        Ingredient ingredient = addIngredient(new Ingredient("ingredient", IngredientUnit.GRAM));
+        Ingredient ingredient = addIngredient(Ingredient.factory().create("ingredient", IngredientUnit.GRAM)._1);
         RecipeIngredientCommandPart part = new RecipeIngredientCommandPart() {{
             ingredientId = ingredient.getId().toString();
             quantity = 2f;

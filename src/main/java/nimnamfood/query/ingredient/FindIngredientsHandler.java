@@ -16,7 +16,7 @@ import java.util.UUID;
 public class FindIngredientsHandler extends QueryHandlerJdbc<FindIngredients, List<IngredientSummary>> {
     @Override
     protected List<IngredientSummary> execute(FindIngredients query, NamedParameterJdbcTemplate template) {
-        final String baseSqlQuery = "SELECT * FROM ingredients";
+        final String baseSqlQuery = "SELECT * FROM view_ingredients";
         final HashMap<String, Object> params = this.baseLimitOffsetParams(query);
 
         if (query.query == null || query.query.isEmpty()) {

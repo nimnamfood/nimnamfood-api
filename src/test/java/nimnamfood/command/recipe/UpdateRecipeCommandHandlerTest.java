@@ -34,7 +34,7 @@ class UpdateRecipeCommandHandlerTest {
         Tag tag = new Tag("rapide");
         Repositories.tags().add(tag);
 
-        Ingredient ingredient = new Ingredient("ingredient", IngredientUnit.GRAM);
+        Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.GRAM)._1;
         Repositories.ingredients().add(ingredient);
 
         RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient.getId(), 1f, IngredientUnit.GRAM, false);
@@ -163,7 +163,7 @@ class UpdateRecipeCommandHandlerTest {
     }
 
     private static Recipe createRecipeWithIllustration() {
-        Ingredient ingredient = new Ingredient("ingredient", IngredientUnit.GRAM);
+        Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.GRAM)._1;
         Repositories.ingredients().add(ingredient);
 
         RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient.getId(), 1f, IngredientUnit.GRAM, false);
@@ -173,7 +173,7 @@ class UpdateRecipeCommandHandlerTest {
     }
 
     private static Recipe createRecipeWithoutIllustration() {
-        Ingredient ingredient = new Ingredient("ingredient", IngredientUnit.GRAM);
+        Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.GRAM)._1;
         Repositories.ingredients().add(ingredient);
 
         RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient.getId(), 1f, IngredientUnit.GRAM, false);

@@ -33,7 +33,7 @@ public class CreateRecipeCommandHandlerTest {
         Tag tag = new Tag("rapide");
         Repositories.tags().add(tag);
 
-        Ingredient ingredient = new Ingredient("cacao", IngredientUnit.GRAM);
+        Ingredient ingredient = Ingredient.factory().create("cacao", IngredientUnit.GRAM)._1;
         Repositories.ingredients().add(ingredient);
         RecipeIngredientCommandPart part = new RecipeIngredientCommandPart() {{
             ingredientId = ingredient.getId().toString();
@@ -97,7 +97,7 @@ public class CreateRecipeCommandHandlerTest {
     void throwsAndExceptionIfAnIngredientDoesNotExist() {
         CreateRecipeCommandHandler handler = new CreateRecipeCommandHandler(recipeService);
 
-        Ingredient ingredient = new Ingredient("cacao", IngredientUnit.GRAM);
+        Ingredient ingredient = Ingredient.factory().create("cacao", IngredientUnit.GRAM)._1;
         RecipeIngredientCommandPart part = new RecipeIngredientCommandPart() {{
             ingredientId = ingredient.getId().toString();
             quantity = 20f;
@@ -128,7 +128,7 @@ public class CreateRecipeCommandHandlerTest {
     }
 
     private static RecipeIngredientCommandPart createDefaultRecipeIngredientCommandPart() {
-        Ingredient ingredient = new Ingredient("cacao", IngredientUnit.GRAM);
+        Ingredient ingredient = Ingredient.factory().create("cacao", IngredientUnit.GRAM)._1;
         Repositories.ingredients().add(ingredient);
         return new RecipeIngredientCommandPart() {{
             ingredientId = ingredient.getId().toString();

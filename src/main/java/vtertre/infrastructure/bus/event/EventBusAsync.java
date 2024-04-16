@@ -1,13 +1,11 @@
 package vtertre.infrastructure.bus.event;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.MoreExecutors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vtertre.ddd.Tuple;
-import vtertre.ddd.event.DomainEvent;
-import vtertre.ddd.event.EventBus;
-import vtertre.ddd.event.EventBusMiddleware;
-import vtertre.ddd.event.EventCaptor;
+import vtertre.ddd.event.*;
 
 import java.util.List;
 import java.util.Set;
@@ -15,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
 public class EventBusAsync implements EventBus {
+    private final ExecutorService directExecutorService = MoreExecutors.newDirectExecutorService();
     private final ExecutorService executorService;
     private final List<EventCaptor<?>> captors;
     private final MiddlewareChainLink firstMiddlewareChainLink;
@@ -44,7 +43,8 @@ public class EventBusAsync implements EventBus {
     }
 
     private <T extends DomainEvent> CompletableFuture<Boolean> execute(T event, EventCaptor<T> captor) {
-        return CompletableFuture.supplyAsync(() -> firstMiddlewareChainLink.apply(captor, event), this.executorService);
+        final ExecutorService executor = captor.getClass().getAnnotation(Synced.class) != null ? this.directExecutorService : this.executorService;
+        return CompletableFuture.supplyAsync(() -> firstMiddlewareChainLink.apply(captor, event), executor);
     }
 
     private static class MiddlewareChainLink {
@@ -56,9 +56,9 @@ public class EventBusAsync implements EventBus {
             this.nextLink = nextLink;
         }
 
-        public <T extends DomainEvent> boolean apply(EventCaptor<T> h, T event) {
+        public <T extends DomainEvent> boolean apply(EventCaptor<T> captor, T event) {
             LOGGER.debug("Running middleware {}", middleware.getClass());
-            middleware.intercept(event, () -> nextLink.apply(h, event));
+            middleware.intercept(event, () -> nextLink.apply(captor, event));
             return true;
         }
     }
@@ -69,9 +69,9 @@ public class EventBusAsync implements EventBus {
         }
 
         @Override
-        public <T extends DomainEvent> boolean apply(EventCaptor<T> h, T event) {
-            LOGGER.debug("Applying captor {}", h.getClass());
-            h.execute(event);
+        public <T extends DomainEvent> boolean apply(EventCaptor<T> captor, T event) {
+            LOGGER.debug("Applying captor {}", captor.getClass());
+            captor.execute(event);
             return true;
         }
     }

@@ -43,7 +43,7 @@ public class IngredientJdbcRepositoryTest extends PostgresTestContainerBase {
     @Test
     void addsAnIngredient() {
         IngredientJdbcRepository repository = new IngredientJdbcRepository(crudRepository, jdbcAggregateTemplate);
-        Ingredient ingredient = new Ingredient("citron", IngredientUnit.PIECE);
+        Ingredient ingredient = Ingredient.factory().create("citron", IngredientUnit.PIECE)._1;
 
         repository.add(ingredient);
         IngredientDbo dbo = this.jdbcAggregateTemplate.findById(ingredient.getId(), IngredientDbo.class);
@@ -57,9 +57,9 @@ public class IngredientJdbcRepositoryTest extends PostgresTestContainerBase {
     void throwsAnErrorWhenAddingAnIngredientWithAnExistingName() {
         IngredientJdbcRepository repository = new IngredientJdbcRepository(crudRepository, jdbcAggregateTemplate);
 
-        repository.add(new Ingredient("citron", IngredientUnit.PIECE));
+        repository.add(Ingredient.factory().create("citron", IngredientUnit.PIECE)._1);
 
-        assertThatRuntimeException().isThrownBy(() -> repository.add(new Ingredient(
-                "citron", IngredientUnit.GRAM))).withCauseInstanceOf(DuplicateKeyException.class);
+        assertThatRuntimeException().isThrownBy(() -> repository.add(Ingredient.factory().create(
+                "citron", IngredientUnit.GRAM)._1)).withCauseInstanceOf(DuplicateKeyException.class);
     }
 }

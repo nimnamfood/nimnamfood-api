@@ -44,3 +44,10 @@ create table recipes (
     instructions text not null,
     creation_date_time timestamp not null
 );
+
+drop table if exists view_ingredients;
+create table view_ingredients (
+    id uuid primary key,
+    name text not null,
+    unit text not null
+);
