@@ -49,20 +49,22 @@ public class RecipeSearchViewTestHelper {
         final Set<Recipe> recipesWithTags = Arrays.stream(recipes).filter(r -> !r.getTagIds().isEmpty()).collect(Collectors.toSet());
         final Set<Recipe> recipesWithoutTags = Sets.difference(Sets.newHashSet(recipes), recipesWithTags);
         if (!recipesWithTags.isEmpty()) {
-            this.template.batchUpdate("""
-                            with selected_tags as (select * from view_part_recipe_search_tags where id in (:tagIds))
-                            insert into view_recipe_search (id, name, illustration_url, creation_date_time, tags)
-                            select :id, :name, :illustrationUrl, :creationDateTime, jsonb_agg(selected_tags.*)
-                            from selected_tags
-                            """,
-                    recipesWithTags.stream().map(r -> new HashMap() {{
-                        put("id", r.getId());
-                        put("name", r.getName());
-                        put("illustrationUrl", "url:" + r.getIllustrationId());
-                        put("creationDateTime", r.getCreationDateTime());
-                        put("tagIds", r.getTagIds());
-                    }}).toArray(Map[]::new)
-            );
+            recipesWithTags.stream().forEach(r -> {
+                this.template.update("""
+                                with selected_tags as (select * from view_part_recipe_search_tags where id in (:tagIds))
+                                insert into view_recipe_search (id, name, illustration_url, creation_date_time, tags)
+                                select :id, :name, :illustrationUrl, :creationDateTime, jsonb_agg(selected_tags.*)
+                                from selected_tags
+                                """,
+                        new HashMap() {{
+                            put("id", r.getId());
+                            put("name", r.getName());
+                            put("illustrationUrl", r.getIllustrationId() != null ? "url:" + r.getIllustrationId() : null);
+                            put("creationDateTime", r.getCreationDateTime());
+                            put("tagIds", r.getTagIds());
+                        }}
+                );
+            });
         }
         if (!recipesWithoutTags.isEmpty()) {
             this.template.batchUpdate("""
@@ -72,7 +74,7 @@ public class RecipeSearchViewTestHelper {
                     recipesWithoutTags.stream().map(r -> new HashMap() {{
                         put("id", r.getId());
                         put("name", r.getName());
-                        put("illustrationUrl", "url:" + r.getIllustrationId());
+                        put("illustrationUrl", r.getIllustrationId() != null ? "url:" + r.getIllustrationId() : null);
                         put("creationDateTime", r.getCreationDateTime());
                     }}).toArray(Map[]::new)
             );

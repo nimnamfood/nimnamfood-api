@@ -1,15 +1,11 @@
 package nimnamfood.query.recipe;
 
-import nimnamfood.infrastructure.repository.jdbc.WithJdbcRepositories;
-import nimnamfood.model.Repositories;
 import nimnamfood.model.recipe.Recipe;
 import nimnamfood.model.tag.Tag;
 import nimnamfood.query.recipe.model.RecipeSearchSummary;
-import nimnamfood.service.RecipeService;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import vtertre.infrastructure.persistence.jdbc.PostgresTestContainerBase;
 
@@ -20,16 +16,16 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith({WithJdbcRepositories.class})
+@Import(RecipeSearchViewTestHelper.class)
 public class FindRecipesHandlerTest extends PostgresTestContainerBase {
+    @Autowired
+    RecipeSearchViewTestHelper view;
     @Autowired
     NamedParameterJdbcTemplate template;
 
-    RecipeService recipeService = Mockito.mock();
-
     @Test
     void returnsAnEmptyListOfRecipes() {
-        FindRecipesHandler handler = new FindRecipesHandler(recipeService);
+        FindRecipesHandler handler = new FindRecipesHandler();
 
         List<RecipeSearchSummary> result = handler.execute(new FindRecipes(), template);
 
@@ -38,20 +34,18 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void returnsAllRecipesWhenNoQueryIsProvided() {
-        FindRecipesHandler handler = new FindRecipesHandler(recipeService);
+        FindRecipesHandler handler = new FindRecipesHandler();
         Recipe recipe1 = Recipe.factory().create("recette", UUID.randomUUID(), 1, Collections.emptySet(), "", Collections.emptySet())._1;
-        Mockito.when(recipeService.illustrationUrl(recipe1.getIllustrationId())).thenReturn("recipe1 illu url");
         Tag tag = Tag.factory().create("tag")._1;
-        Repositories.tags().add(tag);
+        view.insertTags(tag);
         Recipe recipe2 = Recipe.factory().create("recette 2", null, 1, Collections.emptySet(), "", Set.of(tag.getId()))._1;
-        Repositories.recipes().add(recipe1);
-        Repositories.recipes().add(recipe2);
+        view.insertRecipes(recipe2, recipe1);
 
         List<RecipeSearchSummary> result = handler.execute(new FindRecipes(), template);
 
         assertThat(result).hasSize(2);
         assertThat(result).anyMatch(summary -> summary.id().equals(recipe1.getId()) &&
-                summary.name().equals(recipe1.getName()) && summary.illustrationUrl().equals("recipe1 illu url") &&
+                summary.name().equals(recipe1.getName()) && summary.illustrationUrl().equals("url:" + recipe1.getIllustrationId()) &&
                 summary.tags().isEmpty());
         assertThat(result).anyMatch(summary -> summary.id().equals(recipe2.getId()) &&
                 summary.name().equals(recipe2.getName()) &&
@@ -60,14 +54,12 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void returnsAllRecipesContainingTheQuery() {
-        FindRecipesHandler handler = new FindRecipesHandler(recipeService);
+        FindRecipesHandler handler = new FindRecipesHandler();
 
         Recipe recipe1 = Recipe.factory().create("poulet citron", null, 1, Collections.emptySet(), "", Collections.emptySet())._1;
         Recipe recipe2 = Recipe.factory().create("crevettes", null, 1, Collections.emptySet(), "", Collections.emptySet())._1;
         Recipe recipe3 = Recipe.factory().create("riz au poulet", null, 1, Collections.emptySet(), "", Collections.emptySet())._1;
-        Repositories.recipes().add(recipe1);
-        Repositories.recipes().add(recipe2);
-        Repositories.recipes().add(recipe3);
+        view.insertRecipes(recipe1, recipe2, recipe3);
 
         List<RecipeSearchSummary> result = handler.execute(new FindRecipes("poulet"), template);
 
@@ -82,9 +74,9 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void ignoresTheQueryCaseAndSpecialCharacters() {
-        FindRecipesHandler handler = new FindRecipesHandler(recipeService);
-        Repositories.recipes().add(Recipe.factory().create(
-                "taboulé de poulet", null, 1, Collections.emptySet(), "", Collections.emptySet())._1);
+        FindRecipesHandler handler = new FindRecipesHandler();
+        view.insertRecipes(Recipe.factory().create("taboulé de poulet", null, 1, Collections.emptySet(),
+                "", Collections.emptySet())._1);
 
         List<RecipeSearchSummary> result = handler.execute(new FindRecipes("taboule"), template);
 
@@ -94,23 +86,18 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void returnsAllRecipesHavingAtLeastAllRequestedTags() {
-        FindRecipesHandler handler = new FindRecipesHandler(recipeService);
+        FindRecipesHandler handler = new FindRecipesHandler();
 
         Tag tag1 = Tag.factory().create("1")._1;
         Tag tag2 = Tag.factory().create("2")._1;
         Tag tag3 = Tag.factory().create("3")._1;
-        Repositories.tags().add(tag1);
-        Repositories.tags().add(tag2);
-        Repositories.tags().add(tag3);
+        view.insertTags(tag1, tag3, tag2);
 
         Recipe recipe1 = Recipe.factory().create("1", null, 1, Collections.emptySet(), "", Set.of(tag2.getId(), tag3.getId()))._1;
         Recipe recipe2 = Recipe.factory().create("2", null, 1, Collections.emptySet(), "", Set.of(tag2.getId(), tag1.getId()))._1;
         Recipe recipe3 = Recipe.factory().create("3", null, 1, Collections.emptySet(), "", Set.of())._1;
         Recipe recipe4 = Recipe.factory().create("4", null, 1, Collections.emptySet(), "", Set.of(tag1.getId(), tag2.getId(), tag3.getId()))._1;
-        Repositories.recipes().add(recipe1);
-        Repositories.recipes().add(recipe2);
-        Repositories.recipes().add(recipe3);
-        Repositories.recipes().add(recipe4);
+        view.insertRecipes(recipe1, recipe2, recipe3, recipe4);
 
         List<RecipeSearchSummary> result = handler.execute(new FindRecipes(Set.of(tag3.getId().toString(), tag2.getId().toString())), template);
 
@@ -123,24 +110,20 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
         assertThat(summaryOfRecipe4.tags()).anyMatch(s -> s.id().equals(tag3.getId()) && s.name().equals("3"));
         assertThat(summaryOfRecipe4.tags()).anyMatch(s -> s.id().equals(tag2.getId()) && s.name().equals("2"));
         assertThat(summaryOfRecipe4.tags()).anyMatch(s -> s.id().equals(tag1.getId()) && s.name().equals("1"));
-
     }
 
     @Test
     void returnsAllRecipesContainingTheQueryAndHavingAtLeastAllRequestedTags() {
-        FindRecipesHandler handler = new FindRecipesHandler(recipeService);
+        FindRecipesHandler handler = new FindRecipesHandler();
 
         Tag tag1 = Tag.factory().create("1")._1;
         Tag tag2 = Tag.factory().create("2")._1;
-        Repositories.tags().add(tag1);
-        Repositories.tags().add(tag2);
+        view.insertTags(tag1, tag2);
 
         Recipe recipe1 = Recipe.factory().create("poulet au citron", null, 1, Collections.emptySet(), "", Set.of(tag1.getId()))._1;
         Recipe recipe2 = Recipe.factory().create("pâtes au poulet", null, 1, Collections.emptySet(), "", Set.of(tag2.getId(), tag1.getId()))._1;
         Recipe recipe3 = Recipe.factory().create("pâtes au poulet et citron", null, 1, Collections.emptySet(), "", Set.of(tag2.getId()))._1;
-        Repositories.recipes().add(recipe1);
-        Repositories.recipes().add(recipe2);
-        Repositories.recipes().add(recipe3);
+        view.insertRecipes(recipe1, recipe2, recipe3);
 
         List<RecipeSearchSummary> result = handler.execute(new FindRecipes("poulet", Set.of(tag2.getId().toString(), tag1.getId().toString())), template);
 
@@ -150,17 +133,15 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void paginatesTheRecipesInReversedCreationOrder() {
-        FindRecipesHandler handler = new FindRecipesHandler(recipeService);
+        FindRecipesHandler handler = new FindRecipesHandler();
 
         Tag tag1 = Tag.factory().create("1")._1;
-        Repositories.tags().add(tag1);
+        view.insertTags(tag1);
 
         Recipe recipe1 = Recipe.factory().create("recette 1", 1, Collections.emptySet(), "", Set.of(tag1.getId()))._1;
         Recipe recipe2 = Recipe.factory().create("recette 2", 1, Collections.emptySet(), "", Set.of(tag1.getId()))._1;
         Recipe recipe3 = Recipe.factory().create("recette 3", 1, Collections.emptySet(), "", Set.of(tag1.getId()))._1;
-        Repositories.recipes().add(recipe2);
-        Repositories.recipes().add(recipe3);
-        Repositories.recipes().add(recipe1);
+        view.insertRecipes(recipe2, recipe3, recipe1);
 
         List<RecipeSearchSummary> result1 = handler.execute((FindRecipes) new FindRecipes().limit(1).skip(0), template);
         List<RecipeSearchSummary> result2 = handler.execute((FindRecipes) new FindRecipes("recette").limit(1).skip(1), template);
