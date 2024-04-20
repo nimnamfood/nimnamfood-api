@@ -57,3 +57,18 @@ create table view_ingredients (
     name text not null,
     unit text not null
 );
+
+drop table if exists view_part_recipe_search_tags;
+create table view_part_recipe_search_tags (
+    id uuid primary key,
+    name text not null
+);
+
+drop table if exists view_recipe_search;
+create table view_recipe_search (
+    id uuid primary key,
+    name text not null,
+    illustration_url text null,
+    creation_date_time timestamp not null,
+    tags jsonb not null
+);

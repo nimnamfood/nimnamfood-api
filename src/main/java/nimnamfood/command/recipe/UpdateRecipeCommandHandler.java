@@ -2,6 +2,7 @@ package nimnamfood.command.recipe;
 
 import nimnamfood.model.Repositories;
 import nimnamfood.model.recipe.Recipe;
+import nimnamfood.model.recipe.RecipeChanged;
 import nimnamfood.model.recipe.RecipeIngredient;
 import nimnamfood.service.RecipeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,10 @@ import vtertre.ddd.MissingAggregateRootException;
 import vtertre.ddd.Tuple;
 import vtertre.ddd.event.DomainEvent;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 @Component
 public class UpdateRecipeCommandHandler implements CommandHandler<UpdateRecipeCommand, Void> {
@@ -40,7 +44,7 @@ public class UpdateRecipeCommandHandler implements CommandHandler<UpdateRecipeCo
             this.recipeService.deleteIllustration(currentIllustrationId);
         }
 
-        final Recipe updatedRecipe = currentRecipe.get().updated(
+        final Tuple<Recipe, RecipeChanged> tuple = currentRecipe.get().updated(
                 command.name,
                 newIllustrationId,
                 command.portionsCount,
@@ -48,9 +52,9 @@ public class UpdateRecipeCommandHandler implements CommandHandler<UpdateRecipeCo
                 command.instructions,
                 tagIds
         );
-        Repositories.recipes().update(updatedRecipe);
+        Repositories.recipes().update(tuple._1);
 
-        return Tuple.of(null, Collections.emptyList());
+        return tuple.map(((updatedRecipe, event) -> Tuple.of(null, List.of(event))));
     }
 
     private void activateNewIllustration(UUID currentIllustrationId, UUID newIllustrationId) {

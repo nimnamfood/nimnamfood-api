@@ -1,8 +1,10 @@
 package nimnamfood.model.recipe;
 
+import com.google.common.collect.ImmutableSet;
 import nimnamfood.infrastructure.repository.jdbc.recipe.RecipeDbo;
 import nimnamfood.infrastructure.repository.jdbc.recipe.RecipeTagDbo;
 import vtertre.ddd.BaseAggregateRootWithUuid;
+import vtertre.ddd.Tuple;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -48,17 +50,27 @@ public class Recipe extends BaseAggregateRootWithUuid {
     }
 
     public static class Factory {
-        public Recipe create(String name, UUID illustrationId, int portionsCount,
-                             Set<RecipeIngredient> ingredients, String instructions, Set<UUID> tagIds) {
-            return new Recipe(name, illustrationId, portionsCount, ingredients, instructions, tagIds);
+        public Tuple<Recipe, RecipeCreated> create(String name, UUID illustrationId, int portionsCount,
+                                                   Set<RecipeIngredient> ingredients, String instructions, Set<UUID> tagIds) {
+            final Recipe recipe = new Recipe(name, illustrationId, portionsCount, ingredients, instructions, tagIds);
+            return Tuple.of(recipe, new RecipeCreated(
+                    recipe.getId(),
+                    recipe.name,
+                    recipe.illustrationId,
+                    recipe.portionsCount,
+                    recipe.instructions,
+                    ImmutableSet.copyOf(recipe.ingredients),
+                    ImmutableSet.copyOf(recipe.tagIds),
+                    recipe.creationDateTime
+            ));
         }
 
-        public Recipe create(String name, int portionsCount, Set<RecipeIngredient> ingredients, String instructions,
-                             Set<UUID> tagIds) {
+        public Tuple<Recipe, RecipeCreated> create(String name, int portionsCount, Set<RecipeIngredient> ingredients, String instructions,
+                                                   Set<UUID> tagIds) {
             return this.create(name, null, portionsCount, ingredients, instructions, tagIds);
         }
 
-        public Recipe create(String name, int portionsCount, Set<RecipeIngredient> ingredients, String instructions) {
+        public Tuple<Recipe, RecipeCreated> create(String name, int portionsCount, Set<RecipeIngredient> ingredients, String instructions) {
             return this.create(name, null, portionsCount, ingredients, instructions, Collections.emptySet());
         }
 
@@ -75,10 +87,19 @@ public class Recipe extends BaseAggregateRootWithUuid {
         }
     }
 
-    public Recipe updated(String name, UUID illustrationId, int portionsCount,
-                          Set<RecipeIngredient> ingredients, String instructions, Set<UUID> tagIds) {
-        return new Recipe(this.getId(), name, illustrationId, portionsCount, ingredients, instructions, tagIds,
-                this.creationDateTime);
+    public Tuple<Recipe, RecipeChanged> updated(String name, UUID illustrationId, int portionsCount,
+                                                Set<RecipeIngredient> ingredients, String instructions, Set<UUID> tagIds) {
+        final Recipe updatedRecipe = new Recipe(this.getId(), name, illustrationId, portionsCount, ingredients,
+                instructions, tagIds, this.creationDateTime);
+        return Tuple.of(updatedRecipe, new RecipeChanged(
+                this.getId(),
+                updatedRecipe.name,
+                updatedRecipe.illustrationId,
+                updatedRecipe.portionsCount,
+                updatedRecipe.instructions,
+                ImmutableSet.copyOf(updatedRecipe.ingredients),
+                ImmutableSet.copyOf(updatedRecipe.tagIds)
+        ));
     }
 
     public String getName() {

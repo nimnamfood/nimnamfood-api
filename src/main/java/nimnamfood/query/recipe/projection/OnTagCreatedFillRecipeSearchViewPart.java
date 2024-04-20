@@ -1,4 +1,4 @@
-package nimnamfood.query.tag.projection;
+package nimnamfood.query.recipe.projection;
 
 import nimnamfood.model.tag.TagCreated;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,17 +7,17 @@ import org.springframework.stereotype.Component;
 import vtertre.ddd.event.EventCaptor;
 
 @Component
-public class OnTagCreatedFillSummary implements EventCaptor<TagCreated> {
+public class OnTagCreatedFillRecipeSearchViewPart implements EventCaptor<TagCreated> {
     private final JdbcClient client;
 
     @Autowired
-    public OnTagCreatedFillSummary(JdbcClient client) {
+    public OnTagCreatedFillRecipeSearchViewPart(JdbcClient client) {
         this.client = client;
     }
 
     @Override
     public void execute(TagCreated event) {
-        this.client.sql("INSERT INTO view_tags VALUES (:id, :name)")
+        this.client.sql("INSERT INTO view_part_recipe_search_tags VALUES (:id, :name)")
                 .param("id", event.id())
                 .param("name", event.name())
                 .update();

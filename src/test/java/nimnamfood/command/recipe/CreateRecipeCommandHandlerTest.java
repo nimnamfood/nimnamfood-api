@@ -5,8 +5,11 @@ import nimnamfood.model.Repositories;
 import nimnamfood.model.ingredient.Ingredient;
 import nimnamfood.model.ingredient.IngredientUnit;
 import nimnamfood.model.recipe.Recipe;
+import nimnamfood.model.recipe.RecipeCreated;
+import nimnamfood.model.recipe.RecipeIngredient;
 import nimnamfood.model.tag.Tag;
 import nimnamfood.service.RecipeService;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -22,7 +25,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-@ExtendWith({WithMemoryRepositories.class})
+@ExtendWith(WithMemoryRepositories.class)
 public class CreateRecipeCommandHandlerTest {
     RecipeService recipeService = Mockito.mock();
 
@@ -63,7 +66,28 @@ public class CreateRecipeCommandHandlerTest {
         assertThat(recipe.getIngredients().stream().findFirst().get()).matches(ri -> ri.getId() != null &&
                 ri.ingredientId().equals(ingredient.getId()) && ri.quantity() == 20f &&
                 ri.unit() == IngredientUnit.PIECE && !ri.quantityFixed());
-        assertThat(result._2).isEmpty();
+    }
+
+    @Test
+    void generatesTheDomainEvent() {
+        CreateRecipeCommandHandler handler = new CreateRecipeCommandHandler(recipeService);
+        CreateRecipeCommand command = createDefaultCommand();
+
+        Tuple<UUID, List<DomainEvent>> result = handler.execute(command);
+        Recipe recipe = Repositories.recipes().get(result._1).get();
+
+        assertThat(result._2).hasSize(1).first()
+                .asInstanceOf(InstanceOfAssertFactories.type(RecipeCreated.class))
+                .satisfies(event -> {
+                    assertThat(event.id()).isEqualTo(result._1);
+                    assertThat(event.name()).isEqualTo("chocolat");
+                    assertThat(event.illustrationId()).isNull();
+                    assertThat(event.portionsCount()).isEqualTo(1);
+                    assertThat(event.instructions()).isEqualTo("instructions");
+                    assertThat(event.ingredients()).containsExactly(recipe.getIngredients().toArray(new RecipeIngredient[0]));
+                    assertThat(event.tagIds()).isEmpty();
+                    assertThat(event.creationDateTime()).isEqualTo(recipe.getCreationDateTime());
+                });
     }
 
     @Test

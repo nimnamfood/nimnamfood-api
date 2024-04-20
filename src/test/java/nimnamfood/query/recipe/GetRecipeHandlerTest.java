@@ -42,7 +42,7 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
         Repositories.ingredients().add(ingredient2);
         Repositories.tags().add(tag1);
         Repositories.tags().add(tag2);
-        Recipe recipe = Recipe.factory().create("recette 1", UUID.randomUUID(), 1, Set.of(new RecipeIngredient(ingredient1.getId(), 10f, IngredientUnit.PINCH, false), new RecipeIngredient(ingredient2.getId(), 5f, IngredientUnit.GRAM, true)), "instructions", Set.of(tag1.getId(), tag2.getId()));
+        Recipe recipe = Recipe.factory().create("recette 1", UUID.randomUUID(), 1, Set.of(new RecipeIngredient(ingredient1.getId(), 10f, IngredientUnit.PINCH, false), new RecipeIngredient(ingredient2.getId(), 5f, IngredientUnit.GRAM, true)), "instructions", Set.of(tag1.getId(), tag2.getId()))._1;
         Repositories.recipes().add(recipe);
         Repositories.recipes().add(RecipeFactory.createEmpty("recette 2"));
         Mockito.when(recipeService.illustrationUrl(recipe.getIllustrationId())).thenReturn("url");
@@ -70,7 +70,7 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
         GetRecipeHandler handler = new GetRecipeHandler(recipeService);
         Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.GRAM)._1;
         Repositories.ingredients().add(ingredient);
-        Recipe recipe = Recipe.factory().create("recette", null, 1, Set.of(new RecipeIngredient(ingredient.getId(), 10f, IngredientUnit.GRAM, false), new RecipeIngredient(ingredient.getId(), 5f, IngredientUnit.GRAM, true)), "instructions", Collections.emptySet());
+        Recipe recipe = Recipe.factory().create("recette", null, 1, Set.of(new RecipeIngredient(ingredient.getId(), 10f, IngredientUnit.GRAM, false), new RecipeIngredient(ingredient.getId(), 5f, IngredientUnit.GRAM, true)), "instructions", Collections.emptySet())._1;
         Repositories.recipes().add(recipe);
 
         RecipeSummary summary = handler.execute(new GetRecipe(recipe.getId().toString()), template);
@@ -93,7 +93,7 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
     @Test
     void canReturnARecipeThatHasNoIngredientsOrTags() {
         GetRecipeHandler handler = new GetRecipeHandler(recipeService);
-        Recipe recipe = Recipe.factory().create("recette 1", null, 1, Collections.emptySet(), "instructions", Collections.emptySet());
+        Recipe recipe = Recipe.factory().create("recette 1", null, 1, Collections.emptySet(), "instructions", Collections.emptySet())._1;
         Repositories.recipes().add(recipe);
 
         RecipeSummary summary = handler.execute(new GetRecipe(recipe.getId().toString()), template);
@@ -104,7 +104,7 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
 
     private static class RecipeFactory {
         public static Recipe createEmpty(String name) {
-            return Recipe.factory().create(name, null, 1, Collections.emptySet(), "instructions", Collections.emptySet());
+            return Recipe.factory().create(name, null, 1, Collections.emptySet(), "instructions", Collections.emptySet())._1;
         }
     }
 }

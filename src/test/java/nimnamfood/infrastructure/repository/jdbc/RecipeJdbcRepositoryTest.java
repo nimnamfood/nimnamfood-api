@@ -85,7 +85,7 @@ public class RecipeJdbcRepositoryTest extends PostgresTestContainerBase {
         UUID tagId = UUID.randomUUID();
         UUID ingredientId = UUID.randomUUID();
         RecipeIngredient recipeIngredient = new RecipeIngredient(ingredientId, 3, IngredientUnit.PINCH, false);
-        Recipe recipe = Recipe.factory().create("autre recette", UUID.randomUUID(), 1, Set.of(recipeIngredient), "autres", Set.of(tagId));
+        Recipe recipe = Recipe.factory().create("autre recette", UUID.randomUUID(), 1, Set.of(recipeIngredient), "autres", Set.of(tagId))._1;
 
         repository.add(recipe);
         RecipeDbo dbo = this.jdbcAggregateTemplate.findById(recipe.getId(), RecipeDbo.class);

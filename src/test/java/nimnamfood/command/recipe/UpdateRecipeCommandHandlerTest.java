@@ -5,9 +5,11 @@ import nimnamfood.model.Repositories;
 import nimnamfood.model.ingredient.Ingredient;
 import nimnamfood.model.ingredient.IngredientUnit;
 import nimnamfood.model.recipe.Recipe;
+import nimnamfood.model.recipe.RecipeChanged;
 import nimnamfood.model.recipe.RecipeIngredient;
 import nimnamfood.model.tag.Tag;
 import nimnamfood.service.RecipeService;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -38,7 +40,7 @@ class UpdateRecipeCommandHandlerTest {
         Repositories.ingredients().add(ingredient);
 
         RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient.getId(), 1f, IngredientUnit.GRAM, false);
-        Recipe recipe = Recipe.factory().create("recette", null, 1, Set.of(recipeIngredient), "instructions", Collections.emptySet());
+        Recipe recipe = Recipe.factory().create("recette", null, 1, Set.of(recipeIngredient), "instructions", Collections.emptySet())._1;
         Repositories.recipes().add(recipe);
 
         RecipeIngredientCommandPart part = new RecipeIngredientCommandPart() {{
@@ -75,8 +77,28 @@ class UpdateRecipeCommandHandlerTest {
                 // safely ignore it.
                 .matches(ri -> ri.ingredientId().equals(ingredient.getId()) && ri.quantity() == 20f &&
                         ri.unit() == IngredientUnit.PIECE && ri.quantityFixed());
+    }
 
-        assertThat(result._2).isEmpty();
+    @Test
+    void generatesTheDomainEvent() {
+        UpdateRecipeCommandHandler handler = new UpdateRecipeCommandHandler(recipeService);
+        Recipe recipe = createRecipeWithoutIllustration();
+        UpdateRecipeCommand command = createDefaultCommand(recipe);
+
+        Tuple<Void, List<DomainEvent>> result = handler.execute(command);
+        Recipe updatedRecipe = Repositories.recipes().get(recipe.getId()).get();
+
+        assertThat(result._2).hasSize(1).first()
+                .asInstanceOf(InstanceOfAssertFactories.type(RecipeChanged.class))
+                .satisfies(r -> {
+                    assertThat(r.id()).isEqualTo(recipe.getId());
+                    assertThat(r.name()).isEqualTo("chocolat");
+                    assertThat(r.illustrationId()).isEqualTo(UUID.fromString(command.illustrationId));
+                    assertThat(r.portionsCount()).isEqualTo(1);
+                    assertThat(r.instructions()).isEqualTo("instructions");
+                    assertThat(r.ingredients()).containsExactly(updatedRecipe.getIngredients().toArray(new RecipeIngredient[0]));
+                    assertThat(r.tagIds()).isEmpty();
+                });
     }
 
     @Test
@@ -167,7 +189,7 @@ class UpdateRecipeCommandHandlerTest {
         Repositories.ingredients().add(ingredient);
 
         RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient.getId(), 1f, IngredientUnit.GRAM, false);
-        Recipe recipe = Recipe.factory().create("recette", UUID.randomUUID(), 1, Set.of(recipeIngredient), "instructions", Collections.emptySet());
+        Recipe recipe = Recipe.factory().create("recette", UUID.randomUUID(), 1, Set.of(recipeIngredient), "instructions", Collections.emptySet())._1;
         Repositories.recipes().add(recipe);
         return recipe;
     }
@@ -177,7 +199,7 @@ class UpdateRecipeCommandHandlerTest {
         Repositories.ingredients().add(ingredient);
 
         RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient.getId(), 1f, IngredientUnit.GRAM, false);
-        Recipe recipe = Recipe.factory().create("recette", 1, Set.of(recipeIngredient), "instructions");
+        Recipe recipe = Recipe.factory().create("recette", 1, Set.of(recipeIngredient), "instructions")._1;
         Repositories.recipes().add(recipe);
         return recipe;
     }
