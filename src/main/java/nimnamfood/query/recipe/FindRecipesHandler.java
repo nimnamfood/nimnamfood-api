@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import nimnamfood.query.recipe.model.RecipeSearchSummary;
 import nimnamfood.query.tag.model.TagSummary;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -18,9 +20,14 @@ import java.util.UUID;
 
 @Component
 public class FindRecipesHandler extends QueryHandlerJdbc<FindRecipes, List<RecipeSearchSummary>> {
-    final ObjectMapper mapper = new ObjectMapper();
-    final TypeReference<Set<TagSummary>> typeReference = new TypeReference<>() {
+    private final ObjectMapper mapper;
+    private final TypeReference<Set<TagSummary>> typeReference = new TypeReference<>() {
     };
+
+    @Autowired
+    public FindRecipesHandler(@Qualifier("Jsonb") ObjectMapper mapper) {
+        this.mapper = mapper;
+    }
 
     @Override
     public List<RecipeSearchSummary> execute(FindRecipes query, NamedParameterJdbcTemplate template) {

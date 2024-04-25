@@ -6,8 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import nimnamfood.model.recipe.Recipe;
 import nimnamfood.model.tag.Tag;
+import nimnamfood.query.ObjectMapperFactory;
 import nimnamfood.query.recipe.model.RecipeSearchSummaryInspector;
-import nimnamfood.query.recipe.model.RecipeSearchTagSummaryInspector;
+import nimnamfood.query.recipe.model.RecipeTagSummaryPartInspector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -24,11 +25,11 @@ public class RecipeSearchViewTestHelper {
     @Autowired
     JdbcClient client;
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = ObjectMapperFactory.withSnakeCasePropertyNamingStrategy();
 
     public void insertTags(Tag... tags) {
         this.template.batchUpdate(
-                "insert into view_part_recipe_search_tags values (:id, :name)",
+                "insert into view_part_recipe_tags values (:id, :name)",
                 Arrays.stream(tags).map(i -> Map.of(
                         "id", i.getId(),
                         "name", i.getName()
@@ -36,11 +37,11 @@ public class RecipeSearchViewTestHelper {
         );
     }
 
-    public Optional<RecipeSearchTagSummaryInspector> findTag(UUID id) {
+    public Optional<RecipeTagSummaryPartInspector> findTag(UUID id) {
         return this.client
-                .sql("select * from view_part_recipe_search_tags where id = :id")
+                .sql("select * from view_part_recipe_tags where id = :id")
                 .param("id", id)
-                .query((resultSet, rowNum) -> new RecipeSearchTagSummaryInspector(resultSet.getObject("id", UUID.class),
+                .query((resultSet, rowNum) -> new RecipeTagSummaryPartInspector(resultSet.getObject("id", UUID.class),
                         resultSet.getString("name")))
                 .optional();
     }
@@ -51,7 +52,7 @@ public class RecipeSearchViewTestHelper {
         if (!recipesWithTags.isEmpty()) {
             recipesWithTags.stream().forEach(r -> {
                 this.template.update("""
-                                with selected_tags as (select * from view_part_recipe_search_tags where id in (:tagIds))
+                                with selected_tags as (select * from view_part_recipe_tags where id in (:tagIds))
                                 insert into view_recipe_search (id, name, illustration_url, creation_date_time, tags)
                                 select :id, :name, :illustrationUrl, :creationDateTime, jsonb_agg(selected_tags.*)
                                 from selected_tags

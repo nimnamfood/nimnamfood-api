@@ -25,16 +25,12 @@ public class OnRecipeChangedUpdateSearchSummary implements EventCaptor<RecipeCha
         final String illustrationUrl = event.illustrationId() != null ?
                 this.recipeService.illustrationUrl(event.illustrationId()) : null;
 
-        final JdbcClient.StatementSpec spec = this.client.sql(sqlQuery)
+        this.client.sql(sqlQuery)
                 .param("id", event.id())
                 .param("name", event.name())
-                .param("illustrationUrl", illustrationUrl);
-
-        if (!event.tagIds().isEmpty()) {
-            spec.param("tagIds", event.tagIds());
-        }
-
-        spec.update();
+                .param("illustrationUrl", illustrationUrl)
+                .param("tagIds", event.tagIds())
+                .update();
     }
 
     private static String sqlQuery(boolean hasNoTags) {
@@ -47,8 +43,8 @@ public class OnRecipeChangedUpdateSearchSummary implements EventCaptor<RecipeCha
         } else {
             return """
                     WITH selected_tags AS (
-                        SELECT jsonb_agg(view_part_recipe_search_tags.*) as tags_jsonb
-                        FROM view_part_recipe_search_tags
+                        SELECT jsonb_agg(view_part_recipe_tags.*) as tags_jsonb
+                        FROM view_part_recipe_tags
                         WHERE id IN (:tagIds)
                     )
                     UPDATE view_recipe_search

@@ -46,7 +46,7 @@ class OnRecipeChangedUpdateSearchSummaryTest extends PostgresTestContainerBase {
     }
 
     @Test
-    void updatesTheSearchSummaryWithTags() {
+    void updatesTheSearchSummary() {
         Tag tag = Tag.factory().create("tag")._1;
         searchView.insertTags(tag);
         Recipe recipe = Recipe.factory().create("recette", 1, Collections.emptySet(), "", Collections.emptySet())._1;

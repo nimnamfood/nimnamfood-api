@@ -25,17 +25,13 @@ public class OnRecipeCreatedFillSearchSummary implements EventCaptor<RecipeCreat
         final String illustrationUrl = event.illustrationId() != null ?
                 this.recipeService.illustrationUrl(event.illustrationId()) : null;
 
-        final JdbcClient.StatementSpec spec = this.client.sql(sqlQuery)
+        this.client.sql(sqlQuery)
                 .param("id", event.id())
                 .param("name", event.name())
                 .param("illustrationUrl", illustrationUrl)
-                .param("creationDateTime", event.creationDateTime());
-
-        if (!event.tagIds().isEmpty()) {
-            spec.param("tagIds", event.tagIds());
-        }
-
-        spec.update();
+                .param("creationDateTime", event.creationDateTime())
+                .param("tagIds", event.tagIds())
+                .update();
     }
 
     private static String sqlQuery(boolean hasNoTags) {
@@ -48,7 +44,7 @@ public class OnRecipeCreatedFillSearchSummary implements EventCaptor<RecipeCreat
             return """
                     WITH selected_tags AS (
                         SELECT *
-                        FROM view_part_recipe_search_tags
+                        FROM view_part_recipe_tags
                         WHERE id IN (:tagIds)
                     )
                     INSERT INTO view_recipe_search (id, name, illustration_url, creation_date_time, tags)

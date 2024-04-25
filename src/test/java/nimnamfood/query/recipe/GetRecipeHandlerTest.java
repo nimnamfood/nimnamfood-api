@@ -1,58 +1,55 @@
 package nimnamfood.query.recipe;
 
-import nimnamfood.infrastructure.repository.jdbc.WithJdbcRepositories;
-import nimnamfood.model.Repositories;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import nimnamfood.model.ingredient.Ingredient;
 import nimnamfood.model.ingredient.IngredientUnit;
 import nimnamfood.model.recipe.Recipe;
 import nimnamfood.model.recipe.RecipeIngredient;
 import nimnamfood.model.tag.Tag;
+import nimnamfood.query.ObjectMapperFactory;
 import nimnamfood.query.recipe.model.RecipeSummary;
-import nimnamfood.service.RecipeService;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import vtertre.ddd.MissingAggregateRootException;
 import vtertre.infrastructure.persistence.jdbc.PostgresTestContainerBase;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-@ExtendWith({WithJdbcRepositories.class})
+@Import(RecipesViewTestHelper.class)
 public class GetRecipeHandlerTest extends PostgresTestContainerBase {
+    @Autowired
+    RecipesViewTestHelper view;
     @Autowired
     NamedParameterJdbcTemplate template;
 
-    RecipeService recipeService = Mockito.mock();
+    ObjectMapper mapper = ObjectMapperFactory.withSnakeCasePropertyNamingStrategy();
 
     @Test
     void returnsTheRecipeWithMatchingId() {
-        GetRecipeHandler handler = new GetRecipeHandler(recipeService);
+        GetRecipeHandler handler = new GetRecipeHandler(mapper);
         Ingredient ingredient1 = Ingredient.factory().create("ingredient 1", IngredientUnit.GRAM)._1;
         Ingredient ingredient2 = Ingredient.factory().create("ingredient 2", IngredientUnit.PIECE)._1;
         Tag tag1 = Tag.factory().create("tag 1")._1;
         Tag tag2 = Tag.factory().create("tag 2")._1;
-        Repositories.ingredients().add(ingredient1);
-        Repositories.ingredients().add(ingredient2);
-        Repositories.tags().add(tag1);
-        Repositories.tags().add(tag2);
+        view.insertIngredients(ingredient1, ingredient2);
+        view.insertTags(tag1, tag2);
         Recipe recipe = Recipe.factory().create("recette 1", UUID.randomUUID(), 1, Set.of(new RecipeIngredient(ingredient1.getId(), 10f, IngredientUnit.PINCH, false), new RecipeIngredient(ingredient2.getId(), 5f, IngredientUnit.GRAM, true)), "instructions", Set.of(tag1.getId(), tag2.getId()))._1;
-        Repositories.recipes().add(recipe);
-        Repositories.recipes().add(RecipeFactory.createEmpty("recette 2"));
-        Mockito.when(recipeService.illustrationUrl(recipe.getIllustrationId())).thenReturn("url");
+        view.insertRecipes(Map.of(ingredient1.getId(), ingredient1.getName(), ingredient2.getId(), ingredient2.getName()), recipe, RecipeFactory.createEmpty("recette 2"));
 
         RecipeSummary summary = handler.execute(new GetRecipe(recipe.getId().toString()), template);
 
         assertThat(summary.id()).isEqualTo(recipe.getId());
         assertThat(summary.name()).isEqualTo(recipe.getName());
         assertThat(summary.illustration().id()).isEqualTo(recipe.getIllustrationId());
-        assertThat(summary.illustration().url()).isEqualTo("url");
+        assertThat(summary.illustration().url()).isEqualTo("url:" + recipe.getIllustrationId());
         assertThat(summary.portionsCount()).isEqualTo(recipe.getPortionsCount());
         assertThat(summary.instructions()).isEqualTo(recipe.getInstructions());
 
@@ -67,11 +64,11 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void handlesMultipleTimesTheSameIngredient() {
-        GetRecipeHandler handler = new GetRecipeHandler(recipeService);
+        GetRecipeHandler handler = new GetRecipeHandler(mapper);
         Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.GRAM)._1;
-        Repositories.ingredients().add(ingredient);
+        view.insertIngredients(ingredient);
         Recipe recipe = Recipe.factory().create("recette", null, 1, Set.of(new RecipeIngredient(ingredient.getId(), 10f, IngredientUnit.GRAM, false), new RecipeIngredient(ingredient.getId(), 5f, IngredientUnit.GRAM, true)), "instructions", Collections.emptySet())._1;
-        Repositories.recipes().add(recipe);
+        view.insertRecipes(Map.of(ingredient.getId(), ingredient.getName()), recipe);
 
         RecipeSummary summary = handler.execute(new GetRecipe(recipe.getId().toString()), template);
 
@@ -82,7 +79,7 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void throwsAnExceptionWhenTheProvidedIdDoesNotMatchAnyEntity() {
-        GetRecipeHandler handler = new GetRecipeHandler(recipeService);
+        GetRecipeHandler handler = new GetRecipeHandler(mapper);
         String stringUuid = UUID.randomUUID().toString();
 
         assertThatExceptionOfType(MissingAggregateRootException.class)
@@ -92,9 +89,9 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void canReturnARecipeThatHasNoIngredientsOrTags() {
-        GetRecipeHandler handler = new GetRecipeHandler(recipeService);
+        GetRecipeHandler handler = new GetRecipeHandler(mapper);
         Recipe recipe = Recipe.factory().create("recette 1", null, 1, Collections.emptySet(), "instructions", Collections.emptySet())._1;
-        Repositories.recipes().add(recipe);
+        view.insertRecipes(Map.of(), recipe);
 
         RecipeSummary summary = handler.execute(new GetRecipe(recipe.getId().toString()), template);
 

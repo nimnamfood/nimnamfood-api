@@ -1,7 +1,9 @@
 package nimnamfood.query.recipe;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import nimnamfood.model.recipe.Recipe;
 import nimnamfood.model.tag.Tag;
+import nimnamfood.query.ObjectMapperFactory;
 import nimnamfood.query.recipe.model.RecipeSearchSummary;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +25,11 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
     @Autowired
     NamedParameterJdbcTemplate template;
 
+    ObjectMapper mapper = ObjectMapperFactory.withSnakeCasePropertyNamingStrategy();
+
     @Test
     void returnsAnEmptyListOfRecipes() {
-        FindRecipesHandler handler = new FindRecipesHandler();
+        FindRecipesHandler handler = new FindRecipesHandler(mapper);
 
         List<RecipeSearchSummary> result = handler.execute(new FindRecipes(), template);
 
@@ -34,7 +38,7 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void returnsAllRecipesWhenNoQueryIsProvided() {
-        FindRecipesHandler handler = new FindRecipesHandler();
+        FindRecipesHandler handler = new FindRecipesHandler(mapper);
         Recipe recipe1 = Recipe.factory().create("recette", UUID.randomUUID(), 1, Collections.emptySet(), "", Collections.emptySet())._1;
         Tag tag = Tag.factory().create("tag")._1;
         view.insertTags(tag);
@@ -54,7 +58,7 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void returnsAllRecipesContainingTheQuery() {
-        FindRecipesHandler handler = new FindRecipesHandler();
+        FindRecipesHandler handler = new FindRecipesHandler(mapper);
 
         Recipe recipe1 = Recipe.factory().create("poulet citron", null, 1, Collections.emptySet(), "", Collections.emptySet())._1;
         Recipe recipe2 = Recipe.factory().create("crevettes", null, 1, Collections.emptySet(), "", Collections.emptySet())._1;
@@ -74,7 +78,7 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void ignoresTheQueryCaseAndSpecialCharacters() {
-        FindRecipesHandler handler = new FindRecipesHandler();
+        FindRecipesHandler handler = new FindRecipesHandler(mapper);
         view.insertRecipes(Recipe.factory().create("taboulé de poulet", null, 1, Collections.emptySet(),
                 "", Collections.emptySet())._1);
 
@@ -86,7 +90,7 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void returnsAllRecipesHavingAtLeastAllRequestedTags() {
-        FindRecipesHandler handler = new FindRecipesHandler();
+        FindRecipesHandler handler = new FindRecipesHandler(mapper);
 
         Tag tag1 = Tag.factory().create("1")._1;
         Tag tag2 = Tag.factory().create("2")._1;
@@ -114,7 +118,7 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void returnsAllRecipesContainingTheQueryAndHavingAtLeastAllRequestedTags() {
-        FindRecipesHandler handler = new FindRecipesHandler();
+        FindRecipesHandler handler = new FindRecipesHandler(mapper);
 
         Tag tag1 = Tag.factory().create("1")._1;
         Tag tag2 = Tag.factory().create("2")._1;
@@ -133,7 +137,7 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
 
     @Test
     void paginatesTheRecipesInReversedCreationOrder() {
-        FindRecipesHandler handler = new FindRecipesHandler();
+        FindRecipesHandler handler = new FindRecipesHandler(mapper);
 
         Tag tag1 = Tag.factory().create("1")._1;
         view.insertTags(tag1);
