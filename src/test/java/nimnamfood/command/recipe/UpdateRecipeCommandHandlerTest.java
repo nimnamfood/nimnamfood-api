@@ -152,10 +152,9 @@ class UpdateRecipeCommandHandlerTest {
 
         handler.execute(command);
 
-        Mockito.verify(recipeService, Mockito.never())
-                .replaceIllustration(Mockito.any(), Mockito.any());
-        Mockito.verify(recipeService, Mockito.never())
-                .activateIllustration(Mockito.any());
+        Mockito.verify(recipeService, Mockito.never()).replaceIllustration(Mockito.any(), Mockito.any());
+        Mockito.verify(recipeService, Mockito.never()).deleteIllustration(Mockito.any());
+        Mockito.verify(recipeService, Mockito.never()).activateIllustration(Mockito.any());
     }
 
     @Test

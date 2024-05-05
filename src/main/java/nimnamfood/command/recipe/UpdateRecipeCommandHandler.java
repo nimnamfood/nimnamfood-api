@@ -40,7 +40,7 @@ public class UpdateRecipeCommandHandler implements CommandHandler<UpdateRecipeCo
 
         if (newIllustrationId != null && !newIllustrationId.equals(currentIllustrationId)) {
             this.activateNewIllustration(currentIllustrationId, newIllustrationId);
-        } else if (currentIllustrationId != null) {
+        } else if (newIllustrationId == null && currentIllustrationId != null) {
             this.recipeService.deleteIllustration(currentIllustrationId);
         }
 

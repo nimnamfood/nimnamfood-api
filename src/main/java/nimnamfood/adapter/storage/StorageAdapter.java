@@ -4,6 +4,8 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.Map;
 public class StorageAdapter {
     private final Storage storage;
     private final String bucketName;
+    private final static Logger LOGGER = LoggerFactory.getLogger(StorageAdapter.class);
 
     public StorageAdapter(@Autowired Storage storage,
                           @Value("${nimnamfood.storage.bucket}") String bucketName) {
@@ -32,6 +35,8 @@ public class StorageAdapter {
                 .setCacheControl("max-age=31536000, immutable")
                 .setMetadata(metadata)
                 .build();
+
+        LOGGER.debug("Uploading file {}", blobName);
 
         this.storage.createFrom(blobInfo, content, Storage.BlobWriteOption.doesNotExist());
     }
@@ -54,11 +59,16 @@ public class StorageAdapter {
                 .setTarget(targetId, Storage.BlobTargetOption.doesNotExist())
                 .build();
 
+        LOGGER.debug("Copying file {} -> {}", sourceName, targetName);
+
         return this.storage.copy(copyRequest).isDone();
     }
 
     public void delete(String blobName) {
         final BlobId blobId = this.blobId(blobName);
+
+        LOGGER.debug("Deleting file {}", blobName);
+
         this.storage.delete(blobId);
     }
 
