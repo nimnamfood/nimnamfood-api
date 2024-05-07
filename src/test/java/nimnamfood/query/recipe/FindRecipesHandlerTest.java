@@ -5,6 +5,10 @@ import nimnamfood.model.recipe.Recipe;
 import nimnamfood.model.tag.Tag;
 import nimnamfood.query.ObjectMapperFactory;
 import nimnamfood.query.recipe.model.RecipeSearchSummary;
+import nimnamfood.web.converter.DoesNotHaveTag;
+import nimnamfood.web.converter.HasOneOfTags;
+import nimnamfood.web.converter.HasTag;
+import nimnamfood.web.converter.TagFilterQuery;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -89,24 +93,31 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
     }
 
     @Test
-    void returnsAllRecipesHavingAtLeastAllRequestedTags() {
+    void returnsAllRecipesMatchingAtLeastTheTagQuery() {
         FindRecipesHandler handler = new FindRecipesHandler(mapper);
 
         Tag tag1 = Tag.factory().create("1")._1;
         Tag tag2 = Tag.factory().create("2")._1;
         Tag tag3 = Tag.factory().create("3")._1;
-        view.insertTags(tag1, tag3, tag2);
+        Tag tag4 = Tag.factory().create("4")._1;
+        view.insertTags(tag1, tag3, tag2, tag4);
 
-        Recipe recipe1 = Recipe.factory().create("1", null, 1, Collections.emptySet(), "", Set.of(tag2.getId(), tag3.getId()))._1;
+        Recipe recipe1 = Recipe.factory().create("1", null, 1, Collections.emptySet(), "", Set.of(tag4.getId(), tag1.getId(), tag2.getId()))._1;
         Recipe recipe2 = Recipe.factory().create("2", null, 1, Collections.emptySet(), "", Set.of(tag2.getId(), tag1.getId()))._1;
         Recipe recipe3 = Recipe.factory().create("3", null, 1, Collections.emptySet(), "", Set.of())._1;
         Recipe recipe4 = Recipe.factory().create("4", null, 1, Collections.emptySet(), "", Set.of(tag1.getId(), tag2.getId(), tag3.getId()))._1;
         view.insertRecipes(recipe1, recipe2, recipe3, recipe4);
 
-        List<RecipeSearchSummary> result = handler.execute(new FindRecipes(Set.of(tag3.getId().toString(), tag2.getId().toString())), template);
+        TagFilterQuery query = new TagFilterQuery(Set.of(
+                new HasTag(tag1.getId().toString()),
+                new DoesNotHaveTag(tag4.getId().toString()),
+                new HasOneOfTags(Set.of(tag2.getId().toString(), tag3.getId().toString()))
+        ));
+
+        List<RecipeSearchSummary> result = handler.execute(new FindRecipes(query), template);
 
         assertThat(result).hasSize(2);
-        assertThat(result).anyMatch(summary -> summary.id().equals(recipe1.getId()));
+        assertThat(result).anyMatch(summary -> summary.id().equals(recipe2.getId()));
 
         final RecipeSearchSummary summaryOfRecipe4 = result.stream().filter(s -> s.id().equals(recipe4.getId())).findFirst().get();
         assertThat(summaryOfRecipe4.name()).isEqualTo("4");
@@ -129,7 +140,7 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
         Recipe recipe3 = Recipe.factory().create("pâtes au poulet et citron", null, 1, Collections.emptySet(), "", Set.of(tag2.getId()))._1;
         view.insertRecipes(recipe1, recipe2, recipe3);
 
-        List<RecipeSearchSummary> result = handler.execute(new FindRecipes("poulet", Set.of(tag2.getId().toString(), tag1.getId().toString())), template);
+        List<RecipeSearchSummary> result = handler.execute(new FindRecipes("poulet", new TagFilterQuery(Set.of(new HasTag(tag2.getId().toString()), new HasTag(tag1.getId().toString())))), template);
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().id()).isEqualTo(recipe2.getId());
@@ -149,8 +160,8 @@ public class FindRecipesHandlerTest extends PostgresTestContainerBase {
 
         List<RecipeSearchSummary> result1 = handler.execute((FindRecipes) new FindRecipes().limit(1).skip(0), template);
         List<RecipeSearchSummary> result2 = handler.execute((FindRecipes) new FindRecipes("recette").limit(1).skip(1), template);
-        List<RecipeSearchSummary> result3 = handler.execute((FindRecipes) new FindRecipes(Set.of(tag1.getId().toString())).limit(1).skip(2), template);
-        List<RecipeSearchSummary> result4 = handler.execute((FindRecipes) new FindRecipes("recette", Set.of(tag1.getId().toString())).limit(2).skip(0), template);
+        List<RecipeSearchSummary> result3 = handler.execute((FindRecipes) new FindRecipes(new TagFilterQuery(Set.of(new HasTag(tag1.getId().toString())))).limit(1).skip(2), template);
+        List<RecipeSearchSummary> result4 = handler.execute((FindRecipes) new FindRecipes("recette", new TagFilterQuery(Set.of(new HasTag(tag1.getId().toString())))).limit(2).skip(0), template);
         List<RecipeSearchSummary> result5 = handler.execute(new FindRecipes(), template);
 
         assertThat(result1).first().extracting(RecipeSearchSummary::id).isEqualTo(recipe3.getId());

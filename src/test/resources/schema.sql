@@ -1,3 +1,5 @@
+create extension if not exists "unaccent";
+
 drop table if exists far;
 create table far (
     id text primary key,
