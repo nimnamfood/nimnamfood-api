@@ -31,6 +31,10 @@ public abstract class RecipeSummaryEventCaptor<TEvent extends DomainEvent> imple
     protected abstract void execute(TEvent event, JdbcClient client);
 
     protected String ingredientsJsonString(Set<RecipeIngredient> ingredients) {
+        if (ingredients.isEmpty()) {
+            return "[]";
+        }
+
         final Map<UUID, String> ingredientNames = this.client
                 .sql("SELECT id, name FROM view_part_recipe_ingredients WHERE id IN (:ingredientIds)")
                 .param("ingredientIds", ingredients.stream().map(RecipeIngredient::ingredientId).collect(Collectors.toSet()))

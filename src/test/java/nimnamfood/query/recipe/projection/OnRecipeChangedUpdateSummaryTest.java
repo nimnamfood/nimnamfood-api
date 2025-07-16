@@ -86,16 +86,16 @@ class OnRecipeChangedUpdateSummaryTest extends PostgresTestContainerBase {
         view.insertTags(tag);
         Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.PIECE)._1;
         view.insertIngredients(ingredient);
-        RecipeIngredient ri = new RecipeIngredient(ingredient.getId(), 10.5f, IngredientUnit.GRAM, false);
         Recipe recipe = Recipe.factory().create("recette", UUID.randomUUID(), 1, Collections.emptySet(), "instructions", Set.of(tag.getId()))._1;
         view.insertRecipes(Map.of(ingredient.getId(), ingredient.getName()), recipe);
-        RecipeChanged event = new RecipeChanged(recipe.getId(), "recette updated", null, 2, "instructions updated", ImmutableSet.of(ri), ImmutableSet.of());
+        RecipeChanged event = new RecipeChanged(recipe.getId(), "recette updated", null, 2, "instructions updated", ImmutableSet.of(), ImmutableSet.of());
         Mockito.when(recipeService.illustrationUrl(event.illustrationId())).thenReturn("url");
 
         handler.execute(event);
         RecipeSummaryInspector inspector = view.findRecipe(event.id());
 
         assertThat(inspector.illustration()).isNull();
+        assertThat(inspector.ingredients()).isEmpty();
         assertThat(inspector.tags()).isEmpty();
     }
 }

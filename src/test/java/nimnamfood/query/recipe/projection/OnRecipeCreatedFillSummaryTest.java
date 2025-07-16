@@ -77,6 +77,18 @@ class OnRecipeCreatedFillSummaryTest extends PostgresTestContainerBase {
     }
 
     @Test
+    void ingredientsCanBeEmpty() {
+        RecipeCreated event = new RecipeCreated(UUID.randomUUID(), "recette", UUID.randomUUID(), 1,
+                "instructions", ImmutableSet.of(), ImmutableSet.of(), LocalDateTime.now());
+        Mockito.when(recipeService.illustrationUrl(event.illustrationId())).thenReturn("url");
+
+        handler.execute(event);
+        RecipeSummaryInspector inspector = view.findRecipe(event.id());
+
+        assertThat(inspector.ingredients()).isEmpty();
+    }
+
+    @Test
     void tagsCanBeEmpty() {
         Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.PIECE)._1;
         view.insertIngredients(ingredient);

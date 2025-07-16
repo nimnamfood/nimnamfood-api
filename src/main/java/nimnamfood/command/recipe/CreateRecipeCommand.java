@@ -2,7 +2,6 @@ package nimnamfood.command.recipe;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import org.hibernate.validator.constraints.UUID;
@@ -27,6 +26,6 @@ public class CreateRecipeCommand implements Command<java.util.UUID> {
     @NotNull
     public Set<@NotNull @UUID(version = 4) String> tagIds;
 
-    @NotEmpty
+    @NotNull
     public Set<@Valid RecipeIngredientCommandPart> ingredients;
 }
