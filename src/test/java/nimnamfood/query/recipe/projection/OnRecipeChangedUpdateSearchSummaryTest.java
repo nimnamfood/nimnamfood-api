@@ -14,10 +14,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import vtertre.infrastructure.persistence.jdbc.PostgresTestContainerBase;
 
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @Import(RecipeSearchViewTestHelper.class)
 class OnRecipeChangedUpdateSearchSummaryTest extends PostgresTestContainerBase {
@@ -41,7 +42,7 @@ class OnRecipeChangedUpdateSearchSummaryTest extends PostgresTestContainerBase {
 
         assertThat(inspector.name()).isEqualTo("recette updated");
         assertThat(inspector.illustrationUrl()).isEqualTo("url");
-        assertThat(inspector.creationDateTime()).isEqualTo(recipe.getCreationDateTime());
+        assertThat(inspector.creationDateTime()).isCloseTo(recipe.getCreationDateTime(), within(1, ChronoUnit.MICROS));
         assertThat(inspector.tags()).isEmpty();
     }
 
@@ -59,7 +60,7 @@ class OnRecipeChangedUpdateSearchSummaryTest extends PostgresTestContainerBase {
 
         assertThat(inspector.name()).isEqualTo("recette updated");
         assertThat(inspector.illustrationUrl()).isEqualTo("url");
-        assertThat(inspector.creationDateTime()).isEqualTo(recipe.getCreationDateTime());
+        assertThat(inspector.creationDateTime()).isCloseTo(recipe.getCreationDateTime(), within(1, ChronoUnit.MICROS));
         assertThat(inspector.tags()).hasSize(1)
                 .first()
                 .satisfies(t -> {

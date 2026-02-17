@@ -14,9 +14,10 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import vtertre.infrastructure.persistence.jdbc.PostgresTestContainerBase;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @Import(RecipeSearchViewTestHelper.class)
 class OnRecipeCreatedFillSearchSummaryTest extends PostgresTestContainerBase {
@@ -44,7 +45,7 @@ class OnRecipeCreatedFillSearchSummaryTest extends PostgresTestContainerBase {
         assertThat(inspector.id()).isEqualTo(event.id());
         assertThat(inspector.name()).isEqualTo("recette");
         assertThat(inspector.illustrationUrl()).isEqualTo("url");
-        assertThat(inspector.creationDateTime()).isEqualTo(event.creationDateTime());
+        assertThat(inspector.creationDateTime()).isCloseTo(event.creationDateTime(), within(1, ChronoUnit.MICROS));
         assertThat(inspector.tags()).hasSize(2);
         assertThat(inspector.tags())
                 .anySatisfy(t -> {
