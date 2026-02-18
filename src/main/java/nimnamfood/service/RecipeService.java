@@ -82,7 +82,7 @@ public class RecipeService {
                     }
 
                     return new RecipeIngredient(
-                            UUID.fromString(part.ingredientId), part.quantity, part.unit, part.quantityFixed);
+                            UUID.fromString(part.ingredientId), part.quantity, part.unit);
                 })
                 .collect(Collectors.toSet());
     }

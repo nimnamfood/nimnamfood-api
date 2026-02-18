@@ -41,7 +41,7 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
         Tag tag2 = Tag.factory().create("tag 2")._1;
         view.insertIngredients(ingredient1, ingredient2);
         view.insertTags(tag1, tag2);
-        Recipe recipe = Recipe.factory().create("recette 1", UUID.randomUUID(), 1, Set.of(new RecipeIngredient(ingredient1.getId(), 10f, IngredientUnit.PINCH, false), new RecipeIngredient(ingredient2.getId(), 5f, IngredientUnit.GRAM, true)), "instructions", Set.of(tag1.getId(), tag2.getId()))._1;
+        Recipe recipe = Recipe.factory().create("recette 1", UUID.randomUUID(), 1, Set.of(new RecipeIngredient(ingredient1.getId(), 10f, IngredientUnit.PINCH), new RecipeIngredient(ingredient2.getId(), 5f, IngredientUnit.GRAM)), "instructions", Set.of(tag1.getId(), tag2.getId()))._1;
         view.insertRecipes(Map.of(ingredient1.getId(), ingredient1.getName(), ingredient2.getId(), ingredient2.getName()), recipe, RecipeFactory.createEmpty("recette 2"));
 
         RecipeSummary summary = handler.execute(new GetRecipe(recipe.getId().toString()), template);
@@ -58,8 +58,8 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
         assertThat(summary.tags()).anyMatch(s -> s.id().equals(tag2.getId()) && s.name().equals("tag 2"));
 
         assertThat(summary.ingredients()).hasSize(2);
-        assertThat(summary.ingredients()).anyMatch(s -> s.id().equals(ingredient1.getId()) && s.name().equals("ingredient 1") && s.quantity() == 10f && s.unit() == IngredientUnit.PINCH && !s.quantityFixed());
-        assertThat(summary.ingredients()).anyMatch(s -> s.id().equals(ingredient2.getId()) && s.name().equals("ingredient 2") && s.quantity() == 5f && s.unit() == IngredientUnit.GRAM && s.quantityFixed());
+        assertThat(summary.ingredients()).anyMatch(s -> s.id().equals(ingredient1.getId()) && s.name().equals("ingredient 1") && s.quantity() == 10f && s.unit() == IngredientUnit.PINCH);
+        assertThat(summary.ingredients()).anyMatch(s -> s.id().equals(ingredient2.getId()) && s.name().equals("ingredient 2") && s.quantity() == 5f && s.unit() == IngredientUnit.GRAM);
     }
 
     @Test
@@ -67,14 +67,14 @@ public class GetRecipeHandlerTest extends PostgresTestContainerBase {
         GetRecipeHandler handler = new GetRecipeHandler(mapper);
         Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.GRAM)._1;
         view.insertIngredients(ingredient);
-        Recipe recipe = Recipe.factory().create("recette", null, 1, Set.of(new RecipeIngredient(ingredient.getId(), 10f, IngredientUnit.GRAM, false), new RecipeIngredient(ingredient.getId(), 5f, IngredientUnit.GRAM, true)), "instructions", Collections.emptySet())._1;
+        Recipe recipe = Recipe.factory().create("recette", null, 1, Set.of(new RecipeIngredient(ingredient.getId(), 10f, IngredientUnit.GRAM), new RecipeIngredient(ingredient.getId(), 5f, IngredientUnit.GRAM)), "instructions", Collections.emptySet())._1;
         view.insertRecipes(Map.of(ingredient.getId(), ingredient.getName()), recipe);
 
         RecipeSummary summary = handler.execute(new GetRecipe(recipe.getId().toString()), template);
 
         assertThat(summary.ingredients()).hasSize(2);
-        assertThat(summary.ingredients()).anyMatch(s -> s.id().equals(ingredient.getId()) && s.name().equals("ingredient") && s.quantity() == 10f && s.unit() == IngredientUnit.GRAM && !s.quantityFixed());
-        assertThat(summary.ingredients()).anyMatch(s -> s.id().equals(ingredient.getId()) && s.name().equals("ingredient") && s.quantity() == 5f && s.unit() == IngredientUnit.GRAM && s.quantityFixed());
+        assertThat(summary.ingredients()).anyMatch(s -> s.id().equals(ingredient.getId()) && s.name().equals("ingredient") && s.quantity() == 10f && s.unit() == IngredientUnit.GRAM);
+        assertThat(summary.ingredients()).anyMatch(s -> s.id().equals(ingredient.getId()) && s.name().equals("ingredient") && s.quantity() == 5f && s.unit() == IngredientUnit.GRAM);
     }
 
     @Test

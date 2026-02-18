@@ -33,8 +33,7 @@ create table recipe_ingredients (
     recipe_id uuid not null,
     ingredient_id uuid not null,
     quantity numeric not null,
-    unit text not null,
-    quantity_fixed boolean not null
+    unit text not null
 );
 
 drop table if exists recipes;

@@ -45,7 +45,6 @@ public class RecipeJdbcRepositoryTest extends PostgresTestContainerBase {
         recipeIngredientDbo.setIngredientId(ingredientDbo.getId());
         recipeIngredientDbo.setQuantity(10f);
         recipeIngredientDbo.setUnit(IngredientUnit.PIECE);
-        recipeIngredientDbo.setQuantityFixed(true);
 
         RecipeDbo recipeDbo = new RecipeDbo();
         recipeDbo.setId(UUID.randomUUID());
@@ -77,7 +76,6 @@ public class RecipeJdbcRepositoryTest extends PostgresTestContainerBase {
         assertThat(recipeIngredient.ingredientId()).isEqualTo(ingredientDbo.getId());
         assertThat(recipeIngredient.quantity()).isEqualTo(10f);
         assertThat(recipeIngredient.unit()).isEqualTo(IngredientUnit.PIECE);
-        assertThat(recipeIngredient.quantityFixed()).isTrue();
     }
 
     @Test
@@ -85,7 +83,7 @@ public class RecipeJdbcRepositoryTest extends PostgresTestContainerBase {
         RecipeJdbcRepository repository = new RecipeJdbcRepository(crudRepository, jdbcAggregateTemplate);
         UUID tagId = UUID.randomUUID();
         UUID ingredientId = UUID.randomUUID();
-        RecipeIngredient recipeIngredient = new RecipeIngredient(ingredientId, 3, IngredientUnit.PINCH, false);
+        RecipeIngredient recipeIngredient = new RecipeIngredient(ingredientId, 3, IngredientUnit.PINCH);
         Recipe recipe = Recipe.factory().create("autre recette", UUID.randomUUID(), 1, Set.of(recipeIngredient), "autres", Set.of(tagId))._1;
 
         repository.add(recipe);
@@ -104,6 +102,5 @@ public class RecipeJdbcRepositoryTest extends PostgresTestContainerBase {
         assertThat(recipeIngredientDbo.getIngredientId()).isEqualTo(ingredientId);
         assertThat(recipeIngredientDbo.getQuantity()).isEqualTo(3);
         assertThat(recipeIngredientDbo.getUnit()).isEqualTo(IngredientUnit.PINCH);
-        assertThat(recipeIngredientDbo.getQuantityFixed()).isFalse();
     }
 }

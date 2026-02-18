@@ -133,7 +133,6 @@ class RecipeServiceTest {
             ingredientId = ingredient.getId().toString();
             quantity = 2f;
             unit = IngredientUnit.GRAM;
-            quantityFixed = false;
         }};
 
         Set<RecipeIngredient> result = RecipeService.recipeIngredientsFromCommand(Set.of(part));
@@ -142,7 +141,7 @@ class RecipeServiceTest {
                 .hasSize(1)
                 .first()
                 .matches(ri -> ri.getId() != null && ri.ingredientId().equals(ingredient.getId()) &&
-                        ri.quantity() == 2f && ri.unit() == IngredientUnit.GRAM && !ri.quantityFixed());
+                        ri.quantity() == 2f && ri.unit() == IngredientUnit.GRAM);
     }
 
     @Test
@@ -151,7 +150,6 @@ class RecipeServiceTest {
             ingredientId = UUID.randomUUID().toString();
             quantity = 2f;
             unit = IngredientUnit.GRAM;
-            quantityFixed = false;
         }};
 
         assertThatExceptionOfType(MissingAggregateRootException.class)

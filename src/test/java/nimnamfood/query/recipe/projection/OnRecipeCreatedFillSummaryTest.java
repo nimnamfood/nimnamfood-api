@@ -49,7 +49,7 @@ class OnRecipeCreatedFillSummaryTest extends PostgresTestContainerBase {
         view.insertTags(tag);
         Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.PIECE)._1;
         view.insertIngredients(ingredient);
-        RecipeIngredient ri = new RecipeIngredient(ingredient.getId(), 10.5f, IngredientUnit.GRAM, false);
+        RecipeIngredient ri = new RecipeIngredient(ingredient.getId(), 10.5f, IngredientUnit.GRAM);
         RecipeCreated event = new RecipeCreated(UUID.randomUUID(), "recette", UUID.randomUUID(), 1,
                 "instructions", ImmutableSet.of(ri), ImmutableSet.of(tag.getId()), LocalDateTime.now());
         Mockito.when(recipeService.illustrationUrl(event.illustrationId())).thenReturn("url");
@@ -68,7 +68,6 @@ class OnRecipeCreatedFillSummaryTest extends PostgresTestContainerBase {
             assertThat(i.name()).isEqualTo("ingredient");
             assertThat(i.quantity()).isEqualTo(10.5f);
             assertThat(i.unit()).isEqualTo(IngredientUnit.GRAM);
-            assertThat(i.quantityFixed()).isFalse();
         });
         assertThat(inspector.tags()).hasSize(1).first().satisfies(t -> {
             assertThat(t.id()).isEqualTo(tag.getId());
@@ -92,7 +91,7 @@ class OnRecipeCreatedFillSummaryTest extends PostgresTestContainerBase {
     void tagsCanBeEmpty() {
         Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.PIECE)._1;
         view.insertIngredients(ingredient);
-        RecipeIngredient ri = new RecipeIngredient(ingredient.getId(), 10.5f, IngredientUnit.GRAM, false);
+        RecipeIngredient ri = new RecipeIngredient(ingredient.getId(), 10.5f, IngredientUnit.GRAM);
         RecipeCreated event = new RecipeCreated(UUID.randomUUID(), "recette", UUID.randomUUID(), 1,
                 "instructions", ImmutableSet.of(ri), ImmutableSet.of(), LocalDateTime.now());
         Mockito.when(recipeService.illustrationUrl(event.illustrationId())).thenReturn("url");
@@ -107,7 +106,7 @@ class OnRecipeCreatedFillSummaryTest extends PostgresTestContainerBase {
     void illustrationCanBeEmpty() {
         Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.PIECE)._1;
         view.insertIngredients(ingredient);
-        RecipeIngredient ri = new RecipeIngredient(ingredient.getId(), 10.5f, IngredientUnit.GRAM, false);
+        RecipeIngredient ri = new RecipeIngredient(ingredient.getId(), 10.5f, IngredientUnit.GRAM);
         RecipeCreated event = new RecipeCreated(UUID.randomUUID(), "recette", null, 1,
                 "instructions", ImmutableSet.of(ri), ImmutableSet.of(), LocalDateTime.now());
 

@@ -13,7 +13,6 @@ public class RecipeIngredientDbo {
     UUID ingredientId;
     Float quantity;
     IngredientUnit unit;
-    Boolean quantityFixed;
 
     public UUID getId() {
         return id;
@@ -47,11 +46,4 @@ public class RecipeIngredientDbo {
         this.unit = unit;
     }
 
-    public Boolean getQuantityFixed() {
-        return quantityFixed;
-    }
-
-    public void setQuantityFixed(Boolean quantityFixed) {
-        this.quantityFixed = quantityFixed;
-    }
 }

@@ -16,7 +16,4 @@ public class RecipeIngredientCommandPart {
 
     @NotNull
     public IngredientUnit unit;
-
-    @NotNull
-    public Boolean quantityFixed;
 }

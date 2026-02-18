@@ -39,7 +39,6 @@ public class RecipeJdbcRepository extends JdbcRepositoryWithUuid<Recipe, RecipeD
         recipeIngredientDbo.ingredientId = recipeIngredient.ingredientId();
         recipeIngredientDbo.quantity = recipeIngredient.quantity();
         recipeIngredientDbo.unit = recipeIngredient.unit();
-        recipeIngredientDbo.quantityFixed = recipeIngredient.quantityFixed();
         return recipeIngredientDbo;
     }
 }

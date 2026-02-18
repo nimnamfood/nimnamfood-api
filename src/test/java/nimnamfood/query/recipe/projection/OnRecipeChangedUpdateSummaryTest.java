@@ -52,7 +52,7 @@ class OnRecipeChangedUpdateSummaryTest extends PostgresTestContainerBase {
         view.insertTags(tag);
         Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.PIECE)._1;
         view.insertIngredients(ingredient);
-        RecipeIngredient ri = new RecipeIngredient(ingredient.getId(), 10.5f, IngredientUnit.GRAM, false);
+        RecipeIngredient ri = new RecipeIngredient(ingredient.getId(), 10.5f, IngredientUnit.GRAM);
         Recipe recipe = Recipe.factory().create("recette", 1, Collections.emptySet(), "instructions", Collections.emptySet())._1;
         view.insertRecipes(Map.of(ingredient.getId(), ingredient.getName()), recipe);
         RecipeChanged event = new RecipeChanged(recipe.getId(), "recette updated", UUID.randomUUID(), 2, "instructions updated", ImmutableSet.of(ri), ImmutableSet.of(tag.getId()));
@@ -72,7 +72,6 @@ class OnRecipeChangedUpdateSummaryTest extends PostgresTestContainerBase {
             assertThat(i.name()).isEqualTo("ingredient");
             assertThat(i.quantity()).isEqualTo(10.5f);
             assertThat(i.unit()).isEqualTo(IngredientUnit.GRAM);
-            assertThat(i.quantityFixed()).isFalse();
         });
         assertThat(inspector.tags()).hasSize(1).first().satisfies(t -> {
             assertThat(t.id()).isEqualTo(tag.getId());

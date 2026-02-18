@@ -50,7 +50,6 @@ public class CreateRecipeCommandTest {
             ingredientId = UUID.randomUUID().toString();
             quantity = 20f;
             unit = IngredientUnit.PIECE;
-            quantityFixed = false;
         }};
     }
 }

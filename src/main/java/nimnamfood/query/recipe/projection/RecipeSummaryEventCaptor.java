@@ -49,8 +49,7 @@ public abstract class RecipeSummaryEventCaptor<TEvent extends DomainEvent> imple
 
         final List<RecipeIngredientSummary> ingredientMaps = ingredients.stream()
                 .map(ingredient -> new RecipeIngredientSummary(ingredient.ingredientId(),
-                        ingredientNames.get(ingredient.ingredientId()), ingredient.quantity(), ingredient.unit(),
-                        ingredient.quantityFixed()))
+                        ingredientNames.get(ingredient.ingredientId()), ingredient.quantity(), ingredient.unit()))
                 .toList();
 
         try {

@@ -39,7 +39,7 @@ class UpdateRecipeCommandHandlerTest {
         Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.GRAM)._1;
         Repositories.ingredients().add(ingredient);
 
-        RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient.getId(), 1f, IngredientUnit.GRAM, false);
+        RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient.getId(), 1f, IngredientUnit.GRAM);
         Recipe recipe = Recipe.factory().create("recette", null, 1, Set.of(recipeIngredient), "instructions", Collections.emptySet())._1;
         Repositories.recipes().add(recipe);
 
@@ -47,7 +47,6 @@ class UpdateRecipeCommandHandlerTest {
             ingredientId = ingredient.getId().toString();
             quantity = 20f;
             unit = IngredientUnit.PIECE;
-            quantityFixed = true;
         }};
 
         UUID illustrationId = UUID.randomUUID();
@@ -76,7 +75,7 @@ class UpdateRecipeCommandHandlerTest {
                 // Updating the ingredients will generate new ids but we can
                 // safely ignore it.
                 .matches(ri -> ri.ingredientId().equals(ingredient.getId()) && ri.quantity() == 20f &&
-                        ri.unit() == IngredientUnit.PIECE && ri.quantityFixed());
+                        ri.unit() == IngredientUnit.PIECE);
     }
 
     @Test
@@ -187,7 +186,7 @@ class UpdateRecipeCommandHandlerTest {
         Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.GRAM)._1;
         Repositories.ingredients().add(ingredient);
 
-        RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient.getId(), 1f, IngredientUnit.GRAM, false);
+        RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient.getId(), 1f, IngredientUnit.GRAM);
         Recipe recipe = Recipe.factory().create("recette", UUID.randomUUID(), 1, Set.of(recipeIngredient), "instructions", Collections.emptySet())._1;
         Repositories.recipes().add(recipe);
         return recipe;
@@ -197,7 +196,7 @@ class UpdateRecipeCommandHandlerTest {
         Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.GRAM)._1;
         Repositories.ingredients().add(ingredient);
 
-        RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient.getId(), 1f, IngredientUnit.GRAM, false);
+        RecipeIngredient recipeIngredient = new RecipeIngredient(ingredient.getId(), 1f, IngredientUnit.GRAM);
         Recipe recipe = Recipe.factory().create("recette", 1, Set.of(recipeIngredient), "instructions")._1;
         Repositories.recipes().add(recipe);
         return recipe;
@@ -208,7 +207,6 @@ class UpdateRecipeCommandHandlerTest {
             ingredientId = recipe.getIngredients().stream().findFirst().get().ingredientId().toString();
             quantity = 20f;
             unit = IngredientUnit.PIECE;
-            quantityFixed = false;
         }};
 
         UpdateRecipeCommand command = new UpdateRecipeCommand().withId(recipe.getId());

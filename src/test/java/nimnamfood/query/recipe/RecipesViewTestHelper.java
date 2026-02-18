@@ -77,8 +77,7 @@ public class RecipesViewTestHelper {
                                     "id", ingredient.ingredientId().toString(),
                                     "name", ingredientNames.get(ingredient.ingredientId()),
                                     "quantity", Float.toString(ingredient.quantity()),
-                                    "unit", ingredient.unit().toString(),
-                                    "quantity_fixed", Boolean.toString(ingredient.quantityFixed())
+                                    "unit", ingredient.unit().toString()
                             ))
                             .toList();
                     try {

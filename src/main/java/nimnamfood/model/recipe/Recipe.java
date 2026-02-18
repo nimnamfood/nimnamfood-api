@@ -77,8 +77,7 @@ public class Recipe extends BaseAggregateRootWithUuid {
         public Recipe recreateFromDbo(RecipeDbo dbo) {
             final Set<RecipeIngredient> recipeIngredients = dbo.getIngredients().stream().map(recipeIngredientDbo ->
                     new RecipeIngredient(recipeIngredientDbo.getId(), recipeIngredientDbo.getIngredientId(),
-                            recipeIngredientDbo.getQuantity(), recipeIngredientDbo.getUnit(),
-                            recipeIngredientDbo.getQuantityFixed())).collect(Collectors.toSet());
+                            recipeIngredientDbo.getQuantity(), recipeIngredientDbo.getUnit())).collect(Collectors.toSet());
 
             final Set<UUID> tagIds = dbo.getTags().stream().map(RecipeTagDbo::getTagId).collect(Collectors.toSet());
 

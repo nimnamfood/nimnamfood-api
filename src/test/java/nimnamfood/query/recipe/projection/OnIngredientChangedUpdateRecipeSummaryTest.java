@@ -30,8 +30,8 @@ class OnIngredientChangedUpdateRecipeSummaryTest extends PostgresTestContainerBa
     void updatesTheNameOfTheIngredientOnAllRecipes() {
         Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.PIECE)._1;
         view.insertIngredients(ingredient);
-        Recipe recipe1 = Recipe.factory().create("", 1, Set.of(new RecipeIngredient(ingredient.getId(), 1, IngredientUnit.GRAM, false)), "", Collections.emptySet())._1;
-        Recipe recipe2 = Recipe.factory().create("", 1, Set.of(new RecipeIngredient(ingredient.getId(), 1, IngredientUnit.GRAM, false)), "", Collections.emptySet())._1;
+        Recipe recipe1 = Recipe.factory().create("", 1, Set.of(new RecipeIngredient(ingredient.getId(), 1, IngredientUnit.GRAM)), "", Collections.emptySet())._1;
+        Recipe recipe2 = Recipe.factory().create("", 1, Set.of(new RecipeIngredient(ingredient.getId(), 1, IngredientUnit.GRAM)), "", Collections.emptySet())._1;
         view.insertRecipes(Map.of(ingredient.getId(), ingredient.getName()), recipe1, recipe2);
 
         new OnIngredientChangedUpdateRecipeSummary(client).execute(new IngredientChanged(ingredient.getId(), "ingredient renamed", IngredientUnit.PIECE));
@@ -53,7 +53,7 @@ class OnIngredientChangedUpdateRecipeSummaryTest extends PostgresTestContainerBa
         Ingredient ingredient1 = Ingredient.factory().create("ingredient 1", IngredientUnit.PIECE)._1;
         Ingredient ingredient2 = Ingredient.factory().create("ingredient 2", IngredientUnit.PIECE)._1;
         view.insertIngredients(ingredient2, ingredient1);
-        Recipe recipe = Recipe.factory().create("", 1, Set.of(new RecipeIngredient(ingredient1.getId(), 1, IngredientUnit.GRAM, false), new RecipeIngredient(ingredient2.getId(), 1, IngredientUnit.GRAM, false)), "", Collections.emptySet())._1;
+        Recipe recipe = Recipe.factory().create("", 1, Set.of(new RecipeIngredient(ingredient1.getId(), 1, IngredientUnit.GRAM), new RecipeIngredient(ingredient2.getId(), 1, IngredientUnit.GRAM)), "", Collections.emptySet())._1;
         view.insertRecipes(Map.of(ingredient1.getId(), ingredient1.getName(), ingredient2.getId(), ingredient2.getName()), recipe);
 
         new OnIngredientChangedUpdateRecipeSummary(client).execute(new IngredientChanged(ingredient1.getId(), "ingredient1 renamed", IngredientUnit.PIECE));
@@ -69,7 +69,7 @@ class OnIngredientChangedUpdateRecipeSummaryTest extends PostgresTestContainerBa
     void preservesOtherProperties() {
         Ingredient ingredient = Ingredient.factory().create("ingredient", IngredientUnit.PIECE)._1;
         view.insertIngredients(ingredient);
-        Recipe recipe = Recipe.factory().create("recette", 1, Set.of(new RecipeIngredient(ingredient.getId(), 1, IngredientUnit.GRAM, true)), "instructions", Collections.emptySet())._1;
+        Recipe recipe = Recipe.factory().create("recette", 1, Set.of(new RecipeIngredient(ingredient.getId(), 1, IngredientUnit.GRAM)), "instructions", Collections.emptySet())._1;
         view.insertRecipes(Map.of(ingredient.getId(), ingredient.getName()), recipe);
 
         new OnIngredientChangedUpdateRecipeSummary(client).execute(new IngredientChanged(ingredient.getId(), "ingredient1 renamed", IngredientUnit.TEASPOON));
@@ -83,7 +83,6 @@ class OnIngredientChangedUpdateRecipeSummaryTest extends PostgresTestContainerBa
         assertThat(recipeInspector.ingredients()).first().satisfies(i -> {
             assertThat(i.quantity()).isEqualTo(1);
             assertThat(i.unit()).isEqualTo(IngredientUnit.GRAM);
-            assertThat(i.quantityFixed()).isTrue();
         });
     }
 }

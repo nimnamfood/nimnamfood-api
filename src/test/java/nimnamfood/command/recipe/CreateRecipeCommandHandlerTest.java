@@ -42,7 +42,6 @@ public class CreateRecipeCommandHandlerTest {
             ingredientId = ingredient.getId().toString();
             quantity = 20f;
             unit = IngredientUnit.PIECE;
-            quantityFixed = false;
         }};
 
         UUID illustrationId = UUID.randomUUID();
@@ -65,7 +64,7 @@ public class CreateRecipeCommandHandlerTest {
         assertThat(recipe.getIngredients()).hasSize(1);
         assertThat(recipe.getIngredients().stream().findFirst().get()).matches(ri -> ri.getId() != null &&
                 ri.ingredientId().equals(ingredient.getId()) && ri.quantity() == 20f &&
-                ri.unit() == IngredientUnit.PIECE && !ri.quantityFixed());
+                ri.unit() == IngredientUnit.PIECE);
     }
 
     @Test
@@ -126,7 +125,6 @@ public class CreateRecipeCommandHandlerTest {
             ingredientId = ingredient.getId().toString();
             quantity = 20f;
             unit = IngredientUnit.PIECE;
-            quantityFixed = false;
         }};
 
         CreateRecipeCommand command = new CreateRecipeCommand();
@@ -158,7 +156,6 @@ public class CreateRecipeCommandHandlerTest {
             ingredientId = ingredient.getId().toString();
             quantity = 20f;
             unit = IngredientUnit.PIECE;
-            quantityFixed = false;
         }};
     }
 

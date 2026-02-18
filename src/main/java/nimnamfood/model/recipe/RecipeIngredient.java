@@ -9,21 +9,18 @@ public class RecipeIngredient extends BaseEntityWithUuid {
     private final UUID ingredientId;
     private final float quantity;
     private final IngredientUnit unit;
-    private final boolean quantityFixed;
 
-    public RecipeIngredient(UUID ingredientId, float quantity, IngredientUnit unit, boolean quantityFixed) {
+    public RecipeIngredient(UUID ingredientId, float quantity, IngredientUnit unit) {
         this.ingredientId = ingredientId;
         this.quantity = quantity;
         this.unit = unit;
-        this.quantityFixed = quantityFixed;
     }
 
-    public RecipeIngredient(UUID id, UUID ingredientId, float quantity, IngredientUnit unit, boolean quantityFixed) {
+    public RecipeIngredient(UUID id, UUID ingredientId, float quantity, IngredientUnit unit) {
         super(id);
         this.ingredientId = ingredientId;
         this.quantity = quantity;
         this.unit = unit;
-        this.quantityFixed = quantityFixed;
     }
 
     public UUID ingredientId() {
@@ -38,7 +35,4 @@ public class RecipeIngredient extends BaseEntityWithUuid {
         return unit;
     }
 
-    public boolean quantityFixed() {
-        return quantityFixed;
-    }
 }
