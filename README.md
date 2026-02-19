@@ -6,16 +6,20 @@ Spring Boot backend API for Nimnamfood.
 
 - **Java 21**
 - **Docker** (for the PostgreSQL database)
+- **Firebase service account key**
 
 ## Running locally
 
-1. Start the PostgreSQL database:
+1. Add the Firebase service account key in `src/main/resources/nimnamfood-storage-service-account-key-dev.json`
+
+
+2. Start the PostgreSQL database:
 
 ```bash
 docker compose up -d
 ```
 
-2. Run the application:
+3. Run the application:
 
 ```bash
 ./mvnw spring-boot:run
