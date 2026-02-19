@@ -1,4 +1,4 @@
-# CLAUDE.md — nimnamfood-api
+# COMPANION.md — nimnamfood-api
 
 ## Project Overview
 
