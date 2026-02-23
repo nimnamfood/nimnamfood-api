@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.MoreExecutors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vtertre.ddd.Tuple;
 import vtertre.ddd.event.*;
 
 import java.util.List;
@@ -15,16 +14,14 @@ import java.util.concurrent.ExecutorService;
 public class EventBusAsync implements EventBus {
     private final ExecutorService directExecutorService = MoreExecutors.newDirectExecutorService();
     private final ExecutorService executorService;
-    private final List<EventCaptor<?>> captors;
     private final MiddlewareChainLink firstMiddlewareChainLink;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(EventBusAsync.class);
 
     public EventBusAsync(Set<EventBusMiddleware> middlewares, Set<EventCaptor<?>> captors, ExecutorService executorService) {
         this.executorService = executorService;
-        this.captors = ImmutableList.copyOf(captors);
 
-        MiddlewareChainLink currentLink = new CaptorInvocation();
+        MiddlewareChainLink currentLink = new CaptorInvocation(ImmutableList.copyOf(captors));
         for (EventBusMiddleware middleware : middlewares.stream().toList().reversed()) {
             currentLink = new MiddlewareChainLink(middleware, currentLink);
         }
@@ -33,18 +30,12 @@ public class EventBusAsync implements EventBus {
 
     @Override
     public <T extends DomainEvent> void publish(List<T> events) {
-        events.stream()
-                .map(event -> Tuple.of(event, this.captors.stream()
-                        .filter(captor -> captor.eventType().equals(event.getClass()))
-                        .map(captor -> (EventCaptor<T>) captor)
-                        .toList()))
-                .toList()
-                .forEach(tuple -> tuple._2.forEach(captor -> execute(tuple._1, captor)));
+        events.forEach(this::execute);
     }
 
-    private <T extends DomainEvent> CompletableFuture<Boolean> execute(T event, EventCaptor<T> captor) {
-        final ExecutorService executor = captor.getClass().getAnnotation(Synced.class) != null ? this.directExecutorService : this.executorService;
-        return CompletableFuture.supplyAsync(() -> firstMiddlewareChainLink.apply(captor, event), executor);
+    private <T extends DomainEvent> CompletableFuture<Boolean> execute(T event) {
+        final ExecutorService executor = event.getClass().getAnnotation(Synced.class) != null ? this.directExecutorService : this.executorService;
+        return CompletableFuture.supplyAsync(() -> firstMiddlewareChainLink.apply(event), executor);
     }
 
     private static class MiddlewareChainLink {
@@ -56,23 +47,33 @@ public class EventBusAsync implements EventBus {
             this.nextLink = nextLink;
         }
 
-        public <T extends DomainEvent> boolean apply(EventCaptor<T> captor, T event) {
+        public <T extends DomainEvent> boolean apply(T event) {
             LOGGER.debug("Running middleware {}", middleware.getClass());
-            middleware.intercept(event, () -> nextLink.apply(captor, event));
+            middleware.intercept(event, () -> nextLink.apply(event));
             return true;
         }
     }
 
     private static class CaptorInvocation extends MiddlewareChainLink {
-        public CaptorInvocation() {
+        private final List<EventCaptor<?>> captors;
+
+        public CaptorInvocation(List<EventCaptor<?>> captors) {
             super(null, null);
+            this.captors = captors;
         }
 
         @Override
-        public <T extends DomainEvent> boolean apply(EventCaptor<T> captor, T event) {
-            LOGGER.debug("Applying captor {}", captor.getClass());
-            captor.execute(event);
-            return true;
+        public <T extends DomainEvent> boolean apply(T event) {
+            return this.captors
+                    .stream()
+                    .filter(captor -> captor.eventType().equals(event.getClass()))
+                    .map(captor -> {
+                        LOGGER.debug("Applying captor {}", captor.getClass());
+                        ((EventCaptor<T>) captor).execute(event);
+                        return true;
+                    })
+                    .reduce((a, b) -> a && b)
+                    .orElseThrow();
         }
     }
 }

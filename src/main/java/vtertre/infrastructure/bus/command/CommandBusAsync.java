@@ -21,7 +21,7 @@ public class CommandBusAsync implements CommandBus {
     public CommandBusAsync(Set<CommandMiddleware> middlewares, Set<CommandHandler<?, ?>> handlers, ExecutorService executorService) {
         MiddlewareChainLink currentLink = new MiddlewareChainLink(
                 new InvokeCommandHandlerMiddleware(handlers, executorService),
-                new ClosingMiddlewareChainLink()
+                null
         );
         for (CommandMiddleware middleware : middlewares.stream().toList().reversed()) {
             currentLink = new MiddlewareChainLink(middleware, currentLink);
@@ -47,18 +47,6 @@ public class CommandBusAsync implements CommandBus {
         public <T> CompletableFuture<Tuple<T, List<DomainEvent>>> apply(Command<T> command) {
             LOGGER.debug("Running middleware {}", this.currentMiddleware.getClass());
             return this.currentMiddleware.intercept(CommandBusAsync.this, command, () -> this.nextLink.apply(command));
-        }
-    }
-
-    private class ClosingMiddlewareChainLink extends MiddlewareChainLink {
-
-        ClosingMiddlewareChainLink() {
-            super(null, null);
-        }
-
-        @Override
-        public <T> CompletableFuture<Tuple<T, List<DomainEvent>>> apply(Command<T> command) {
-            throw new RuntimeException("Reached middleware black hole");
         }
     }
 }

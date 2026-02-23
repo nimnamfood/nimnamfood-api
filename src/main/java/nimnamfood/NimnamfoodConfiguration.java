@@ -27,6 +27,7 @@ import vtertre.infrastructure.bus.event.EventPublisherMiddleware;
 import vtertre.infrastructure.bus.query.QueryBusAsync;
 import vtertre.query.QueryBus;
 import vtertre.query.QueryHandler;
+import vtertre.query.QueryMiddleware;
 
 import java.util.List;
 import java.util.Set;
@@ -78,9 +79,10 @@ public class NimnamfoodConfiguration {
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public QueryBus queryBus(
+            List<QueryMiddleware> middlewares,
             Set<QueryHandler<?, ?>> queryHandlers,
             @Qualifier("Io") ExecutorService executorService) {
-        return new QueryBusAsync(queryHandlers, executorService);
+        return new QueryBusAsync(Sets.newLinkedHashSet(middlewares), queryHandlers, executorService);
     }
 
     @Bean
