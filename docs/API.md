@@ -491,6 +491,59 @@ Returns `404 Not Found` if no recipe exists with the given UUID.
 
 ---
 
+### Plans
+
+#### `GET /plans/{id}`
+
+Retrieve a meal plan by its UUID.
+
+**Path Parameters**:
+
+| Name | Type | Description       |
+|------|------|-------------------|
+| `id` | UUID | The plan's UUID   |
+
+**Response** `200 OK`:
+```json
+{
+  "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "meals": [
+    {
+      "mealIndex": 0,
+      "recipe": {
+        "id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+        "name": "Pancakes",
+        "illustrationUrl": "https://storage.googleapis.com/..."
+      }
+    },
+    {
+      "mealIndex": 1,
+      "recipe": {
+        "id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+        "name": "Omelette",
+        "illustrationUrl": null
+      }
+    }
+  ]
+}
+```
+
+**Response Fields**:
+
+| Field                        | Type         | Description                            |
+|------------------------------|--------------|----------------------------------------|
+| `id`                         | UUID         | Unique identifier of the plan          |
+| `meals`                      | array        | Set of meal slots in this plan         |
+| `meals[].mealIndex`          | integer      | Slot index within the plan             |
+| `meals[].recipe`             | object       | Recipe assigned to this meal slot      |
+| `meals[].recipe.id`          | UUID         | Recipe identifier                      |
+| `meals[].recipe.name`        | string       | Recipe name                            |
+| `meals[].recipe.illustrationUrl` | string\|null | Public URL of the recipe illustration, or `null` |
+
+Returns `404 Not Found` if no plan exists with the given UUID.
+
+---
+
 ### Illustrations
 
 #### `POST /illustrations`
@@ -567,4 +620,8 @@ Recipe
   illustration:   { id: UUID, url: string } | null
   ingredients:    [{ id, name, quantity, unit }]
   tags:           [{ id, name }]
+
+Plan
+  id:    UUID
+  meals: [{ mealIndex: integer, recipe: { id, name, illustrationUrl } }]
 ```

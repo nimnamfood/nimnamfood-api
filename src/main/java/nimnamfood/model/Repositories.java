@@ -1,6 +1,7 @@
 package nimnamfood.model;
 
 import nimnamfood.model.ingredient.IngredientRepository;
+import nimnamfood.model.plan.PlanRepository;
 import nimnamfood.model.recipe.RecipeRepository;
 import nimnamfood.model.tag.TagRepository;
 import org.springframework.beans.factory.InitializingBean;
@@ -13,6 +14,8 @@ public abstract class Repositories implements InitializingBean {
     protected abstract IngredientRepository getIngredients();
 
     protected abstract RecipeRepository getRecipes();
+
+    protected abstract PlanRepository getPlans();
 
     @Override
     public void afterPropertiesSet() {
@@ -33,5 +36,9 @@ public abstract class Repositories implements InitializingBean {
 
     public static RecipeRepository recipes() {
         return INSTANCE.getRecipes();
+    }
+
+    public static PlanRepository plans() {
+        return INSTANCE.getPlans();
     }
 }

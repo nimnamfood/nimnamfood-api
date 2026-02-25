@@ -63,13 +63,16 @@ src/
 │   │   │   └── tag/
 │   │   ├── infrastructure/repository/
 │   │   │   ├── jdbc/            # Spring Data JDBC repository implementations
+│   │   │   │   └── plan/        # Plan JDBC repositories and DBOs
 │   │   │   └── memory/          # In-memory repository implementations (for dev/test)
 │   │   ├── model/               # Domain model (aggregate roots, domain events, repos)
 │   │   │   ├── ingredient/
+│   │   │   ├── plan/            # Plan aggregate, Meal entity, PlanCreated event, PlanRepository
 │   │   │   ├── recipe/
 │   │   │   └── tag/
 │   │   ├── query/               # Queries and handlers (read side)
 │   │   │   ├── ingredient/
+│   │   │   ├── plan/            # GetPlan query + handler + projections + view models
 │   │   │   ├── recipe/
 │   │   │   └── tag/
 │   │   ├── service/             # RecipeService (illustration lifecycle)
@@ -86,7 +89,7 @@ src/
 │   ├── application.properties           # Base config (virtual threads, Flyway, storage)
 │   ├── application-local.properties     # Local dev config (Docker PostgreSQL)
 │   ├── application-production.properties# Production config (env vars)
-│   ├── db/migration/postgresql/         # Flyway SQL migrations (V1–V9)
+│   ├── db/migration/postgresql/         # Flyway SQL migrations (V1–V10)
 │   └── logback.xml
 │
 └── test/java/
@@ -140,15 +143,16 @@ CreateRecipeCommand → CreateRecipeCommandHandler → Recipe.factory().create()
 
 ## Domain Model
 
-Three aggregate roots, each with a corresponding domain event for creation and update:
+Four aggregate roots, each with a corresponding domain event for creation and (where applicable) update:
 
 | Aggregate | Created event | Changed event | Repository interface |
 |---|---|---|---|
 | `Recipe` | `RecipeCreated` | `RecipeChanged` | `RecipeRepository` |
 | `Ingredient` | `IngredientCreated` | `IngredientChanged` | `IngredientRepository` |
 | `Tag` | `TagCreated` | — | `TagRepository` |
+| `Plan` | `PlanCreated` | — | `PlanRepository` |
 
-`Repositories` is a static-access singleton initialized at startup. Call `Repositories.recipes()`, `Repositories.ingredients()`, or `Repositories.tags()` from command handlers.
+`Repositories` is a static-access singleton initialized at startup. Call `Repositories.recipes()`, `Repositories.ingredients()`, `Repositories.tags()`, or `Repositories.plans()` from command handlers.
 
 ---
 
@@ -168,6 +172,7 @@ Three aggregate roots, each with a corresponding domain event for creation and u
 | `GET` | `/tags` | List tags |
 | `POST` | `/tags` | Create a tag |
 | `POST` | `/illustrations` | Upload an illustration (multipart) |
+| `GET` | `/plans/{id}` | Get a meal plan |
 
 ### Tag Filter Query Syntax (`?tags=`)
 
@@ -190,6 +195,7 @@ Flyway migrations live in `src/main/resources/db/migration/postgresql/`. Always 
 - `recipes`, `recipe_ingredients`, `recipe_tags`
 - `ingredients`
 - `tags`
+- `plans`, `meals`
 
 ### View Tables (read side — denormalized for queries)
 - `view_recipe_search` — lightweight search results (id, name, illustration_url, tags JSON, creation_date_time)
@@ -198,6 +204,7 @@ Flyway migrations live in `src/main/resources/db/migration/postgresql/`. Always 
 - `view_part_recipe_ingredients` — ingredient lookup for recipe views
 - `view_part_default_ingredients` — ingredient list view
 - `view_part_default_tags` — tag list view
+- `view_plans` — plan detail with denormalized meal+recipe info (id, meals JSONB)
 
 View tables are kept in sync by `EventCaptor` projections — **never update view tables directly**; emit a domain event instead.
 

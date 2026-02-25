@@ -4,9 +4,15 @@ import nimnamfood.model.recipe.Recipe;
 import nimnamfood.model.recipe.RecipeIngredient;
 import nimnamfood.model.recipe.RecipeRepository;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
+import vtertre.infrastructure.persistence.jdbc.JdbcDbo;
 import vtertre.infrastructure.persistence.jdbc.JdbcRepositoryWithUuid;
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class RecipeJdbcRepository extends JdbcRepositoryWithUuid<Recipe, RecipeDbo> implements RecipeRepository {
 
@@ -40,5 +46,13 @@ public class RecipeJdbcRepository extends JdbcRepositoryWithUuid<Recipe, RecipeD
         recipeIngredientDbo.quantity = recipeIngredient.quantity();
         recipeIngredientDbo.unit = recipeIngredient.unit();
         return recipeIngredientDbo;
+    }
+
+    @Override
+    public Iterable<Recipe> getAllById(Set<UUID> recipeIds) {
+        return StreamSupport
+                .stream(this.jdbcCrudRepository.findAllById(recipeIds).spliterator(), false)
+                .map(RecipeDbo::asAggregateRoot)
+                .toList();
     }
 }
