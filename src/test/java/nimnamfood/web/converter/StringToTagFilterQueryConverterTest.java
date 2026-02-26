@@ -23,7 +23,7 @@ public class StringToTagFilterQueryConverterTest {
 
         assertThat(query.values()).hasSize(1);
         assertThat(query.values()).first().isExactlyInstanceOf(HasTag.class);
-        assertThat(query.values()).first().extracting(f -> f.value).isEqualTo("1aE-4");
+        assertThat(query.values()).first().extracting(f -> f.value()).isEqualTo("1aE-4");
     }
 
     @Test
@@ -33,8 +33,8 @@ public class StringToTagFilterQueryConverterTest {
         TagFilterQuery query = converter.convert("1aE-4,0-Z");
 
         assertThat(query.values()).hasSize(2);
-        assertThat(query.values()).anyMatch(f -> f.value.equals("1aE-4"));
-        assertThat(query.values()).anyMatch(f -> f.value.equals("0-Z"));
+        assertThat(query.values()).anyMatch(f -> f.value().equals("1aE-4"));
+        assertThat(query.values()).anyMatch(f -> f.value().equals("0-Z"));
     }
 
     @Test
@@ -45,7 +45,7 @@ public class StringToTagFilterQueryConverterTest {
 
         assertThat(query.values()).hasSize(1);
         assertThat(query.values()).first().isExactlyInstanceOf(DoesNotHaveTag.class)
-                .extracting(f -> f.value).isEqualTo("0-Z");
+                .extracting(f -> f.value()).isEqualTo("0-Z");
     }
 
     @Test
@@ -70,12 +70,12 @@ public class StringToTagFilterQueryConverterTest {
         TagFilterQuery query = converter.convert("!0-1-2,1-aA,(1e-A|0-Z),!8,1,(1|2),a-a");
 
         assertThat(query.values()).hasSize(7);
-        assertThat(query.values()).anyMatch(f -> f.value.equals("0-1-2"));
-        assertThat(query.values()).anyMatch(f -> f.value.equals("1-aA"));
-        assertThat(query.values()).anyMatch(f -> f.value.equals("8"));
-        assertThat(query.values()).anyMatch(f -> f.value.equals("1"));
-        assertThat(query.values()).anyMatch(f -> f.value.equals("a-a"));
-        assertThat(query.values()).filteredOn(f -> f.getClass().equals(HasOneOfTags.class))
+        assertThat(query.values()).anyMatch(f -> f.value().equals("0-1-2"));
+        assertThat(query.values()).anyMatch(f -> f.value().equals("1-aA"));
+        assertThat(query.values()).anyMatch(f -> f.value().equals("8"));
+        assertThat(query.values()).anyMatch(f -> f.value().equals("1"));
+        assertThat(query.values()).anyMatch(f -> f.value().equals("a-a"));
+        assertThat(query.values()).filteredOn(f -> f instanceof HasOneOfTags)
                 .hasSize(2)
                 .anySatisfy(f -> assertThat(((HasOneOfTags) f).value()).containsExactlyInAnyOrder("1e-A", "0-Z"))
                 .anySatisfy(f -> assertThat(((HasOneOfTags) f).value()).containsExactlyInAnyOrder("1", "2"));

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Component
@@ -14,7 +15,7 @@ public class StringToTagFilterQueryConverter implements Converter<String, TagFil
     @NonNull
     public TagFilterQuery convert(@NonNull String source) {
         final Set<TagFilter<?>> filters = Arrays.stream(source.split(","))
-                .filter(part -> !part.isEmpty())
+                .filter(Predicate.not(String::isEmpty))
                 .map(StringToTagFilterQueryConverter::toFilter)
                 .collect(Collectors.toUnmodifiableSet());
         return new TagFilterQuery(filters);

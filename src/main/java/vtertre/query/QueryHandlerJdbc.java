@@ -14,10 +14,10 @@ public abstract class QueryHandlerJdbc<TQuery extends Query<TResponse>, TRespons
     }
 
     protected HashMap<String, Object> baseLimitOffsetParams(TQuery query) {
-        return new HashMap<>() {{
-            put("limit", query.limit() > 0 ? query.limit() : null);
-            put("offset", query.skip() > -1 ? query.skip() : 0);
-        }};
+        var params = new HashMap<String, Object>();
+        params.put("limit", query.limit() > 0 ? query.limit() : null);
+        params.put("offset", query.skip() > -1 ? query.skip() : 0);
+        return params;
     }
 
     protected abstract TResponse execute(TQuery query, NamedParameterJdbcTemplate jdbcTemplate);

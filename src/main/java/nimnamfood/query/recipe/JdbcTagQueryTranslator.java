@@ -1,18 +1,16 @@
 package nimnamfood.query.recipe;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import nimnamfood.web.converter.DoesNotHaveTag;
 import nimnamfood.web.converter.HasOneOfTags;
 import nimnamfood.web.converter.HasTag;
 import nimnamfood.web.converter.TagFilterQuery;
 import vtertre.ddd.Tuple;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class JdbcTagQueryTranslator implements TagQueryTranslator<Tuple<String, Map<String, Set<String>>>> {
     private final String jsonbTagsColumn;
@@ -27,38 +25,35 @@ public class JdbcTagQueryTranslator implements TagQueryTranslator<Tuple<String, 
             return null;
         }
 
-        final List<String> clauses = Lists.newArrayList();
-        final Map<String, Set<String>> params = Maps.newHashMap();
+        var clauses = new ArrayList<String>();
+        var params = new HashMap<String, Set<String>>();
 
-        final Set<String> inclusiveFilterValues = query.values().stream()
-                .filter(filter -> filter.getClass().equals(HasTag.class))
-                .map(filter -> ((HasTag) filter).value())
-                .collect(Collectors.toUnmodifiableSet());
+        var inclusiveFilterValues = new HashSet<String>();
+        var exclusiveFilterValues = new HashSet<String>();
+        var orFilters = new ArrayList<HasOneOfTags>();
+
+        for (var filter : query.values()) {
+            switch (filter) {
+                case HasTag t         -> inclusiveFilterValues.add(t.value());
+                case DoesNotHaveTag t -> exclusiveFilterValues.add(t.value());
+                case HasOneOfTags t   -> orFilters.add(t);
+            }
+        }
+
         if (!inclusiveFilterValues.isEmpty()) {
-            clauses.add("jsonb_exists_all(" + this.jsonbTagsColumn + ", array[:hasTagIds])");
+            clauses.add("jsonb_exists_all(%s, array[:hasTagIds])".formatted(jsonbTagsColumn));
             params.put("hasTagIds", inclusiveFilterValues);
         }
 
-
-        final Set<String> exclusiveFilterValues = query.values().stream()
-                .filter(filter -> filter.getClass().equals(DoesNotHaveTag.class))
-                .map(filter -> ((DoesNotHaveTag) filter).value())
-                .collect(Collectors.toUnmodifiableSet());
         if (!exclusiveFilterValues.isEmpty()) {
-            clauses.add("NOT (jsonb_exists_any(" + this.jsonbTagsColumn + ", array[:doesNotHaveTagIds]))");
+            clauses.add("NOT (jsonb_exists_any(%s, array[:doesNotHaveTagIds]))".formatted(jsonbTagsColumn));
             params.put("doesNotHaveTagIds", exclusiveFilterValues);
         }
 
-        final List<HasOneOfTags> orFilters = query.values().stream()
-                .filter(filter -> filter.getClass().equals(HasOneOfTags.class))
-                .map(filter -> (HasOneOfTags) filter)
-                .toList();
-        if (!orFilters.isEmpty()) {
-            IntStream.range(0, orFilters.size()).forEach(index -> {
-                final String paramName = "hasOneOfTagIds" + index;
-                clauses.add("jsonb_exists_any(" + this.jsonbTagsColumn + ", array[:" + paramName + "])");
-                params.put(paramName, orFilters.get(index).value());
-            });
+        for (int i = 0; i < orFilters.size(); i++) {
+            var paramName = "hasOneOfTagIds" + i;
+            clauses.add("jsonb_exists_any(%s, array[:%s])".formatted(jsonbTagsColumn, paramName));
+            params.put(paramName, orFilters.get(i).value());
         }
 
         return Tuple.of(String.join(" AND ", clauses), params);

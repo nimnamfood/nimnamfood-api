@@ -20,7 +20,8 @@ public class BlobPublicUrl {
 
     public String toUrl() {
         final String encodedBlobName = URLEncoder.encode(this.blobName, StandardCharsets.UTF_8);
-        final String base = "https://firebasestorage.googleapis.com/v0/b/" + this.bucketName + "/o/" + encodedBlobName + "?alt=media";
+        final var base = "https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media"
+                .formatted(this.bucketName, encodedBlobName);
         return this.token != null ? base + "&token=" + this.token : base;
     }
 

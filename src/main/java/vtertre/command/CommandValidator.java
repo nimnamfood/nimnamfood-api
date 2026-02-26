@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Component
 @Order(1)
@@ -40,6 +39,6 @@ public class CommandValidator implements CommandMiddleware {
 
     private List<String> toMessages(Set<ConstraintViolation<Command<?>>> violations) {
         return violations.stream().map(
-                violation -> violation.getPropertyPath() + " " + violation.getMessage()).collect(Collectors.toList());
+                violation -> violation.getPropertyPath() + " " + violation.getMessage()).toList();
     }
 }

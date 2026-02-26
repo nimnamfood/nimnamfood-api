@@ -1,13 +1,5 @@
 package nimnamfood.web.converter;
 
-public abstract class TagFilter<T> {
-    protected final T value;
-
-    protected TagFilter(T value) {
-        this.value = value;
-    }
-
-    public T value() {
-        return value;
-    }
+public sealed interface TagFilter<T> permits HasTag, DoesNotHaveTag, HasOneOfTags {
+    T value();
 }
