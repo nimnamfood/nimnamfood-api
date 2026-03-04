@@ -15,9 +15,11 @@ import nimnamfood.model.recipe.RecipeRepository;
 import nimnamfood.model.tag.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 public class JdbcRepositories extends Repositories {
     private JdbcAggregateTemplate jdbcAggregateTemplate;
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private TagJdbcCrudRepository tagJdbcCrudRepository;
     private IngredientJdbcCrudRepository ingredientJdbcCrudRepository;
     private RecipeJdbcCrudRepository recipeJdbcCrudRepository;
@@ -35,7 +37,8 @@ public class JdbcRepositories extends Repositories {
 
     @Override
     protected RecipeRepository getRecipes() {
-        return new RecipeJdbcRepository(this.recipeJdbcCrudRepository, this.jdbcAggregateTemplate);
+        return new RecipeJdbcRepository(this.recipeJdbcCrudRepository, this.jdbcAggregateTemplate,
+                this.namedParameterJdbcTemplate);
     }
 
     @Override
@@ -46,6 +49,11 @@ public class JdbcRepositories extends Repositories {
     @Autowired
     public void setJdbcAggregateTemplate(JdbcAggregateTemplate jdbcAggregateTemplate) {
         this.jdbcAggregateTemplate = jdbcAggregateTemplate;
+    }
+
+    @Autowired
+    public void setNamedParameterJdbcTemplate(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
     @Autowired

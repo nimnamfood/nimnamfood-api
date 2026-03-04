@@ -59,6 +59,7 @@ src/
 │   │   ├── command/             # Commands and handlers (write side)
 │   │   │   ├── illustration/
 │   │   │   ├── ingredient/
+│   │   │   ├── plan/            # GeneratePlanCommand + handler, tag filter parts
 │   │   │   ├── recipe/
 │   │   │   └── tag/
 │   │   ├── infrastructure/repository/
@@ -80,7 +81,7 @@ src/
 │   │
 │   └── vtertre/                 # In-house DDD/CQRS/bus framework
 │       ├── command/             # Command, CommandBus, CommandHandler, CommandMiddleware
-│       ├── ddd/                 # AggregateRoot, Entity, Repository, DomainEvent, EventBus
+│       ├── ddd/                 # AggregateRoot, Entity, Repository, DomainEvent, EventBus, BusinessError
 │       ├── infrastructure/bus/  # Async command, event, and query bus implementations
 │       ├── infrastructure/persistence/ # Base JDBC/memory DBO and repository classes
 │       └── query/               # Query, QueryBus, QueryHandler, QueryHandlerJdbc
@@ -89,7 +90,7 @@ src/
 │   ├── application.properties           # Base config (virtual threads, Flyway, storage)
 │   ├── application-local.properties     # Local dev config (Docker PostgreSQL)
 │   ├── application-production.properties# Production config (env vars)
-│   ├── db/migration/postgresql/         # Flyway SQL migrations (V1–V10)
+│   ├── db/migration/postgresql/         # Flyway SQL migrations (V1–V11)
 │   └── logback.xml
 │
 └── test/java/
@@ -172,6 +173,7 @@ Four aggregate roots, each with a corresponding domain event for creation and (w
 | `GET` | `/tags` | List tags |
 | `POST` | `/tags` | Create a tag |
 | `POST` | `/illustrations` | Upload an illustration (multipart) |
+| `POST` | `/plans/generate` | Generate a meal plan with random recipes matching tag filters |
 | `GET` | `/plans/{id}` | Get a meal plan |
 
 ### Tag Filter Query Syntax (`?tags=`)
@@ -315,6 +317,7 @@ Two `ObjectMapper` beans:
 ### Exception Handling
 
 `NimnamfoodExceptionHandler` maps:
+- `BusinessError` → `400 Bad Request` with `{"error": "..."}`
 - `ValidationException` → `400 Bad Request` with `{"errors": [...]}`
 - `MissingAggregateRootException` → `404 Not Found` with `{"error": "..."}`
 - `DuplicateKeyException` → `400 Bad Request` with `{"error": "..."}`

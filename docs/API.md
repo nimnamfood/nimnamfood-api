@@ -493,6 +493,60 @@ Returns `404 Not Found` if no recipe exists with the given UUID.
 
 ### Plans
 
+#### `POST /plans/generate`
+
+Generate a new meal plan by randomly selecting recipes matching tag filters.
+
+**Request Body** (`application/json`):
+```json
+{
+  "globalTagFilters": {
+    "has": ["7c9e6679-7425-40de-944b-e07fc1f90ae7"],
+    "doesNotHave": ["3fa85f64-5717-4562-b3fc-2c963f66afa6"],
+    "hasOneOf": [
+      ["9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d", "6ba7b810-9dad-11d1-80b4-00c04fd430c8"]
+    ]
+  },
+  "meals": [
+    {
+      "mealIndex": 0,
+      "tagFilters": {
+        "has": ["1c9e6679-7425-40de-944b-e07fc1f90ae7"],
+        "doesNotHave": [],
+        "hasOneOf": []
+      }
+    },
+    {
+      "mealIndex": 1,
+      "tagFilters": {}
+    }
+  ]
+}
+```
+
+**Fields**:
+
+| Field                            | Type    | Required | Validation              | Description                                                      |
+|----------------------------------|---------|----------|-------------------------|------------------------------------------------------------------|
+| `globalTagFilters`               | object  | No       |                         | Global tag filters applied to all meals                          |
+| `tagFilters.has`                 | array   | No       | Each element: valid UUID | Recipe must have ALL of these tags                              |
+| `tagFilters.doesNotHave`         | array   | No       | Each element: valid UUID | Recipe must NOT have any of these tags                          |
+| `tagFilters.hasOneOf`            | array   | No       | Each element: array of valid UUIDs | For each group, recipe must have at least one tag   |
+| `meals`                          | array   | Yes      | Not empty               | List of meal slot configurations                                 |
+| `meals[].mealIndex`              | integer | Yes      | Not null, ≥ 0           | Position of the meal in the plan                                 |
+| `meals[].tagFilters`             | object  | No       |                         | Per-meal tag filters (same structure as global `tagFilters`). Combined with global filters using AND logic |
+
+For each meal, the handler combines global and per-meal tag filters, then selects a random recipe from matching results. Already-selected recipes are excluded from subsequent meals when possible (best-effort deduplication). If no recipe matches the filters for a given meal, the meal's `recipeId` is set to `null`.
+
+**Response** `201 Created`:
+```json
+{
+  "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+}
+```
+
+---
+
 #### `GET /plans/{id}`
 
 Retrieve a meal plan by its UUID.
@@ -523,6 +577,10 @@ Retrieve a meal plan by its UUID.
         "name": "Omelette",
         "illustrationUrl": null
       }
+    },
+    {
+      "mealIndex": 2,
+      "recipe": null
     }
   ]
 }
@@ -530,14 +588,14 @@ Retrieve a meal plan by its UUID.
 
 **Response Fields**:
 
-| Field                        | Type         | Description                            |
-|------------------------------|--------------|----------------------------------------|
-| `id`                         | UUID         | Unique identifier of the plan          |
-| `meals`                      | array        | Set of meal slots in this plan         |
-| `meals[].mealIndex`          | integer      | Slot index within the plan             |
-| `meals[].recipe`             | object       | Recipe assigned to this meal slot      |
-| `meals[].recipe.id`          | UUID         | Recipe identifier                      |
-| `meals[].recipe.name`        | string       | Recipe name                            |
+| Field                        | Type          | Description                            |
+|------------------------------|---------------|----------------------------------------|
+| `id`                         | UUID          | Unique identifier of the plan          |
+| `meals`                      | array         | Set of meal slots in this plan         |
+| `meals[].mealIndex`          | integer       | Slot index within the plan             |
+| `meals[].recipe`             | object\|null  | Recipe assigned to this meal slot, or `null` |
+| `meals[].recipe.id`          | UUID          | Recipe identifier                      |
+| `meals[].recipe.name`        | string        | Recipe name                            |
 | `meals[].recipe.illustrationUrl` | string\|null | Public URL of the recipe illustration, or `null` |
 
 Returns `404 Not Found` if no plan exists with the given UUID.

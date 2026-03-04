@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import vtertre.command.ValidationException;
+import vtertre.ddd.BusinessError;
 import vtertre.ddd.MissingAggregateRootException;
 
 import java.util.Collections;
@@ -23,14 +24,20 @@ public class NimnamfoodExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(MissingAggregateRootException.class)
-    public ResponseEntity<Map<String, String>> validationExceptionHandler(MissingAggregateRootException exception, WebRequest request) {
+    public ResponseEntity<Map<String, String>> missingAggregateRootExceptionHandler(MissingAggregateRootException exception, WebRequest request) {
         return new ResponseEntity<>(
                 Collections.singletonMap("error", exception.getMessage()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(DuplicateKeyException.class)
-    public ResponseEntity<Map<String, String>> validationExceptionHandler(DuplicateKeyException exception, WebRequest request) {
+    public ResponseEntity<Map<String, String>> duplicateKeyExceptionHandler(DuplicateKeyException exception, WebRequest request) {
         return new ResponseEntity<>(
                 Collections.singletonMap("error", exception.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BusinessError.class)
+    public ResponseEntity<Map<String, String>> validationExceptionHandler(BusinessError error, WebRequest request) {
+        return new ResponseEntity<>(
+                Collections.singletonMap("error", error.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }

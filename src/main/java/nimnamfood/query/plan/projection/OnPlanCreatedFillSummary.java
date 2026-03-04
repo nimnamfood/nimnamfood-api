@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import vtertre.ddd.event.EventCaptor;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -36,13 +37,22 @@ public class OnPlanCreatedFillSummary implements EventCaptor<PlanCreated> {
 
     @Override
     public void execute(PlanCreated event) {
-        final Iterable<Recipe> recipes = Repositories.recipes()
-                .getAllById(event.meals().stream().map(Meal::recipeId).collect(Collectors.toSet()));
+        final Set<UUID> recipeIds = event.meals().stream()
+                .map(Meal::recipeId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        final Iterable<Recipe> recipes = recipeIds.isEmpty()
+                ? Set.of()
+                : Repositories.recipes().getAllById(recipeIds);
         final Map<UUID, Recipe> recipesById = StreamSupport
                 .stream(recipes.spliterator(), false)
                 .collect(Collectors.toMap(Recipe::getId, recipe -> recipe));
 
         final Set<MealSummary> mealSummaries = event.meals().stream().map(meal -> {
+            if (meal.recipeId() == null) {
+                return new MealSummary(meal.mealIndex(), null);
+            }
+
             final Recipe recipe = recipesById.get(meal.recipeId());
             final String illustrationUrl = recipe.getIllustrationId() != null ?
                     this.recipeService.illustrationUrl(recipe.getIllustrationId()) : null;
