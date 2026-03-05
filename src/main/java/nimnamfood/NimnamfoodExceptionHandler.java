@@ -32,7 +32,7 @@ public class NimnamfoodExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(DuplicateKeyException.class)
     public ResponseEntity<Map<String, String>> duplicateKeyExceptionHandler(DuplicateKeyException exception, WebRequest request) {
         return new ResponseEntity<>(
-                Collections.singletonMap("error", exception.getMessage()), HttpStatus.BAD_REQUEST);
+                Collections.singletonMap("error", "DUPLICATE_IDENTIFIER"), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BusinessError.class)
