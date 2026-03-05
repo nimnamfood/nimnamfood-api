@@ -1,5 +1,3 @@
-package bin;
-
 import nimnamfood.NimnamfoodApiApplication;
 import org.springframework.boot.SpringApplication;
 
