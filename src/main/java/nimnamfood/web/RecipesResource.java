@@ -2,8 +2,8 @@ package nimnamfood.web;
 
 import nimnamfood.command.recipe.CreateRecipeCommand;
 import nimnamfood.query.recipe.FindRecipes;
-import nimnamfood.web.converter.TagFilterQuery;
 import nimnamfood.query.recipe.model.RecipeSearchSummary;
+import nimnamfood.web.converter.TagFilterQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +45,6 @@ public class RecipesResource {
             @RequestParam(required = false) Integer limit) {
         return this.queryBus.dispatch(new FindRecipes(query, tagFilterQuery)
                 .skip(skip != null ? Math.max(skip, 0) : 0)
-                .limit(limit != null ? Math.clamp(limit, 0, MAX_SEARCH_RESULT) : 0));
+                .limit(limit != null ? Math.clamp(limit, 0, MAX_SEARCH_RESULT) : MAX_SEARCH_RESULT));
     }
 }

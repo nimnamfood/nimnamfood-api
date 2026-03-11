@@ -2,7 +2,7 @@ package nimnamfood.query.plan.projection;
 
 import com.google.common.collect.ImmutableSet;
 import nimnamfood.model.recipe.RecipeChanged;
-import nimnamfood.query.plan.PlanViewTestHelper;
+import nimnamfood.query.plan.PlansViewTestHelper;
 import nimnamfood.query.plan.model.MealRecipeSummary;
 import nimnamfood.query.plan.model.MealSummary;
 import nimnamfood.query.plan.model.PlanSummary;
@@ -19,10 +19,10 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Import(PlanViewTestHelper.class)
+@Import(PlansViewTestHelper.class)
 class OnRecipeChangedUpdatePlanSummaryTest extends PostgresTestContainerBase {
     @Autowired
-    PlanViewTestHelper view;
+    PlansViewTestHelper view;
     @Autowired
     JdbcClient client;
 

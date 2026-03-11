@@ -8,7 +8,7 @@ import nimnamfood.model.plan.Meal;
 import nimnamfood.model.plan.PlanCreated;
 import nimnamfood.model.recipe.Recipe;
 import nimnamfood.query.ObjectMapperFactory;
-import nimnamfood.query.plan.PlanViewTestHelper;
+import nimnamfood.query.plan.PlansViewTestHelper;
 import nimnamfood.query.plan.model.PlanSummary;
 import nimnamfood.service.RecipeService;
 import org.junit.jupiter.api.Test;
@@ -25,10 +25,10 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith({WithJdbcRepositories.class})
-@Import(PlanViewTestHelper.class)
+@Import(PlansViewTestHelper.class)
 class OnPlanCreatedFillSummaryTest extends PostgresTestContainerBase {
     @Autowired
-    PlanViewTestHelper view;
+    PlansViewTestHelper view;
     @Autowired
     JdbcClient client;
 

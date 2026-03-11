@@ -18,10 +18,10 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-@Import(PlanViewTestHelper.class)
+@Import(PlansViewTestHelper.class)
 public class GetPlanHandlerTest extends PostgresTestContainerBase {
     @Autowired
-    PlanViewTestHelper view;
+    PlansViewTestHelper view;
     @Autowired
     NamedParameterJdbcTemplate template;
 

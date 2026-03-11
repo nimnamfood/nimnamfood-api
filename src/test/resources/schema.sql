@@ -121,6 +121,13 @@ create table view_recipes
     tags           jsonb    not null
 );
 
+drop table if exists view_plan_search;
+create table view_plan_search
+(
+    id         uuid primary key,
+    created_at timestamp not null
+);
+
 drop table if exists view_plans;
 create table view_plans
 (
