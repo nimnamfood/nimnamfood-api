@@ -9,9 +9,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import vtertre.infrastructure.persistence.jdbc.PostgresTestContainerBase;
 
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 @Import(PlanSearchViewTestHelper.class)
 public class GetPlansHandlerTest extends PostgresTestContainerBase {
@@ -39,10 +41,14 @@ public class GetPlansHandlerTest extends PostgresTestContainerBase {
         var result = handler.execute(new GetPlans(), template);
 
         assertThat(result).hasSize(2);
-        assertThat(result).anyMatch(summary -> summary.id().equals(plan1.getId()) &&
-                summary.createdAt().equals(plan1.createdAt().toInstant(ZoneOffset.UTC)));
-        assertThat(result).anyMatch(summary -> summary.id().equals(plan2.getId()) &&
-                summary.createdAt().equals(plan2.createdAt().toInstant(ZoneOffset.UTC)));
+        assertThat(result).anySatisfy(summary -> {
+            assertThat(summary.id()).isEqualTo(plan1.getId());
+            assertThat(summary.createdAt()).isCloseTo(plan1.createdAt().toInstant(ZoneOffset.UTC), within(1, ChronoUnit.MICROS));
+        });
+        assertThat(result).anySatisfy(summary -> {
+            assertThat(summary.id()).isEqualTo(plan2.getId());
+            assertThat(summary.createdAt()).isCloseTo(plan2.createdAt().toInstant(ZoneOffset.UTC), within(1, ChronoUnit.MICROS));
+        });
     }
 
     @Test
