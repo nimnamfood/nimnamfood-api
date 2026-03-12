@@ -6,8 +6,7 @@ import nimnamfood.infrastructure.repository.jdbc.recipe.RecipeTagDbo;
 import vtertre.ddd.BaseAggregateRootWithUuid;
 import vtertre.ddd.Tuple;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
@@ -20,7 +19,7 @@ public class Recipe extends BaseAggregateRootWithUuid {
     private final String instructions;
     private final Set<RecipeIngredient> ingredients;
     private final Set<UUID> tagIds;
-    private final LocalDateTime creationDateTime;
+    private final Instant creationDateTime;
 
     public static Factory factory() {
         return new Factory();
@@ -34,11 +33,11 @@ public class Recipe extends BaseAggregateRootWithUuid {
         this.ingredients = ingredients;
         this.instructions = instructions;
         this.tagIds = tagIds;
-        this.creationDateTime = LocalDateTime.now(ZoneOffset.UTC);
+        this.creationDateTime = Instant.now();
     }
 
     private Recipe(UUID id, String name, UUID illustrationId, int portionsCount, Set<RecipeIngredient> ingredients,
-                   String instructions, Set<UUID> tagIds, LocalDateTime creationDateTime) {
+                   String instructions, Set<UUID> tagIds, Instant creationDateTime) {
         super(id);
         this.name = name;
         this.illustrationId = illustrationId;
@@ -125,7 +124,7 @@ public class Recipe extends BaseAggregateRootWithUuid {
         return this.tagIds;
     }
 
-    public LocalDateTime getCreationDateTime() {
+    public Instant getCreationDateTime() {
         return this.creationDateTime;
     }
 }

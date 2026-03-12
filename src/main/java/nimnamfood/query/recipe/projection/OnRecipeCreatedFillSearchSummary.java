@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
 import vtertre.ddd.event.EventCaptor;
 
+import java.time.ZoneOffset;
+
 @Component
 public class OnRecipeCreatedFillSearchSummary implements EventCaptor<RecipeCreated> {
     private final JdbcClient client;
@@ -29,7 +31,7 @@ public class OnRecipeCreatedFillSearchSummary implements EventCaptor<RecipeCreat
                 .param("id", event.id())
                 .param("name", event.name())
                 .param("illustrationUrl", illustrationUrl)
-                .param("creationDateTime", event.creationDateTime())
+                .param("creationDateTime", event.creationDateTime().atOffset(ZoneOffset.UTC))
                 .param("tagIds", event.tagIds())
                 .update();
     }

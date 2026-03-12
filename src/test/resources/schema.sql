@@ -45,19 +45,19 @@ drop table if exists recipes cascade;
 create table recipes
 (
     id                 uuid primary key,
-    name               text      not null,
-    illustration_id    uuid      null,
-    portions_count     smallint  not null,
-    instructions       text      not null,
-    creation_date_time timestamp not null
+    name               text        not null,
+    illustration_id    uuid        null,
+    portions_count     smallint    not null,
+    instructions       text        not null,
+    creation_date_time timestamptz not null
 );
 
 drop table if exists plans cascade;
 create table plans
 (
     id         uuid primary key,
-    created_at timestamp not null,
-    updated_at timestamp not null
+    created_at timestamptz not null,
+    updated_at timestamptz not null
 );
 
 drop table if exists meals;
@@ -96,10 +96,10 @@ drop table if exists view_recipe_search;
 create table view_recipe_search
 (
     id                 uuid primary key,
-    name               text      not null,
-    illustration_url   text      null,
-    creation_date_time timestamp not null,
-    tags               jsonb     not null
+    name               text        not null,
+    illustration_url   text        null,
+    creation_date_time timestamptz not null,
+    tags               jsonb       not null
 );
 
 drop table if exists view_part_recipe_ingredients;
@@ -125,7 +125,7 @@ drop table if exists view_plan_search;
 create table view_plan_search
 (
     id         uuid primary key,
-    created_at timestamp not null
+    created_at timestamptz not null
 );
 
 drop table if exists view_plans;

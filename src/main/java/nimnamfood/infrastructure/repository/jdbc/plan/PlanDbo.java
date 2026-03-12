@@ -7,14 +7,14 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 import vtertre.infrastructure.persistence.jdbc.BaseJdbcDboWithUuid;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Table("plans")
 public class PlanDbo extends BaseJdbcDboWithUuid<Plan> {
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+    Instant createdAt;
+    Instant updatedAt;
 
     @MappedCollection(idColumn = "plan_id")
     Set<MealDbo> meals = Sets.newHashSet();
@@ -28,19 +28,19 @@ public class PlanDbo extends BaseJdbcDboWithUuid<Plan> {
         return new Plan(this.getId(), this.createdAt, this.updatedAt, meals);
     }
 
-    public LocalDateTime createdAt() {
+    public Instant createdAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime updatedAt() {
+    public Instant updatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 

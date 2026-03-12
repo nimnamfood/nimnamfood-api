@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import vtertre.infrastructure.persistence.jdbc.PostgresTestContainerBase;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +44,7 @@ class OnPlanCreatedFillSummaryTest extends PostgresTestContainerBase {
         Mockito.when(recipeService.illustrationUrl(recipe.getIllustrationId())).thenReturn("url");
 
         Meal meal = new Meal(0, recipe.getId());
-        PlanCreated event = new PlanCreated(UUID.randomUUID(), LocalDateTime.now(), ImmutableSet.of(meal));
+        PlanCreated event = new PlanCreated(UUID.randomUUID(), Instant.now(), ImmutableSet.of(meal));
 
         captor.execute(event);
 
@@ -64,7 +64,7 @@ class OnPlanCreatedFillSummaryTest extends PostgresTestContainerBase {
     void mealsCanBeEmpty() {
         OnPlanCreatedFillSummary captor = new OnPlanCreatedFillSummary(client, recipeService, mapper);
 
-        PlanCreated event = new PlanCreated(UUID.randomUUID(), LocalDateTime.now(), ImmutableSet.of());
+        PlanCreated event = new PlanCreated(UUID.randomUUID(), Instant.now(), ImmutableSet.of());
 
         captor.execute(event);
 

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ public class PlanSearchViewTestHelper {
     public void insert(Plan... plans) {
         this.template.batchUpdate(
                 "insert into view_plan_search values (:id, :createdAt)",
-                Arrays.stream(plans).map(p -> Map.of("id", p.getId(), "createdAt", p.createdAt())).toArray(Map[]::new)
+                Arrays.stream(plans).map(p -> Map.of("id", p.getId(), "createdAt", p.createdAt().atOffset(ZoneOffset.UTC))).toArray(Map[]::new)
         );
     }
 }

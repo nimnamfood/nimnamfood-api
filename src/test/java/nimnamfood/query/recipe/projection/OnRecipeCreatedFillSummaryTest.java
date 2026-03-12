@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import vtertre.infrastructure.persistence.jdbc.PostgresTestContainerBase;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,7 +51,7 @@ class OnRecipeCreatedFillSummaryTest extends PostgresTestContainerBase {
         view.insertIngredients(ingredient);
         RecipeIngredient ri = new RecipeIngredient(ingredient.getId(), 10.5f, IngredientUnit.GRAM);
         RecipeCreated event = new RecipeCreated(UUID.randomUUID(), "recette", UUID.randomUUID(), 1,
-                "instructions", ImmutableSet.of(ri), ImmutableSet.of(tag.getId()), LocalDateTime.now());
+                "instructions", ImmutableSet.of(ri), ImmutableSet.of(tag.getId()), Instant.now());
         Mockito.when(recipeService.illustrationUrl(event.illustrationId())).thenReturn("url");
 
         handler.execute(event);
@@ -78,7 +78,7 @@ class OnRecipeCreatedFillSummaryTest extends PostgresTestContainerBase {
     @Test
     void ingredientsCanBeEmpty() {
         RecipeCreated event = new RecipeCreated(UUID.randomUUID(), "recette", UUID.randomUUID(), 1,
-                "instructions", ImmutableSet.of(), ImmutableSet.of(), LocalDateTime.now());
+                "instructions", ImmutableSet.of(), ImmutableSet.of(), Instant.now());
         Mockito.when(recipeService.illustrationUrl(event.illustrationId())).thenReturn("url");
 
         handler.execute(event);
@@ -93,7 +93,7 @@ class OnRecipeCreatedFillSummaryTest extends PostgresTestContainerBase {
         view.insertIngredients(ingredient);
         RecipeIngredient ri = new RecipeIngredient(ingredient.getId(), 10.5f, IngredientUnit.GRAM);
         RecipeCreated event = new RecipeCreated(UUID.randomUUID(), "recette", UUID.randomUUID(), 1,
-                "instructions", ImmutableSet.of(ri), ImmutableSet.of(), LocalDateTime.now());
+                "instructions", ImmutableSet.of(ri), ImmutableSet.of(), Instant.now());
         Mockito.when(recipeService.illustrationUrl(event.illustrationId())).thenReturn("url");
 
         handler.execute(event);
@@ -108,7 +108,7 @@ class OnRecipeCreatedFillSummaryTest extends PostgresTestContainerBase {
         view.insertIngredients(ingredient);
         RecipeIngredient ri = new RecipeIngredient(ingredient.getId(), 10.5f, IngredientUnit.GRAM);
         RecipeCreated event = new RecipeCreated(UUID.randomUUID(), "recette", null, 1,
-                "instructions", ImmutableSet.of(ri), ImmutableSet.of(), LocalDateTime.now());
+                "instructions", ImmutableSet.of(ri), ImmutableSet.of(), Instant.now());
 
         handler.execute(event);
         RecipeSummaryInspector inspector = view.findRecipe(event.id());

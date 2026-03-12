@@ -5,14 +5,13 @@ import vtertre.ddd.BaseAggregateRootWithUuid;
 import vtertre.ddd.BusinessError;
 import vtertre.ddd.Tuple;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
 public class Plan extends BaseAggregateRootWithUuid {
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+    private final Instant createdAt;
+    private final Instant updatedAt;
     private final Set<Meal> meals;
 
     public static Factory factory() {
@@ -20,13 +19,13 @@ public class Plan extends BaseAggregateRootWithUuid {
     }
 
     public Plan(Set<Meal> meals) {
-        final LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC);
-        this.createdAt = localDateTime;
-        this.updatedAt = localDateTime;
+        final Instant instant = Instant.now();
+        this.createdAt = instant;
+        this.updatedAt = instant;
         this.meals = meals;
     }
 
-    public Plan(UUID id, LocalDateTime createdAt, LocalDateTime updatedAt, Set<Meal> meals) {
+    public Plan(UUID id, Instant createdAt, Instant updatedAt, Set<Meal> meals) {
         super(id);
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -45,11 +44,11 @@ public class Plan extends BaseAggregateRootWithUuid {
         }
     }
 
-    public LocalDateTime createdAt() {
+    public Instant createdAt() {
         return this.createdAt;
     }
 
-    public LocalDateTime updatedAt() {
+    public Instant updatedAt() {
         return this.updatedAt;
     }
 

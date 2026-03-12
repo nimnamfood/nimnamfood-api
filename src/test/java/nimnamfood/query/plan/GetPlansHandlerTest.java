@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import vtertre.infrastructure.persistence.jdbc.PostgresTestContainerBase;
 
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
 
@@ -43,11 +42,11 @@ public class GetPlansHandlerTest extends PostgresTestContainerBase {
         assertThat(result).hasSize(2);
         assertThat(result).anySatisfy(summary -> {
             assertThat(summary.id()).isEqualTo(plan1.getId());
-            assertThat(summary.createdAt()).isCloseTo(plan1.createdAt().toInstant(ZoneOffset.UTC), within(1, ChronoUnit.MICROS));
+            assertThat(summary.createdAt()).isCloseTo(plan1.createdAt(), within(1, ChronoUnit.MICROS));
         });
         assertThat(result).anySatisfy(summary -> {
             assertThat(summary.id()).isEqualTo(plan2.getId());
-            assertThat(summary.createdAt()).isCloseTo(plan2.createdAt().toInstant(ZoneOffset.UTC), within(1, ChronoUnit.MICROS));
+            assertThat(summary.createdAt()).isCloseTo(plan2.createdAt(), within(1, ChronoUnit.MICROS));
         });
     }
 

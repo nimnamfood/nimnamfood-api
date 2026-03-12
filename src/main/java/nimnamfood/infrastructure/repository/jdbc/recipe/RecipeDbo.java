@@ -6,7 +6,7 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 import vtertre.infrastructure.persistence.jdbc.BaseJdbcDboWithUuid;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
@@ -16,7 +16,7 @@ public class RecipeDbo extends BaseJdbcDboWithUuid<Recipe> {
     UUID illustrationId;
     Integer portionsCount;
     String instructions;
-    LocalDateTime creationDateTime;
+    Instant creationDateTime;
 
     @MappedCollection(idColumn = "recipe_id")
     Set<RecipeIngredientDbo> ingredients = Sets.newHashSet();
@@ -76,11 +76,11 @@ public class RecipeDbo extends BaseJdbcDboWithUuid<Recipe> {
         this.ingredients = ingredients;
     }
 
-    public LocalDateTime getCreationDateTime() {
+    public Instant getCreationDateTime() {
         return creationDateTime;
     }
 
-    public void setCreationDateTime(LocalDateTime creationDateTime) {
+    public void setCreationDateTime(Instant creationDateTime) {
         this.creationDateTime = creationDateTime;
     }
 }

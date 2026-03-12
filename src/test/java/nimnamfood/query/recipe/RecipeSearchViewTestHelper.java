@@ -14,7 +14,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -61,7 +62,7 @@ public class RecipeSearchViewTestHelper {
                             put("id", r.getId());
                             put("name", r.getName());
                             put("illustrationUrl", r.getIllustrationId() != null ? "url:" + r.getIllustrationId() : null);
-                            put("creationDateTime", r.getCreationDateTime());
+                            put("creationDateTime", r.getCreationDateTime().atOffset(ZoneOffset.UTC));
                             put("tagIds", r.getTagIds());
                         }}
                 );
@@ -76,7 +77,7 @@ public class RecipeSearchViewTestHelper {
                         put("id", r.getId());
                         put("name", r.getName());
                         put("illustrationUrl", r.getIllustrationId() != null ? "url:" + r.getIllustrationId() : null);
-                        put("creationDateTime", r.getCreationDateTime());
+                        put("creationDateTime", r.getCreationDateTime().atOffset(ZoneOffset.UTC));
                     }}).toArray(Map[]::new)
             );
         }
@@ -96,7 +97,7 @@ public class RecipeSearchViewTestHelper {
                                 resultSet.getObject("id", UUID.class),
                                 resultSet.getString("name"),
                                 resultSet.getString("illustration_url"),
-                                resultSet.getObject("creation_date_time", LocalDateTime.class),
+                                resultSet.getObject("creation_date_time", OffsetDateTime.class).toInstant(),
                                 mapper.readValue(resultSet.getString("tags"), new TypeReference<>() {
                                 })
                         );

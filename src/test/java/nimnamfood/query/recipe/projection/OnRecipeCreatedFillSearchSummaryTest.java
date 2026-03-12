@@ -13,11 +13,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import vtertre.infrastructure.persistence.jdbc.PostgresTestContainerBase;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 @Import(RecipeSearchViewTestHelper.class)
 class OnRecipeCreatedFillSearchSummaryTest extends PostgresTestContainerBase {
@@ -36,7 +37,7 @@ class OnRecipeCreatedFillSearchSummaryTest extends PostgresTestContainerBase {
         Tag tag3 = Tag.factory().create("3")._1;
         searchView.insertTags(tag2, tag1, tag3);
         RecipeCreated event = new RecipeCreated(UUID.randomUUID(), "recette", UUID.randomUUID(), 1,
-                "", ImmutableSet.of(), ImmutableSet.of(tag2.getId(), tag1.getId()), LocalDateTime.now());
+                "", ImmutableSet.of(), ImmutableSet.of(tag2.getId(), tag1.getId()), Instant.now());
         Mockito.when(recipeService.illustrationUrl(event.illustrationId())).thenReturn("url");
 
         new OnRecipeCreatedFillSearchSummary(client, recipeService).execute(event);
@@ -60,7 +61,7 @@ class OnRecipeCreatedFillSearchSummaryTest extends PostgresTestContainerBase {
     @Test
     void tagsCanBeEmpty() {
         RecipeCreated event = new RecipeCreated(UUID.randomUUID(), "recette", UUID.randomUUID(), 1,
-                "", ImmutableSet.of(), ImmutableSet.of(), LocalDateTime.now());
+                "", ImmutableSet.of(), ImmutableSet.of(), Instant.now());
 
         new OnRecipeCreatedFillSearchSummary(client, recipeService).execute(event);
         RecipeSearchSummaryInspector inspector = searchView.findRecipe(event.id());
@@ -71,7 +72,7 @@ class OnRecipeCreatedFillSearchSummaryTest extends PostgresTestContainerBase {
     @Test
     void illustrationUrlCanBeNull() {
         RecipeCreated event = new RecipeCreated(UUID.randomUUID(), "", null, 1,
-                "", ImmutableSet.of(), ImmutableSet.of(), LocalDateTime.now());
+                "", ImmutableSet.of(), ImmutableSet.of(), Instant.now());
 
         new OnRecipeCreatedFillSearchSummary(client, recipeService).execute(event);
         RecipeSearchSummaryInspector inspector = searchView.findRecipe(event.id());

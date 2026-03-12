@@ -13,12 +13,16 @@ import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import vtertre.infrastructure.persistence.jdbc.PostgresTestContainerBase;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 public class RecipeJdbcRepositoryTest extends PostgresTestContainerBase {
     @Autowired
@@ -55,7 +59,7 @@ public class RecipeJdbcRepositoryTest extends PostgresTestContainerBase {
         recipeDbo.setIllustrationId(UUID.randomUUID());
         recipeDbo.setPortionsCount(2);
         recipeDbo.setInstructions("instructions");
-        recipeDbo.setCreationDateTime(LocalDateTime.now());
+        recipeDbo.setCreationDateTime(Instant.now());
         recipeDbo.setTags(Set.of(recipeTagDbo));
         recipeDbo.setIngredients(Set.of(recipeIngredientDbo));
 
@@ -229,7 +233,7 @@ public class RecipeJdbcRepositoryTest extends PostgresTestContainerBase {
         recipe.setName(name);
         recipe.setPortionsCount(1);
         recipe.setInstructions("instructions");
-        recipe.setCreationDateTime(LocalDateTime.now());
+        recipe.setCreationDateTime(Instant.now());
         recipe.setTags(tags.stream().map(tag -> {
             RecipeTagDbo recipeTag = new RecipeTagDbo();
             recipeTag.setTagId(tag.getId());

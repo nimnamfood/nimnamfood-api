@@ -1,6 +1,9 @@
 package nimnamfood.infrastructure.repository.jdbc;
 
-import nimnamfood.infrastructure.repository.jdbc.plan.*;
+import nimnamfood.infrastructure.repository.jdbc.plan.MealDbo;
+import nimnamfood.infrastructure.repository.jdbc.plan.PlanDbo;
+import nimnamfood.infrastructure.repository.jdbc.plan.PlanJdbcCrudRepository;
+import nimnamfood.infrastructure.repository.jdbc.plan.PlanJdbcRepository;
 import nimnamfood.model.plan.Meal;
 import nimnamfood.model.plan.Plan;
 import org.junit.jupiter.api.Test;
@@ -8,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import vtertre.infrastructure.persistence.jdbc.PostgresTestContainerBase;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Set;
@@ -33,8 +36,8 @@ public class PlanJdbcRepositoryTest extends PostgresTestContainerBase {
 
         PlanDbo planDbo = new PlanDbo();
         planDbo.setId(UUID.randomUUID());
-        planDbo.setCreatedAt(LocalDateTime.now());
-        planDbo.setUpdatedAt(LocalDateTime.now());
+        planDbo.setCreatedAt(Instant.now());
+        planDbo.setUpdatedAt(Instant.now());
         planDbo.setMeals(Set.of(mealDbo));
         this.jdbcAggregateTemplate.insert(planDbo);
 
